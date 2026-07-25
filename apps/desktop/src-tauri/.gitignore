@@ -1,0 +1,8 @@
+# Tauri build artifacts
+target/
+gen/
+
+# Icon placeholder — replace with real assets before shipping.
+icons/*.png
+icons/*.icns
+icons/*.ico

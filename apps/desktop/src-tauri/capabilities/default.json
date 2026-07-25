@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.tauri.app/config/2.0.0-rc",
+  "identifier": "default",
+  "description": "default capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "shell:allow-execute"
+  ]
+}

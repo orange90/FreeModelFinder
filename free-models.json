@@ -1,0 +1,102 @@
+{
+  "$schema": "./free-models.schema.json",
+  "generatedAt": "2026-07-24",
+  "providers": [
+    {
+      "id": "openrouter",
+      "label": "OpenRouter",
+      "homepage": "https://openrouter.ai",
+      "apiBaseUrl": "https://openrouter.ai/api/v1",
+      "keyUrl": "https://openrouter.ai/keys",
+      "limits": "免费模型：约 20 req/min、200 req/day；账户余额 > $10 可提升上限",
+      "models": [
+        { "name": "meta-llama/llama-3.1-8b-instruct:free", "family": "Llama", "contextK": 131, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 90, "modality": "text", "intelligenceIndex": 41, "arenaElo": 1176 },
+        { "name": "meta-llama/llama-3.3-70b-instruct:free", "family": "Llama", "contextK": 131, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 40, "modality": "text", "intelligenceIndex": 68, "arenaElo": 1260 },
+        { "name": "deepseek/deepseek-r1:free", "family": "DeepSeek", "contextK": 163, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 25, "modality": "reasoning", "intelligenceIndex": 89, "arenaElo": 1361 },
+        { "name": "deepseek/deepseek-chat-v3:free", "family": "DeepSeek", "contextK": 163, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 35, "modality": "text", "intelligenceIndex": 80, "arenaElo": 1318 },
+        { "name": "qwen/qwen-2.5-72b-instruct:free", "family": "Qwen", "contextK": 32, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 30, "modality": "text", "intelligenceIndex": 72, "arenaElo": 1257 },
+        { "name": "google/gemma-2-9b-it:free", "family": "Gemma", "contextK": 8, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 80, "modality": "text", "intelligenceIndex": 40, "arenaElo": 1190 },
+        { "name": "mistralai/mistral-7b-instruct:free", "family": "Mistral", "contextK": 32, "reqPerMin": 20, "reqPerDay": 200, "throughputTps": 90, "modality": "text", "intelligenceIndex": 30, "arenaElo": 1072 }
+      ]
+    },
+    {
+      "id": "gemini",
+      "label": "Google Gemini (AI Studio)",
+      "homepage": "https://aistudio.google.com",
+      "apiBaseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "keyUrl": "https://aistudio.google.com/apikey",
+      "limits": "Flash 15 RPM / 1500 RPD；Pro 2 RPM / 50 RPD",
+      "models": [
+        { "name": "gemini-2.0-flash", "family": "Gemini", "contextK": 1000, "reqPerMin": 15, "reqPerDay": 1500, "throughputTps": 200, "modality": "vision", "intelligenceIndex": 73, "arenaElo": 1355 },
+        { "name": "gemini-2.0-flash-lite", "family": "Gemini", "contextK": 1000, "reqPerMin": 30, "reqPerDay": 1500, "throughputTps": 250, "modality": "text", "intelligenceIndex": 65, "arenaElo": 1310 },
+        { "name": "gemini-1.5-flash", "family": "Gemini", "contextK": 1000, "reqPerMin": 15, "reqPerDay": 1500, "throughputTps": 180, "modality": "vision", "intelligenceIndex": 60, "arenaElo": 1271 },
+        { "name": "gemini-1.5-flash-8b", "family": "Gemini", "contextK": 1000, "reqPerMin": 15, "reqPerDay": 1500, "throughputTps": 220, "modality": "text", "intelligenceIndex": 52, "arenaElo": 1211 },
+        { "name": "gemini-1.5-pro", "family": "Gemini", "contextK": 2000, "reqPerMin": 2, "reqPerDay": 50, "throughputTps": 60, "modality": "vision", "intelligenceIndex": 71, "arenaElo": 1301 }
+      ]
+    },
+    {
+      "id": "siliconflow",
+      "label": "硅基流动 SiliconFlow",
+      "homepage": "https://siliconflow.cn",
+      "apiBaseUrl": "https://api.siliconflow.cn/v1",
+      "keyUrl": "https://cloud.siliconflow.cn/account/ak",
+      "limits": "免费模型共享公用队列，高峰期可能排队；具体以控制台公告为准",
+      "models": [
+        { "name": "Qwen/Qwen2.5-7B-Instruct", "family": "Qwen", "contextK": 32, "throughputTps": 60, "modality": "text", "intelligenceIndex": 45, "arenaElo": 1180 },
+        { "name": "Qwen/Qwen3-8B", "family": "Qwen", "contextK": 32, "throughputTps": 60, "modality": "text", "intelligenceIndex": 55, "arenaElo": 1220 },
+        { "name": "Qwen/Qwen2.5-Coder-7B-Instruct", "family": "Qwen", "contextK": 32, "throughputTps": 55, "modality": "text", "intelligenceIndex": 48, "arenaElo": 1190 },
+        { "name": "THUDM/GLM-4-9B-0414", "family": "GLM", "contextK": 32, "throughputTps": 55, "modality": "text", "intelligenceIndex": 52, "arenaElo": 1210 },
+        { "name": "THUDM/GLM-Z1-9B-0414", "family": "GLM", "contextK": 32, "throughputTps": 40, "modality": "reasoning", "intelligenceIndex": 60, "arenaElo": 1240 },
+        { "name": "THUDM/GLM-4-Flash", "family": "GLM", "contextK": 128, "throughputTps": 90, "modality": "text", "intelligenceIndex": 50, "arenaElo": 1205 },
+        { "name": "tencent/Hunyuan-MT-7B", "family": "Hunyuan", "contextK": 32, "throughputTps": 60, "modality": "text", "intelligenceIndex": 42, "arenaElo": 1160 }
+      ]
+    },
+    {
+      "id": "cohere",
+      "label": "Cohere",
+      "homepage": "https://cohere.com",
+      "apiBaseUrl": "https://api.cohere.ai/compatibility/v1",
+      "keyUrl": "https://dashboard.cohere.com/api-keys",
+      "limits": "Trial Key 免费 fair-use 约 20 RPM，仅用于开发测试",
+      "models": [
+        { "name": "command-a-reasoning-08-2025", "family": "Command", "contextK": 256, "reqPerMin": 20, "throughputTps": 45, "modality": "reasoning", "intelligenceIndex": 78, "arenaElo": 1305 },
+        { "name": "command-a-vision-07-2025", "family": "Command", "contextK": 128, "reqPerMin": 20, "throughputTps": 55, "modality": "vision", "intelligenceIndex": 72, "arenaElo": 1280 },
+        { "name": "command-r-plus-08-2024", "family": "Command", "contextK": 128, "reqPerMin": 20, "throughputTps": 50, "modality": "text", "intelligenceIndex": 65, "arenaElo": 1255 },
+        { "name": "command-r-08-2024", "family": "Command", "contextK": 128, "reqPerMin": 20, "throughputTps": 80, "modality": "text", "intelligenceIndex": 55, "arenaElo": 1210 },
+        { "name": "command-r7b-12-2024", "family": "Command", "contextK": 128, "reqPerMin": 20, "throughputTps": 120, "modality": "text", "intelligenceIndex": 42, "arenaElo": 1150 }
+      ]
+    },
+    {
+      "id": "huggingface",
+      "label": "HuggingFace Router",
+      "homepage": "https://huggingface.co",
+      "apiBaseUrl": "https://router.huggingface.co/v1",
+      "keyUrl": "https://huggingface.co/settings/tokens",
+      "limits": "免费层约 300 requests/hour，跨模型共享",
+      "models": [
+        { "name": "deepseek-ai/DeepSeek-V3-0324", "family": "DeepSeek", "contextK": 128, "throughputTps": 30, "modality": "text", "intelligenceIndex": 82, "arenaElo": 1330 },
+        { "name": "deepseek-ai/DeepSeek-R1-0528", "family": "DeepSeek", "contextK": 128, "throughputTps": 25, "modality": "reasoning", "intelligenceIndex": 90, "arenaElo": 1370 },
+        { "name": "meta-llama/Llama-3.3-70B-Instruct", "family": "Llama", "contextK": 128, "throughputTps": 40, "modality": "text", "intelligenceIndex": 68, "arenaElo": 1260 },
+        { "name": "Qwen/Qwen2.5-72B-Instruct", "family": "Qwen", "contextK": 32, "throughputTps": 35, "modality": "text", "intelligenceIndex": 72, "arenaElo": 1257 },
+        { "name": "Qwen/Qwen2.5-Coder-32B-Instruct", "family": "Qwen", "contextK": 32, "throughputTps": 40, "modality": "text", "intelligenceIndex": 65, "arenaElo": 1230 },
+        { "name": "zai-org/GLM-4.5", "family": "GLM", "contextK": 128, "throughputTps": 40, "modality": "text", "intelligenceIndex": 75, "arenaElo": 1290 },
+        { "name": "moonshotai/Kimi-K2-Instruct", "family": "Kimi", "contextK": 128, "throughputTps": 45, "modality": "text", "intelligenceIndex": 70, "arenaElo": 1275 },
+        { "name": "google/gemma-3-27b-it", "family": "Gemma", "contextK": 128, "throughputTps": 55, "modality": "text", "intelligenceIndex": 58, "arenaElo": 1230 },
+        { "name": "MiniMaxAI/MiniMax-M1-80k", "family": "MiniMax", "contextK": 80, "throughputTps": 40, "modality": "text", "intelligenceIndex": 62, "arenaElo": 1240 }
+      ]
+    },
+    {
+      "id": "sensenova",
+      "label": "SenseNova (商汤)",
+      "homepage": "https://platform.sensenova.cn",
+      "apiBaseUrl": "https://token.sensenova.cn/v1",
+      "keyUrl": "https://platform.sensenova.cn",
+      "limits": "公测免费额度：sensenova-6.7-flash-lite 约 1500 请求 / 5 小时，deepseek-v4-flash 约 500 请求 / 5 小时",
+      "models": [
+        { "name": "sensenova-6.7-flash-lite", "family": "SenseNova", "contextK": 256, "reqPerMin": 5, "throughputTps": 40, "modality": "text", "intelligenceIndex": 68, "arenaElo": 1245 },
+        { "name": "deepseek-v4-flash", "family": "DeepSeek", "contextK": 1024, "reqPerMin": 5, "throughputTps": 30, "modality": "reasoning", "intelligenceIndex": 85, "arenaElo": 1340 },
+        { "name": "glm-5.2", "family": "GLM", "contextK": 1024, "reqPerMin": 5, "throughputTps": 30, "modality": "text", "intelligenceIndex": 78, "arenaElo": 1305 }
+      ]
+    }
+  ]
+}

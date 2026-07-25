@@ -1,0 +1,516 @@
+{
+  "ok": [
+    "abacusai/dracarys-llama-3.1-70b-instruct",
+    "bytedance/seed-oss-36b-instruct",
+    "deepseek-ai/deepseek-v4-flash",
+    "google/diffusiongemma-26b-a4b-it",
+    "google/gemma-2-2b-it",
+    "google/gemma-3n-e2b-it",
+    "google/gemma-3n-e4b-it",
+    "google/gemma-4-31b-it",
+    "meta/llama-3.1-70b-instruct",
+    "meta/llama-3.1-8b-instruct",
+    "meta/llama-3.2-11b-vision-instruct",
+    "meta/llama-3.2-1b-instruct",
+    "meta/llama-3.2-3b-instruct",
+    "meta/llama-3.2-90b-vision-instruct",
+    "meta/llama-4-maverick-17b-128e-instruct",
+    "minimaxai/minimax-m2.7",
+    "minimaxai/minimax-m3",
+    "mistralai/mistral-medium-3.5-128b",
+    "mistralai/mistral-nemotron",
+    "mistralai/mistral-small-4-119b-2603",
+    "mistralai/mixtral-8x7b-instruct-v0.1",
+    "nvidia/gliner-pii",
+    "nvidia/ising-calibration-1-35b-a3b",
+    "nvidia/ising-calibration-1.5-31b",
+    "nvidia/llama-3.1-nemoguard-8b-content-safety",
+    "nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
+    "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+    "nvidia/llama-3.3-nemotron-super-49b-v1",
+    "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "nvidia/nemotron-3-nano-30b-a3b",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    "nvidia/nemotron-3-super-120b-a12b",
+    "nvidia/nemotron-3-ultra-550b-a55b",
+    "nvidia/nemotron-3.5-content-safety",
+    "nvidia/nemotron-mini-4b-instruct",
+    "nvidia/nemotron-nano-12b-v2-vl",
+    "nvidia/nvidia-nemotron-nano-9b-v2",
+    "nvidia/riva-translate-4b-instruct-v1.1",
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3-next-80b-a3b-instruct",
+    "sarvamai/sarvam-m",
+    "stepfun-ai/step-3.5-flash",
+    "stepfun-ai/step-3.7-flash",
+    "upstage/solar-10.7b-instruct"
+  ],
+  "bad": [
+    {
+      "id": "01-ai/yi-large",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '23bd454d-b225-49a3-8118-582a62fc51b8': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "adept/fuyu-8b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'e598bfc1-b058-41af-869d-556d3c7e1b48': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "ai21labs/jamba-1.5-large-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '6497fc2b-7ff8-4019-8946-123dccbfc863': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "aisingapore/sea-lion-7b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '02f84bf4-c1a1-489b-a9de-ac3e8dcdec14': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "baai/bge-m3",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "bigcode/starcoder2-15b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "databricks/dbrx-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '3d6c2ff8-8bfc-4d10-8fd0-b7337288e869': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "deepseek-ai/deepseek-coder-6.7b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'e503b15c-62b0-4d69-b532-a88f0bfa2656': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "deepseek-ai/deepseek-r1",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "deepseek-ai/deepseek-r1-distill-llama-8b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "deepseek-ai/deepseek-r1-distill-qwen-14b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "deepseek-ai/deepseek-r1-distill-qwen-32b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "deepseek-ai/deepseek-r1-distill-qwen-7b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "deepseek-ai/deepseek-v4-pro",
+      "status": 0,
+      "err": "This operation was aborted"
+    },
+    {
+      "id": "google/codegemma-1.1-7b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'e2d298c5-204e-4213-b921-9f492cc9011b': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "google/codegemma-7b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '7dfc10a8-3cc4-448e-97c1-2213308dc222': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "google/deplot",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '784a8ca4-ea7d-4c93-bb46-ec027c3fae47': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "google/gemma-2-27b-it",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "google/gemma-2-9b-it",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "google/gemma-2b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '04174188-f742-4069-9e72-d77c2b77d3cb': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "google/gemma-3-12b-it",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'ee47df99-c92b-4dc9-b3a7-f3fb0f087b73': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "google/gemma-3-1b-it",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "google/gemma-3-27b-it",
+      "status": 410,
+      "err": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'google/gemma-3-27b-it' has reached its end of life on 2026-05-12T00:00:00Z and is no longer available.\"}\n"
+    },
+    {
+      "id": "google/gemma-3-4b-it",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'c322f327-55a3-4af3-a91f-c757e2b8b135': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "google/recurrentgemma-2b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '2f495340-a99f-4b4b-89bd-1beb003dd896': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "ibm/granite-3.0-3b-a800m-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '67324577-3f91-4aa6-b750-97468262530d': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "ibm/granite-3.0-8b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '5a24a4f0-2d59-46b3-ac65-42307f2633d1': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "ibm/granite-34b-code-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '4df48b4f-e3c5-4ade-82c7-c06b65e25d18': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "ibm/granite-8b-code-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'af7b6f03-f615-4c5f-86c6-388bd35cede0': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "meta/codellama-70b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'f6b06895-d073-4714-8bb2-26c09e9f6597': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "meta/llama-3.1-405b-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "meta/llama-3.3-70b-instruct",
+      "status": 0,
+      "err": "This operation was aborted"
+    },
+    {
+      "id": "meta/llama-4-scout-17b-16e-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "meta/llama-guard-4-12b",
+      "status": 0,
+      "err": "This operation was aborted"
+    },
+    {
+      "id": "meta/llama2-70b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '2fddadfb-7e76-4c8a-9b82-f7d3fab94471': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "microsoft/kosmos-2",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '6018fed7-f227-48dc-99bc-3fd4264d5037': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "microsoft/phi-3-medium-4k-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "microsoft/phi-3-mini-4k-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "microsoft/phi-3-small-8k-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "microsoft/phi-3-vision-128k-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '20f2537e-8593-4eb9-ad40-60eee3bbaa55': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "microsoft/phi-3.5-mini-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "microsoft/phi-3.5-moe-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'e6cab982-62f4-481e-9a7a-3dedb87dbd01': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "microsoft/phi-4-mini-instruct",
+      "status": 410,
+      "err": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'microsoft/phi-4-mini-instruct' has reached its end of life on 2026-07-15T00:00:00Z and is no longer available.\"}\n"
+    },
+    {
+      "id": "microsoft/phi-4-multimodal-instruct",
+      "status": 410,
+      "err": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'microsoft/phi-4-multimodal-instruct' has reached its end of life on 2026-07-15T00:00:00Z and is no longer available.\"}\n"
+    },
+    {
+      "id": "mistralai/codestral-22b-instruct-v0.1",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '9a10b012-e6df-46fd-83b2-700dcbc75814': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "mistralai/ministral-14b-instruct-2512",
+      "status": 0,
+      "err": "This operation was aborted"
+    },
+    {
+      "id": "mistralai/mistral-7b-instruct-v0.3",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'cd89bd68-13e3-47a9-861e-9a62e6e14b05': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "mistralai/mistral-large",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '767b5b9a-3f9d-4c1d-86e8-fa861988cee7': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "mistralai/mistral-large-2-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '7fadd4de-e22a-48e4-90e9-f02ef14a74b9': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "mistralai/mixtral-8x22b-instruct-v0.1",
+      "status": 410,
+      "err": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'mistralai/mixtral-8x22b-instruct-v0.1' has reached its end of life on 2026-05-21T00:00:00Z and is no longer available.\"}\n"
+    },
+    {
+      "id": "mistralai/mixtral-8x22b-v0.1",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '39655fc1-9ebc-4b24-963e-6915ea6680de': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "moonshotai/kimi-k2.6",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '23d4f03a-b8a6-4adb-a183-7daa083a09cc': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nv-mistralai/mistral-nemo-12b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'f8c05193-d2e2-4f0f-bb4d-7ad70070002b': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/ai-synthetic-video-detector",
+      "status": 500,
+      "err": "{\"type\":\"urn:nvcf-worker-service:problem-details:internal-server-error\", \"title\":\"Internal Server Error\", \"status\":500, \"detail\":\"Internal error while making inference request\"}"
+    },
+    {
+      "id": "nvidia/cosmos-reason2-8b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'e199b43b-6c62-4a63-9379-f60e1a953236': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/embed-qa-4",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/llama-3.1-nemoguard-8b-topic-control",
+      "status": 500,
+      "err": "{\"error\":\"Error during inference of request chat-8ba1dff5cba541d1869835c10a936c07 -- Encountered an error in forwardAsync function: [TensorRT-LLM][ERROR] CUDA runtime error in cudaMemcpyAsync(dst, src"
+    },
+    {
+      "id": "nvidia/llama-3.1-nemotron-51b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '5beba52c-65a9-4f46-8cd9-656689a1b205': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/llama-3.1-nemotron-70b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '9b96341b-9791-4db9-a00d-4e43aa192a39': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/llama-3.1-nemotron-nano-8b-v1",
+      "status": 0,
+      "err": "This operation was aborted"
+    },
+    {
+      "id": "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '84bf12ff-edbd-4435-baea-0fa6a7453d2e': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/llama-3.2-nemoretriever-1b-vlm-embed-v1",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/llama-3.2-nv-embedqa-1b-v1",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/llama-nemotron-embed-1b-v2",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/llama-nemotron-embed-vl-1b-v2",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/llama3-chatqa-1.5-70b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '46594287-38b9-481c-a37f-baa02f2d3ba1': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/mistral-nemo-minitron-8b-8k-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '5aa06dd2-0a02-4a5d-be4c-bf88e956965d': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/nemoretriever-parse",
+      "status": 400,
+      "err": "{\"object\":\"error\",\"message\":\"Content cannot be a plain string. The model does not support text input.\",\"type\":\"BadRequestError\",\"param\":null,\"code\":400}"
+    },
+    {
+      "id": "nvidia/nemotron-3-embed-1b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/nemotron-4-340b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'b0fcd392-e905-4ab4-8eb9-aeae95c30b37': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/nemotron-4-340b-reward",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'c53ee0e9-bad9-4e09-b365-52c9d6b71254': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/nemotron-nano-3-30b-a3b",
+      "status": 404,
+      "err": "{\"error\":{\"message\":\"Model not found\",\"type\":\"Not Found\",\"code\":404}}"
+    },
+    {
+      "id": "nvidia/nemotron-parse",
+      "status": 400,
+      "err": "{\"object\":\"error\",\"message\":\"Content cannot be a plain string. The model does not support text input. Content cannot be a plain string. The model does not support text input.\",\"type\":\"BadRequestError\""
+    },
+    {
+      "id": "nvidia/neva-22b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'bc205f8e-1740-40df-8d32-c4321763498a': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/nv-embed-v1",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/nv-embedcode-7b-v1",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/nv-embedqa-e5-v5",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/nv-embedqa-mistral-7b-v2",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/nvclip",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "nvidia/riva-translate-4b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'f35337fa-b4dd-4996-bcba-5476ee01171d': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "nvidia/vila",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '1c8df143-2303-419b-8b28-b4dd82cfe113': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "qwen/qwen2.5-7b-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "qwen/qwen2.5-coder-32b-instruct",
+      "status": 410,
+      "err": "{\"type\":\"about:blank\",\"title\":\"Gone\",\"status\":410,\"detail\":\"The model 'qwen/qwen2.5-coder-32b-instruct' has reached its end of life on 2026-05-12T00:00:00Z and is no longer available.\"}\n"
+    },
+    {
+      "id": "qwen/qwen2.5-coder-7b-instruct",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "qwen/qwen3-235b-a22b",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "qwen/qwen3.5-397b-a17b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function id 'f32596d4-0577-4a17-baf2-034515d1e457' version 'null': Specified function in account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ' is not found\""
+    },
+    {
+      "id": "snowflake/arctic-embed-l",
+      "status": 404,
+      "err": "404 page not found\n"
+    },
+    {
+      "id": "thinkingmachines/inkling",
+      "status": 400,
+      "err": "{\"status\":400,\"title\":\"Bad Request\",\"detail\":\"Function id 'e972e88f-cd11-45ef-86d2-6802da998eca': DEGRADED function cannot be invoked\"}"
+    },
+    {
+      "id": "writer/palmyra-creative-122b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '00bdd0a7-e38f-4423-9007-c4d8730a3f78': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "writer/palmyra-fin-70b-32k",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '316490c6-f1ed-41f9-9da8-3fa9e885653b': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "writer/palmyra-med-70b",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'aab71274-5281-4941-b0b8-20f339d1fc7e': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "writer/palmyra-med-70b-32k",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function 'd6faa974-3591-49a4-963d-97221d074b2e': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    },
+    {
+      "id": "zyphra/zamba2-7b-instruct",
+      "status": 404,
+      "err": "{\"status\":404,\"title\":\"Not Found\",\"detail\":\"Function '8378ffb2-51b0-4140-9684-dda1889373e6': Not found for account 'gJVypHT1IDfECfIG3p2IDVZFatJcGMmuEHx2E6r_MjQ'\"}"
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* FreeModelFinder — Cool Slate design tokens (light) */
+    --background: 210 20% 98%;
+    --surface: 0 0% 100%;
+    --surface-muted: 210 20% 96%;
+    --foreground: 215 28% 17%;
+    --foreground-muted: 215 14% 45%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+
+    /* Cool electric blue */
+    --primary: 212 92% 45%;
+    --primary-foreground: 210 40% 98%;
+    --primary-soft: 212 92% 96%;
+
+    --secondary: 215 16% 94%;
+    --secondary-foreground: 215 28% 17%;
+
+    --muted: 215 16% 94%;
+    --muted-foreground: 215 14% 45%;
+
+    --accent: 212 92% 96%;
+    --accent-foreground: 212 92% 35%;
+
+    --success: 152 60% 36%;
+    --warning: 32 95% 44%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 20% 88%;
+    --border-strong: 215 20% 78%;
+    --input: 215 20% 88%;
+    --ring: 212 92% 45%;
+
+    --radius: 0.5rem;
+
+    /* Section-level subtle tints — for grouping blocks inside the same page */
+    --section-a: 210 40% 97.5%;
+    --section-b: 200 30% 96%;
+    --section-c: 220 25% 96.5%;
+
+    color-scheme: light;
+  }
+
+  .dark {
+    /* Slate / graphite based dark palette */
+    --background: 222 24% 8%;
+    --surface: 222 22% 11%;
+    --surface-muted: 222 20% 14%;
+    --foreground: 210 30% 96%;
+    --foreground-muted: 215 16% 68%;
+
+    --card: 222 22% 11%;
+    --card-foreground: 210 30% 96%;
+
+    --popover: 222 22% 12%;
+    --popover-foreground: 210 30% 96%;
+
+    --primary: 210 96% 62%;
+    --primary-foreground: 222 24% 8%;
+    --primary-soft: 212 60% 18%;
+
+    --secondary: 222 18% 16%;
+    --secondary-foreground: 210 30% 96%;
+
+    --muted: 222 18% 16%;
+    --muted-foreground: 215 16% 68%;
+
+    --accent: 212 60% 18%;
+    --accent-foreground: 210 96% 78%;
+
+    --success: 152 50% 55%;
+    --warning: 32 92% 62%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 18% 20%;
+    --border-strong: 222 16% 28%;
+    --input: 222 18% 20%;
+    --ring: 210 96% 62%;
+
+    /* Section-level subtle tints — dark mode */
+    --section-a: 222 22% 12%;
+    --section-b: 210 18% 13%;
+    --section-c: 225 16% 13%;
+
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family:
+      'PingFang SC',
+      'Microsoft YaHei',
+      'Hiragino Sans GB',
+      'Inter',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial,
+      sans-serif;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code,
+  kbd,
+  pre {
+    font-family:
+      'JetBrains Mono',
+      ui-monospace,
+      SFMono-Regular,
+      'SF Mono',
+      Menlo,
+      Consolas,
+      'Liberation Mono',
+      monospace;
+  }
+
+  input,
+  textarea,
+  select {
+    background-color: transparent;
+    color: hsl(var(--foreground));
+    caret-color: hsl(var(--foreground));
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground) / 0.7);
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    caret-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--surface)) inset;
+    box-shadow: 0 0 0px 1000px hsl(var(--surface)) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .app-sticky-shadow {
+    box-shadow: 0 1px 0 0 hsl(var(--border));
+  }
+  .toast-in {
+    animation: toast-in 200ms ease-out;
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+  .bg-section-a {
+    background-color: hsl(var(--section-a));
+  }
+  .bg-section-b {
+    background-color: hsl(var(--section-b));
+  }
+  .bg-section-c {
+    background-color: hsl(var(--section-c));
+  }
+}

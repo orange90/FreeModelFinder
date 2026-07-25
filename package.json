@@ -1,0 +1,33 @@
+{
+  "name": "freemodelfinder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aggregate free LLM providers (OpenRouter/Gemini) behind a local multi-protocol API gateway, with Chat UI, CLI and macOS tray app.",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* build",
+    "dev:server": "pnpm --filter @freemodelfinder/server dev",
+    "dev:ui": "pnpm --filter @freemodelfinder/ui dev",
+    "dev:cli": "pnpm --filter @freemodelfinder/cli dev",
+    "dev": "pnpm -r --parallel --filter=./packages/{core,server,ui} dev",
+    "lint": "eslint \"packages/*/src/**/*.{ts,tsx}\" --max-warnings=0",
+    "typecheck": "pnpm -r --filter=./packages/* typecheck",
+    "test": "pnpm -r --filter=./packages/* run test",
+    "clean": "pnpm -r exec rm -rf dist .next .turbo node_modules/.cache",
+    "update:readme": "node scripts/update-readme.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@typescript-eslint/parser": "^7.5.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.2",
+    "typescript": "^5.4.5"
+  }
+}

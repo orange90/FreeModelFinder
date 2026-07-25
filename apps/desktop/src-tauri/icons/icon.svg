@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67E8F9"/>
+      <stop offset="100%" stop-color="#A78BFA"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="1024" rx="220" ry="220" fill="url(#bgGrad)"/>
+
+  <rect x="0" y="0" width="1024" height="1024" rx="220" ry="220" fill="none"
+        stroke="url(#accentGrad)" stroke-width="4" opacity="0.35"/>
+
+  <g filter="url(#glow)" stroke="url(#accentGrad)" stroke-width="14" stroke-linecap="round" fill="none">
+    <path d="M 512 512 L 260 280"/>
+    <path d="M 512 512 L 760 280"/>
+    <path d="M 512 512 L 260 744"/>
+    <path d="M 512 512 L 760 744"/>
+  </g>
+
+  <g fill="url(#hubGrad)" filter="url(#glow)">
+    <circle cx="260" cy="280" r="58"/>
+    <circle cx="760" cy="280" r="58"/>
+    <circle cx="260" cy="744" r="58"/>
+    <circle cx="760" cy="744" r="58"/>
+  </g>
+
+  <circle cx="512" cy="512" r="140" fill="url(#hubGrad)" filter="url(#glow)"/>
+  <circle cx="512" cy="512" r="90" fill="#0F172A"/>
+
+  <g fill="none" stroke="url(#accentGrad)" stroke-width="10" stroke-linecap="round">
+    <path d="M 470 490 L 470 534"/>
+    <path d="M 470 490 L 500 490"/>
+    <path d="M 470 512 L 495 512"/>
+    <path d="M 520 490 L 520 534"/>
+    <path d="M 545 490 L 545 534"/>
+    <path d="M 520 490 L 545 490"/>
+    <path d="M 520 534 L 545 534"/>
+  </g>
+</svg>
