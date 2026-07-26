@@ -1,16 +1,12 @@
 import { loadConfig } from './config/store.js';
 import {
   BaseProvider,
-  CerebrasProvider,
   CloudflareProvider,
   CohereProvider,
   CustomProvider,
-  DashScopeProvider,
-  DeepSeekProvider,
   GeminiProvider,
   GitHubModelsProvider,
   HuggingFaceProvider,
-  MistralProvider,
   ModelScopeProvider,
   NvidiaProvider,
   OpenRouterProvider,
@@ -18,23 +14,21 @@ import {
   SiliconFlowProvider,
   ZhipuProvider,
 } from './providers/index.js';
-import { AutoRouter } from './router/auto-router.js';
-import type { AppConfig, ModelInfo, ProviderId, ProviderCredentials, SwitchNotice } from './types.js';
+import type { ProviderContext } from './providers/base.js';
+import { QuotaTracker } from './quota.js';
+import { AutoRouter, parseRateLimitError } from './router/auto-router.js';
+import type { AppConfig, ModelInfo, ModelQuotaSnapshot, ProviderId, SwitchNotice } from './types.js';
 
 const PROVIDER_CTORS: Record<
   Exclude<ProviderId, 'ollama'>,
-  new (ctx: { credentials: ProviderCredentials }) => BaseProvider
+  new (ctx: ProviderContext) => BaseProvider
 > = {
   openrouter: OpenRouterProvider,
   gemini: GeminiProvider,
   zhipu: ZhipuProvider,
   siliconflow: SiliconFlowProvider,
-  deepseek: DeepSeekProvider,
   modelscope: ModelScopeProvider,
-  dashscope: DashScopeProvider,
-  cerebras: CerebrasProvider,
   nvidia: NvidiaProvider,
-  mistral: MistralProvider,
   cloudflare: CloudflareProvider,
   github: GitHubModelsProvider,
   cohere: CohereProvider,
@@ -58,6 +52,7 @@ export class ProviderRegistry {
   private modelsCache: ListAllModelsResult | null = null;
   private cacheAt = 0;
   private autoRouter: AutoRouter;
+  private quotaTracker = new QuotaTracker();
   private noticeBuffer: SwitchNotice[] = [];
 
   constructor(private config: AppConfig) {
@@ -105,14 +100,23 @@ export class ProviderRegistry {
     if (cached) return cached;
 
     const settings = this.config.providers[id];
-    if (!settings?.enabled || !settings.credentials?.apiKey) {
-      throw new Error(`provider ${id} is not enabled or missing api key`);
+    if (!settings?.enabled) {
+      throw new Error(`provider ${id} is not enabled`);
+    }
+    if (id !== 'custom' && !settings.credentials?.apiKey) {
+      throw new Error(`provider ${id} is missing api key`);
     }
     if (id === 'ollama') {
       throw new Error('ollama provider not yet implemented');
     }
     const Ctor = PROVIDER_CTORS[id];
-    const instance = new Ctor({ credentials: settings.credentials });
+    const credentials = settings.credentials ?? { apiKey: '' };
+    const instance = new Ctor({
+      credentials,
+      onResponse: (event) => this.quotaTracker.recordResponse(event),
+      onUsage: (event) => this.quotaTracker.recordUsage(event),
+      onQuotaWindows: (event) => this.quotaTracker.recordProviderWindows(event.provider, event.windows),
+    });
     this.instances.set(id, instance);
     return instance;
   }
@@ -120,7 +124,17 @@ export class ProviderRegistry {
   listEnabledProviders(): ProviderId[] {
     return (Object.keys(PROVIDER_CTORS) as Array<Exclude<ProviderId, 'ollama'>>).filter((id) => {
       const settings = this.config.providers[id];
-      return !!(settings?.enabled && settings.credentials?.apiKey);
+      if (!settings?.enabled) return false;
+      if (id === 'custom') {
+        const extra = (settings.credentials?.extra ?? {}) as {
+          sources?: unknown;
+          models?: unknown;
+        };
+        const hasSources = Array.isArray(extra.sources) && extra.sources.length > 0;
+        const hasLegacy = !!settings.credentials?.baseUrl;
+        return hasSources || hasLegacy;
+      }
+      return !!settings.credentials?.apiKey;
     });
   }
 
@@ -169,6 +183,40 @@ export class ProviderRegistry {
     this.modelsCache = result;
     this.cacheAt = Date.now();
     return result;
+  }
+
+  getModelQuota(provider: ProviderId, model: string): ModelQuotaSnapshot {
+    return this.quotaTracker.snapshot(provider, model);
+  }
+
+  listModelQuotas(models: ModelInfo[]): ModelQuotaSnapshot[] {
+    return models.map((model) => this.getModelQuota(model.provider, model.id));
+  }
+
+  async probeModel(model: string): Promise<ModelQuotaSnapshot> {
+    const resolved = this.resolveModel(model);
+    const startedAt = Date.now();
+    try {
+      await resolved.provider.chat({
+        model: resolved.modelId,
+        messages: [{ role: 'user', content: 'Reply with only: OK' }],
+        max_tokens: 8,
+        stream: false,
+      });
+      this.quotaTracker.recordTest(resolved.provider.id, resolved.modelId, {
+        ok: true,
+        latencyMs: Date.now() - startedAt,
+      });
+    } catch (error) {
+      const parsed = parseRateLimitError(error);
+      this.quotaTracker.recordTest(resolved.provider.id, resolved.modelId, {
+        ok: false,
+        limited: parsed.isRateLimit,
+        latencyMs: Date.now() - startedAt,
+        error: (error instanceof Error ? error.message : String(error)).slice(0, 500),
+      });
+    }
+    return this.getModelQuota(resolved.provider.id, resolved.modelId);
   }
 
   resolveModel(modelId: string): { provider: BaseProvider; modelId: string } {
@@ -223,27 +271,20 @@ export class ProviderRegistry {
     }
     if (modelId.startsWith('qwen') || modelId.startsWith('Qwen/')) {
       try {
-        return { provider: this.getProvider('dashscope'), modelId };
+        return { provider: this.getProvider('siliconflow'), modelId };
       } catch {
-        try {
-          return { provider: this.getProvider('siliconflow'), modelId };
-        } catch {
-          // fallthrough
-        }
+        // fallthrough
       }
     }
     if (modelId.startsWith('deepseek') || modelId.startsWith('deepseek-ai/')) {
       try {
-        return { provider: this.getProvider('deepseek'), modelId };
+        return { provider: this.getProvider('sensenova'), modelId };
       } catch {
-        // fallthrough
-      }
-    }
-    if (modelId.startsWith('mistral') || modelId.startsWith('codestral')) {
-      try {
-        return { provider: this.getProvider('mistral'), modelId };
-      } catch {
-        // fallthrough
+        try {
+          return { provider: this.getProvider('modelscope'), modelId };
+        } catch {
+          // fallthrough
+        }
       }
     }
     if (modelId.startsWith('@cf/')) {

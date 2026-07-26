@@ -8,12 +8,8 @@ const KNOWN_PROVIDERS: Array<{ id: ProviderId; label: string; hint: string }> = 
   { id: 'gemini', label: 'Google Gemini', hint: 'https://aistudio.google.com/apikey' },
   { id: 'zhipu', label: 'Zhipu (GLM)', hint: 'https://open.bigmodel.cn/usercenter/apikeys' },
   { id: 'siliconflow', label: 'SiliconFlow', hint: 'https://cloud.siliconflow.cn/account/ak' },
-  { id: 'deepseek', label: 'DeepSeek', hint: 'https://platform.deepseek.com/api_keys' },
   { id: 'modelscope', label: 'ModelScope', hint: 'https://modelscope.cn/my/myaccesstoken' },
-  { id: 'dashscope', label: 'Aliyun Bailian', hint: 'https://bailian.console.aliyun.com/?apiKey=1' },
-  { id: 'cerebras', label: 'Cerebras', hint: 'https://cloud.cerebras.ai/' },
   { id: 'nvidia', label: 'NVIDIA NIM', hint: 'https://build.nvidia.com/' },
-  { id: 'mistral', label: 'Mistral AI', hint: 'https://console.mistral.ai/api-keys' },
   { id: 'cloudflare', label: 'Cloudflare Workers AI', hint: 'https://dash.cloudflare.com/profile/api-tokens' },
   { id: 'github', label: 'GitHub Models', hint: 'https://github.com/settings/tokens' },
 ];

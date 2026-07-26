@@ -139,13 +139,21 @@ export class GeminiProvider extends BaseProvider {
   async chat(req: ChatRequest): Promise<ChatResponse> {
     const key = requireKey(this.ctx.credentials, this.id);
     const url = `${this.baseUrl()}/models/${encodeURIComponent(req.model)}:generateContent?key=${encodeURIComponent(key)}`;
-    const res = await this.fetch(url, {
+    const res = this.observeResponse(req.model, await this.fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(this.buildBody(req)),
-    });
+    }));
     if (!res.ok) throw new Error(`gemini chat failed ${res.status}: ${await res.text()}`);
     const data = (await res.json()) as GeminiResponse;
+    const usage = data.usageMetadata
+      ? {
+          prompt_tokens: data.usageMetadata.promptTokenCount,
+          completion_tokens: data.usageMetadata.candidatesTokenCount,
+          total_tokens: data.usageMetadata.totalTokenCount,
+        }
+      : undefined;
+    this.observeUsage(req.model, usage);
     const cand = data.candidates?.[0];
     const text = cand?.content?.parts?.map((p) => p.text).join('') ?? '';
     return {
@@ -154,24 +162,18 @@ export class GeminiProvider extends BaseProvider {
       created: Math.floor(Date.now() / 1000),
       content: text,
       finish_reason: mapFinish(cand?.finishReason),
-      usage: data.usageMetadata
-        ? {
-            prompt_tokens: data.usageMetadata.promptTokenCount,
-            completion_tokens: data.usageMetadata.candidatesTokenCount,
-            total_tokens: data.usageMetadata.totalTokenCount,
-          }
-        : undefined,
+      usage,
     };
   }
 
   async *stream(req: ChatRequest): AsyncIterable<StreamChunk> {
     const key = requireKey(this.ctx.credentials, this.id);
     const url = `${this.baseUrl()}/models/${encodeURIComponent(req.model)}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
-    const res = await this.fetch(url, {
+    const res = this.observeResponse(req.model, await this.fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(this.buildBody(req)),
-    });
+    }));
     if (!res.ok || !res.body) {
       throw new Error(`gemini stream failed ${res.status}: ${await res.text()}`);
     }
@@ -180,6 +182,7 @@ export class GeminiProvider extends BaseProvider {
     const decoder = new TextDecoder();
     let buffer = '';
     const streamId = `gemini-${Date.now()}`;
+    let latestUsage: ChatResponse['usage'];
 
     while (true) {
       const { value, done } = await reader.read();
@@ -194,6 +197,13 @@ export class GeminiProvider extends BaseProvider {
         if (!payload) continue;
         try {
           const json = JSON.parse(payload) as GeminiResponse;
+          if (json.usageMetadata) {
+            latestUsage = {
+              prompt_tokens: json.usageMetadata.promptTokenCount,
+              completion_tokens: json.usageMetadata.candidatesTokenCount,
+              total_tokens: json.usageMetadata.totalTokenCount,
+            };
+          }
           const cand = json.candidates?.[0];
           const delta = cand?.content?.parts?.map((p) => p.text).join('') ?? '';
           yield {
@@ -208,5 +218,6 @@ export class GeminiProvider extends BaseProvider {
         }
       }
     }
+    this.observeUsage(req.model, latestUsage);
   }
 }

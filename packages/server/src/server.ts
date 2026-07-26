@@ -150,8 +150,38 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
     const cfg = registry.getConfig();
     const custom = cfg.providers.custom;
     const customExtra = (custom?.credentials?.extra ?? {}) as {
+      sources?: Array<{
+        id: string;
+        label?: string;
+        baseUrl: string;
+        hasKey?: boolean;
+        models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
+      }>;
       models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
     };
+    const rawSources = Array.isArray(customExtra.sources) ? customExtra.sources : null;
+    const legacyBaseUrl = custom?.credentials?.baseUrl ?? '';
+    const legacyModels = Array.isArray(customExtra.models) ? customExtra.models : [];
+    const legacyHasKey = !!custom?.credentials?.apiKey;
+    const sources = rawSources
+      ? rawSources.map((s) => ({
+          id: String(s.id ?? ''),
+          label: s.label ?? '',
+          baseUrl: String(s.baseUrl ?? ''),
+          hasKey: !!(s as { apiKey?: string }).apiKey,
+          models: Array.isArray(s.models) ? s.models : [],
+        }))
+      : legacyBaseUrl
+        ? [
+            {
+              id: 'default',
+              label: 'Custom',
+              baseUrl: legacyBaseUrl,
+              hasKey: legacyHasKey,
+              models: legacyModels,
+            },
+          ]
+        : [];
     return {
       version: cfg.version,
       port: cfg.port,
@@ -172,9 +202,10 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
       ),
       custom: {
         enabled: !!custom?.enabled,
-        hasKey: !!custom?.credentials?.apiKey,
-        baseUrl: custom?.credentials?.baseUrl ?? '',
-        models: Array.isArray(customExtra.models) ? customExtra.models : [],
+        hasKey: legacyHasKey,
+        baseUrl: legacyBaseUrl,
+        models: legacyModels,
+        sources,
       },
     };
   });
@@ -188,6 +219,13 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
       clearCredentials?: boolean;
       accountId?: string;
       models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
+      sources?: Array<{
+        id: string;
+        label?: string;
+        baseUrl: string;
+        apiKey?: string;
+        models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
+      }>;
     };
   }>(
     '/api/providers',
@@ -200,6 +238,7 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
         clearCredentials,
         accountId,
         models,
+        sources,
       } = req.body ?? {};
       if (!provider) return reply.code(400).send({ error: 'provider required' });
       const parsedProvider = ProviderIdSchema.safeParse(provider);
@@ -225,6 +264,40 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
             }))
             .filter((m) => m.id)
         : undefined;
+      const cleanSources = Array.isArray(sources)
+        ? sources
+            .map((s) => {
+              const id = typeof s?.id === 'string' ? s.id.trim() : '';
+              const bu = typeof s?.baseUrl === 'string' ? s.baseUrl.trim() : '';
+              if (!id || !bu) return null;
+              const key = typeof s?.apiKey === 'string' ? s.apiKey.trim() : '';
+              const label =
+                typeof s?.label === 'string' && s.label.trim() ? s.label.trim() : undefined;
+              const modelsList = Array.isArray(s?.models)
+                ? s!.models!
+                    .map((m) => ({
+                      id: typeof m?.id === 'string' ? m.id.trim() : '',
+                      displayName:
+                        typeof m?.displayName === 'string' && m.displayName.trim()
+                          ? m.displayName.trim()
+                          : undefined,
+                      contextWindow:
+                        typeof m?.contextWindow === 'number' && m.contextWindow > 0
+                          ? m.contextWindow
+                          : undefined,
+                    }))
+                    .filter((m) => m.id)
+                : [];
+              return {
+                id,
+                label,
+                baseUrl: bu.replace(/\/$/, ''),
+                apiKey: key || undefined,
+                models: modelsList,
+              };
+            })
+            .filter((s): s is NonNullable<typeof s> => !!s)
+        : undefined;
       try {
         const next = await updateConfig((cfg) => {
           const cur = (cfg.providers[providerId] ?? { enabled: false }) as {
@@ -237,6 +310,38 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
           };
           const shouldClear = clearCredentials === true || cleanApiKey === '';
           const prevExtra = cur.credentials?.extra ?? {};
+
+          if (providerId === 'custom') {
+            if (clearCredentials === true) {
+              cfg.providers[providerId] = {
+                ...cur,
+                enabled: enabled ?? false,
+                credentials: undefined,
+              };
+              return cfg;
+            }
+            const nextExtra: Record<string, unknown> = { ...prevExtra };
+            if (cleanSources !== undefined) {
+              nextExtra.sources = cleanSources;
+              delete (nextExtra as { models?: unknown }).models;
+            } else if (cleanModels !== undefined) {
+              nextExtra.models = cleanModels;
+            }
+            const topKey = cleanApiKey ?? cur.credentials?.apiKey ?? '';
+            const topBaseUrl =
+              cleanBaseUrl !== undefined ? cleanBaseUrl : cur.credentials?.baseUrl;
+            cfg.providers[providerId] = {
+              ...cur,
+              enabled: enabled ?? cur.enabled,
+              credentials: {
+                apiKey: topKey,
+                baseUrl: topBaseUrl,
+                extra: nextExtra,
+              },
+            };
+            return cfg;
+          }
+
           const nextExtra = {
             ...prevExtra,
             ...(cleanModels !== undefined ? { models: cleanModels } : {}),

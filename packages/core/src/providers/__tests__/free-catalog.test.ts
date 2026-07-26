@@ -47,6 +47,38 @@ describe('free provider catalogs', () => {
     assert.deepEqual(models.map((model) => model.id), ['vendor/chat:free']);
   });
 
+  it('publishes OpenRouter account-wide free-model limits from the current key tier', async () => {
+    let observed: Array<{ windowSeconds?: number; limit?: number; scope: string }> = [];
+    const provider = new OpenRouterProvider({
+      credentials: { apiKey: 'test-key' },
+      fetchImpl: (async (input: string | URL | Request) => {
+        const url = String(input);
+        const body = url.endsWith('/key')
+          ? { data: { is_free_tier: false } }
+          : {
+              data: [{
+                id: 'vendor/chat:free',
+                pricing: { prompt: '0', completion: '0' },
+                architecture: { output_modalities: ['text'] },
+              }],
+            };
+        return new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      }) as typeof fetch,
+      onQuotaWindows: ({ windows }) => {
+        observed = windows;
+      },
+    });
+
+    await provider.listModels();
+    assert.deepEqual(observed.map((window) => [window.windowSeconds, window.limit, window.scope]), [
+      [60, 20, 'provider'],
+      [86_400, 1_000, 'provider'],
+    ]);
+  });
+
   it('does not advertise Gemini versions unavailable to new accounts', async () => {
     const provider = new GeminiProvider({
       credentials: { apiKey: 'test-key' },

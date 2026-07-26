@@ -3,8 +3,40 @@ export type ModelItem = {
   provider: string;
   display_name?: string;
   context_window?: number;
+  capability_score?: number;
   description?: string;
   free?: boolean;
+  quota?: ModelQuotaSnapshot;
+};
+
+export type QuotaWindow = {
+  resource: 'requests' | 'tokens' | 'neurons';
+  windowSeconds?: number;
+  limit?: number;
+  used?: number;
+  remaining?: number;
+  resetAt?: number;
+  scope: 'model' | 'provider';
+  source: 'upstream' | 'local-estimate';
+};
+
+export type ModelQuotaSnapshot = {
+  model: string;
+  provider: string;
+  session: {
+    startedAt: number;
+    requests: number;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    lastRequestAt?: number;
+    resetAt?: number;
+  };
+  windows: QuotaWindow[];
+  availability: 'untested' | 'available' | 'limited' | 'error';
+  lastTestAt?: number;
+  latencyMs?: number;
+  error?: string;
 };
 
 export type ProviderFailure = {

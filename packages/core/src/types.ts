@@ -6,12 +6,8 @@ export const ProviderIdSchema = z.enum([
   'ollama',
   'zhipu',
   'siliconflow',
-  'deepseek',
   'modelscope',
-  'dashscope',
-  'cerebras',
   'nvidia',
-  'mistral',
   'cloudflare',
   'github',
   'cohere',
@@ -25,6 +21,14 @@ export interface CustomModelEntry {
   id: string;
   displayName?: string;
   contextWindow?: number;
+}
+
+export interface CustomSource {
+  id: string;
+  label?: string;
+  baseUrl: string;
+  apiKey?: string;
+  models: CustomModelEntry[];
 }
 
 export const RoleSchema = z.enum(['system', 'user', 'assistant', 'tool']);
@@ -77,6 +81,42 @@ export interface ModelInfo {
   contextWindow?: number;
   free: boolean;
   description?: string;
+}
+
+export type QuotaResource = 'requests' | 'tokens' | 'neurons';
+export type QuotaSource = 'upstream' | 'local-estimate';
+export type QuotaScope = 'model' | 'provider';
+
+export interface QuotaWindow {
+  resource: QuotaResource;
+  /** Window length in seconds. Omitted when the upstream does not disclose it. */
+  windowSeconds?: number;
+  limit?: number;
+  used?: number;
+  remaining?: number;
+  resetAt?: number;
+  scope: QuotaScope;
+  source: QuotaSource;
+}
+
+export interface ModelQuotaSnapshot {
+  model: string;
+  provider: ProviderId;
+  session: {
+    startedAt: number;
+    requests: number;
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    lastRequestAt?: number;
+    /** The nearest known quota-window reset, not a promise that every quota resets then. */
+    resetAt?: number;
+  };
+  windows: QuotaWindow[];
+  availability: 'untested' | 'available' | 'limited' | 'error';
+  lastTestAt?: number;
+  latencyMs?: number;
+  error?: string;
 }
 
 export const AutoRouteStrategySchema = z.enum(['capability', 'speed', 'rate-limit']);
@@ -134,8 +174,6 @@ export interface ProviderCooldownState {
  * - GitHub Models: monthly request cap shared across every model
  *   (per Copilot tier).
  * - Cohere trial key: monthly request quota shared across models.
- * - Mistral La Plateforme free tier: 1 req/s and a monthly cap that
- *   counts across all models on the key.
  * - Hugging Face Inference API: monthly credits pooled across models.
  * - Cloudflare Workers AI: daily neuron budget pooled across models.
  */
@@ -143,7 +181,6 @@ export const PROVIDER_SHARED_QUOTA: Partial<Record<ProviderId, boolean>> = {
   openrouter: true,
   github: true,
   cohere: true,
-  mistral: true,
   huggingface: true,
   cloudflare: true,
 };

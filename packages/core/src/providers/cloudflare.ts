@@ -81,7 +81,7 @@ export class CloudflareProvider extends BaseProvider {
   }
 
   async chat(req: ChatRequest): Promise<ChatResponse> {
-    const res = await this.fetch(`${this.baseUrl()}/${req.model}`, {
+    const res = this.observeResponse(req.model, await this.fetch(`${this.baseUrl()}/${req.model}`, {
       method: 'POST',
       headers: this.buildHeaders(),
       body: JSON.stringify({
@@ -90,12 +90,13 @@ export class CloudflareProvider extends BaseProvider {
         max_tokens: req.max_tokens,
         stream: false,
       }),
-    });
+    }));
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`cloudflare chat failed ${res.status}: ${text}`);
     }
     const data = (await res.json()) as CFResponse;
+    this.observeUsage(req.model, data.result?.usage);
     if (data.success === false) {
       throw new Error(`cloudflare error: ${data.errors?.map((e) => e.message).join('; ')}`);
     }
@@ -110,7 +111,7 @@ export class CloudflareProvider extends BaseProvider {
   }
 
   async *stream(req: ChatRequest): AsyncIterable<StreamChunk> {
-    const res = await this.fetch(`${this.baseUrl()}/${req.model}`, {
+    const res = this.observeResponse(req.model, await this.fetch(`${this.baseUrl()}/${req.model}`, {
       method: 'POST',
       headers: this.buildHeaders(),
       body: JSON.stringify({
@@ -119,7 +120,7 @@ export class CloudflareProvider extends BaseProvider {
         max_tokens: req.max_tokens,
         stream: true,
       }),
-    });
+    }));
     if (!res.ok || !res.body) {
       const text = await res.text();
       throw new Error(`cloudflare stream failed ${res.status}: ${text}`);

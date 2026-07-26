@@ -7,6 +7,7 @@ dist/
 build/
 out/
 .next/
+.next-dev/
 .turbo/
 
 # tauri / rust

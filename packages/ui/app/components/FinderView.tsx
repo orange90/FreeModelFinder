@@ -3,9 +3,13 @@
 import { useMemo, useState } from 'react';
 import {
   ArrowUpRight,
+  Activity,
   Check,
   CircleAlert,
+  Clock3,
+  Gauge,
   KeyRound,
+  LoaderCircle,
   RefreshCw,
   Search,
   SlidersHorizontal,
@@ -16,11 +20,13 @@ import {
   formatContext,
   modelValue,
   type ModelItem,
+  type ModelQuotaSnapshot,
   type ProviderFailure,
+  type QuotaWindow,
 } from '../lib/models';
 import { classNames, GATEWAY } from '../lib/utils';
 
-type SortMode = 'provider' | 'context' | 'name';
+type SortMode = 'capability' | 'provider' | 'context' | 'name';
 
 const PROVIDER_MARKS = [
   'bg-emerald-500',
@@ -51,6 +57,8 @@ export function FinderView({
   onOpenTester,
   onOpenSettings,
   onRefresh,
+  onProbeModel,
+  probingModels,
 }: {
   models: ModelItem[];
   selectedModel: string;
@@ -61,6 +69,8 @@ export function FinderView({
   onOpenTester: () => void;
   onOpenSettings: () => void;
   onRefresh: () => void;
+  onProbeModel: (model: string) => void;
+  probingModels: string[];
 }) {
   const [query, setQuery] = useState('');
   const [provider, setProvider] = useState('all');
@@ -87,6 +97,13 @@ export function FinderView({
       .sort((a, b) => {
         if (sort === 'context') {
           return (b.context_window ?? 0) - (a.context_window ?? 0);
+        }
+        if (sort === 'capability') {
+          return (
+            (b.capability_score ?? 0) - (a.capability_score ?? 0) ||
+            (b.context_window ?? 0) - (a.context_window ?? 0) ||
+            (a.display_name ?? a.id).localeCompare(b.display_name ?? b.id)
+          );
         }
         if (sort === 'name') {
           return (a.display_name ?? a.id).localeCompare(b.display_name ?? b.id);
@@ -214,6 +231,7 @@ export function FinderView({
                 className="h-11 min-w-[148px] rounded-xl border border-input bg-surface pl-9 pr-3 text-sm outline-none focus:border-ring focus:ring-4 focus:ring-ring/10"
               >
                 <option value="provider">按来源排序</option>
+                <option value="capability">能力优先</option>
                 <option value="context">上下文优先</option>
                 <option value="name">按名称排序</option>
               </select>
@@ -251,6 +269,7 @@ export function FinderView({
             {visibleModels.map((item) => {
               const value = modelValue(item);
               const selected = value === selectedModel;
+              const probing = probingModels.includes(value);
               return (
                 <article
                   key={value}
@@ -285,6 +304,12 @@ export function FinderView({
                     {item.description || '已通过该来源的免费模型规则，可用于文本对话。'}
                   </p>
 
+                  <QuotaPanel
+                    quota={item.quota}
+                    probing={probing}
+                    onProbe={() => onProbeModel(value)}
+                  />
+
                   <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
                     <span className="text-xs font-medium text-foreground">
                       {formatContext(item.context_window)}
@@ -318,6 +343,130 @@ export function FinderView({
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function compactNumber(value: number): string {
+  return new Intl.NumberFormat('zh-CN', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
+}
+
+function formatReset(resetAt?: number): string {
+  if (!resetAt) return '未知';
+  const date = new Date(resetAt);
+  const sameDay = date.toDateString() === new Date().toDateString();
+  return date.toLocaleString('zh-CN', sameDay
+    ? { hour: '2-digit', minute: '2-digit', second: '2-digit' }
+    : { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function windowName(window: QuotaWindow): string {
+  const resource = window.resource === 'requests'
+    ? '请求'
+    : window.resource === 'tokens'
+      ? 'Token'
+      : 'Neuron';
+  const seconds = window.windowSeconds;
+  if (!seconds) return `${resource}额度`;
+  if (seconds === 1) return `每秒${resource}`;
+  if (seconds === 60) return `每分钟${resource}`;
+  if (seconds === 3_600) return `每小时${resource}`;
+  if (seconds === 86_400) return `每天${resource}`;
+  if (seconds === 2_592_000) return `每月${resource}`;
+  if (seconds % 3_600 === 0) return `每 ${seconds / 3_600} 小时${resource}`;
+  if (seconds % 60 === 0) return `每 ${seconds / 60} 分钟${resource}`;
+  return `${seconds} 秒${resource}`;
+}
+
+function QuotaPanel({
+  quota,
+  probing,
+  onProbe,
+}: {
+  quota?: ModelQuotaSnapshot;
+  probing: boolean;
+  onProbe: () => void;
+}) {
+  const status = quota?.availability ?? 'untested';
+  const statusCopy = {
+    untested: '未检测',
+    available: '可用',
+    limited: '已限流',
+    error: '检测失败',
+  }[status];
+  const statusTone = status === 'available'
+    ? 'text-success'
+    : status === 'limited' || status === 'error'
+      ? 'text-destructive'
+      : 'text-muted-foreground';
+
+  return (
+    <div className="mt-4 rounded-xl border border-border bg-surface-muted/45 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2 text-[11px] font-medium">
+          <Activity size={13} className={statusTone} />
+          <span className={statusTone}>{statusCopy}</span>
+          {quota?.latencyMs !== undefined && (
+            <span className="text-muted-foreground">· {quota.latencyMs} ms</span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onProbe}
+          disabled={probing}
+          className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-medium text-primary transition hover:bg-primary/10 disabled:opacity-60"
+        >
+          {probing ? <LoaderCircle size={11} className="animate-spin" /> : <Gauge size={11} />}
+          {probing ? '检测中' : '检测额度'}
+        </button>
+      </div>
+
+      <div className="mt-2 grid gap-1.5 text-[11px] text-muted-foreground sm:grid-cols-2">
+        <div className="flex items-center gap-1.5">
+          <Gauge size={12} />
+          <span>
+            本地会话已用 <b className="font-semibold text-foreground">{compactNumber(quota?.session.totalTokens ?? 0)}</b> tokens
+            {' · '}{quota?.session.requests ?? 0} 次
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Clock3 size={12} />
+          <span>最近额度重置：{formatReset(quota?.session.resetAt)}</span>
+        </div>
+      </div>
+
+      {quota?.windows.length ? (
+        <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+          {quota.windows.map((window, index) => (
+            <div
+              key={`${window.resource}:${window.windowSeconds ?? 'unknown'}:${window.scope}:${index}`}
+              className="rounded-lg border border-border/70 bg-surface px-2.5 py-2"
+            >
+              <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                <span>{windowName(window)} · {window.scope === 'provider' ? '共享' : '模型'}</span>
+                <span>{window.source === 'upstream' ? '上游' : '本地估算'}</span>
+              </div>
+              <div className="mt-0.5 text-xs font-semibold text-foreground">
+                {window.remaining !== undefined ? `剩余 ${compactNumber(window.remaining)}` : '剩余额度未知'}
+                {window.limit !== undefined ? ` / ${compactNumber(window.limit)}` : ''}
+              </div>
+              {window.resetAt && (
+                <div className="mt-0.5 text-[10px] text-muted-foreground">{formatReset(window.resetAt)} 重置</div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-[10px] leading-4 text-muted-foreground">
+          上游尚未返回精确的 RPM / RPH / RPD 信息；点击检测可读取响应头。
+        </p>
+      )}
+
+      {quota?.error && (
+        <p className="mt-2 line-clamp-2 text-[10px] leading-4 text-destructive" title={quota.error}>
+          {quota.error}
+        </p>
+      )}
     </div>
   );
 }

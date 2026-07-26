@@ -3,6 +3,7 @@ import {
   chatResponseToOpenAI,
   openAIToChatRequest,
   parseRateLimitError,
+  scoreModel,
   streamChunkToOpenAI,
   type ChatRequest,
   type ChatResponse,
@@ -101,6 +102,7 @@ export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => Pr
   app.get('/v1/models', async (_req, reply) => {
     const reg = getRegistry();
     const { models, succeededProviders, failedProviders } = await reg.listAllModels();
+    const router = reg.getAutoRouter();
     return reply.send({
       object: 'list',
       data: models.map((m) => ({
@@ -113,6 +115,8 @@ export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => Pr
         provider: m.provider,
         free: m.free,
         description: m.description,
+        capability_score: scoreModel(m, 'capability', router.getProfile(m.id)),
+        quota: reg.getModelQuota(m.provider, m.id),
       })),
       fmf: {
         enabled_providers: reg.listEnabledProviders(),
@@ -121,6 +125,30 @@ export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => Pr
       },
     });
   });
+
+  app.get('/api/model-quotas', async () => {
+    const reg = getRegistry();
+    const { models } = await reg.listAllModels();
+    return { data: reg.listModelQuotas(models) };
+  });
+
+  app.post(
+    '/api/model-quotas/probe',
+    async (req: FastifyRequest<{ Body: { model?: string } }>, reply: FastifyReply) => {
+      const model = req.body?.model?.trim();
+      if (!model) return reply.code(400).send({ error: 'model required' });
+      try {
+        const reg = getRegistry();
+        const quota = await reg.probeModel(model);
+        const { models } = await reg.listAllModels();
+        const affected = models.filter((item) => item.provider === quota.provider);
+        return reply.send({ quota, data: reg.listModelQuotas(affected) });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return reply.code(400).send({ error: message });
+      }
+    },
+  );
 
   app.post(
     '/v1/chat/completions',

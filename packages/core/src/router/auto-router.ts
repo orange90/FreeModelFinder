@@ -107,8 +107,7 @@ function heuristicCapabilityScore(m: ModelInfo): number {
 function heuristicSpeedScore(m: ModelInfo): number {
   const id = m.id.toLowerCase();
   let score = 50;
-  if (m.provider === 'cerebras') score = 95;
-  else if (m.provider === 'gemini' && /flash/.test(id)) score = 85;
+  if (m.provider === 'gemini' && /flash/.test(id)) score = 85;
   else if (/flash|mini|nano|haiku|8b|7b|3b|1b/.test(id)) score = 78;
   else if (/70b|72b|405b|opus|max/.test(id)) score = 35;
   return score;
@@ -118,14 +117,10 @@ function heuristicRpmScore(m: ModelInfo, profile?: ModelRoutingProfile): number 
   if (profile?.rpmLimit) return Math.min(100, Math.log10(profile.rpmLimit + 1) * 30);
   // Providers roughly ordered by known free tier RPM (higher = better)
   const providerBaseline: Partial<Record<ProviderId, number>> = {
-    cerebras: 85,
     openrouter: 60,
     siliconflow: 70,
     modelscope: 70,
-    dashscope: 70,
     zhipu: 70,
-    deepseek: 60,
-    mistral: 55,
     cloudflare: 65,
     github: 40,
     cohere: 55,

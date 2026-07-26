@@ -14,7 +14,13 @@ import { SettingsView } from './components/SettingsView';
 import { TesterView, type Msg } from './components/TesterView';
 import { BottomNav, type SegmentedItem } from './components/SegmentedTabs';
 import { ThemeToggle } from './theme';
-import { modelValue, type ModelItem, type ModelsResponse, type ProviderFailure } from './lib/models';
+import {
+  modelValue,
+  type ModelItem,
+  type ModelQuotaSnapshot,
+  type ModelsResponse,
+  type ProviderFailure,
+} from './lib/models';
 import { GATEWAY, classNames, withUiHeaders } from './lib/utils';
 
 type TabKey = 'finder' | 'tester' | 'settings';
@@ -50,6 +56,7 @@ export default function Home() {
   const [modelLoading, setModelLoading] = useState(true);
   const [gatewayReachable, setGatewayReachable] = useState<boolean | null>(null);
   const [failures, setFailures] = useState<ProviderFailure[]>([]);
+  const [probingModels, setProbingModels] = useState<string[]>([]);
 
   const applyModels = useCallback((payload: ModelsResponse) => {
     const list = Array.isArray(payload.data) ? payload.data.filter((item) => item.free !== false) : [];
@@ -124,6 +131,60 @@ export default function Home() {
       cancelled = true;
     };
   }, [applyModels]);
+
+  const applyQuotas = useCallback((quotas: ModelQuotaSnapshot[]) => {
+    const byModel = new Map(quotas.map((quota) => [`${quota.provider}:${quota.model}`.toLowerCase(), quota]));
+    setModels((current) => current.map((item) => ({
+      ...item,
+      quota: byModel.get(modelValue(item).toLowerCase()) ?? item.quota,
+    })));
+  }, []);
+
+  useEffect(() => {
+    if (tab !== 'finder' || models.length === 0) return;
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const response = await fetch(`${GATEWAY}/api/model-quotas`, withUiHeaders());
+        if (!response.ok) return;
+        const payload = await response.json() as { data?: ModelQuotaSnapshot[] };
+        if (!cancelled && Array.isArray(payload.data)) applyQuotas(payload.data);
+      } catch {
+        // Quota polling is supplemental; keep the model catalog usable while offline.
+      }
+    };
+    void poll();
+    const timer = window.setInterval(() => void poll(), 15_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [applyQuotas, models.length, tab]);
+
+  const probeModel = useCallback(async (value: string) => {
+    setProbingModels((current) => current.includes(value) ? current : [...current, value]);
+    try {
+      const response = await fetch(
+        `${GATEWAY}/api/model-quotas/probe`,
+        withUiHeaders({
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ model: value }),
+        }),
+      );
+      if (!response.ok) throw new Error(`probe failed ${response.status}`);
+      const payload = await response.json() as {
+        quota?: ModelQuotaSnapshot;
+        data?: ModelQuotaSnapshot[];
+      };
+      if (Array.isArray(payload.data)) applyQuotas(payload.data);
+      else if (payload.quota) applyQuotas([payload.quota]);
+    } catch {
+      // Keep the current snapshot; the card can be retried when the gateway is reachable.
+    } finally {
+      setProbingModels((current) => current.filter((item) => item !== value));
+    }
+  }, [applyQuotas]);
 
   const selectModel = useCallback((value: string) => {
     setModel(value);
@@ -341,6 +402,8 @@ export default function Home() {
                   onOpenTester={() => setTab('tester')}
                   onOpenSettings={() => setTab('settings')}
                   onRefresh={() => void refreshModels(true)}
+                  onProbeModel={(value) => void probeModel(value)}
+                  probingModels={probingModels}
                 />
               </div>
             ) : tab === 'tester' ? (

@@ -5,7 +5,7 @@ import { makeModel } from './fixtures.js';
 
 describe('scoreModel', () => {
   it('S1: capability strategy scores 70b model >= 95', () => {
-    const m = makeModel('llama-3.1-70b-instruct', 'cerebras');
+    const m = makeModel('llama-3.1-70b-instruct', 'openrouter');
     assert.ok(scoreModel(m, 'capability') >= 95);
   });
 
@@ -20,14 +20,14 @@ describe('scoreModel', () => {
     assert.equal(scoreModel(big, 'capability') - scoreModel(base, 'capability'), 5);
   });
 
-  it('S4: speed strategy gives cerebras = 95', () => {
-    const m = makeModel('llama-3-8b', 'cerebras');
-    assert.equal(scoreModel(m, 'speed'), 95);
-  });
-
-  it('S5: speed strategy gives gemini-flash = 85', () => {
+  it('S4: speed strategy gives gemini-flash = 85', () => {
     const m = makeModel('gemini-2.0-flash', 'gemini');
     assert.equal(scoreModel(m, 'speed'), 85);
+  });
+
+  it('S5: speed strategy gives generic flash id = 78', () => {
+    const m = makeModel('llama-flash-8b', 'openrouter');
+    assert.equal(scoreModel(m, 'speed'), 78);
   });
 
   it('S6: speed strategy gives opus = 35', () => {
@@ -43,9 +43,9 @@ describe('scoreModel', () => {
     assert.equal(score, expected);
   });
 
-  it('S8: rate-limit strategy falls back to provider baseline (cerebras=85)', () => {
-    const m = makeModel('anything', 'cerebras');
-    assert.equal(scoreModel(m, 'rate-limit'), 85);
+  it('S8: rate-limit strategy falls back to provider baseline (siliconflow=70)', () => {
+    const m = makeModel('anything', 'siliconflow');
+    assert.equal(scoreModel(m, 'rate-limit'), 70);
   });
 
   it('S9: profile.capabilityScore overrides heuristic', () => {
@@ -59,7 +59,7 @@ describe('scoreModel', () => {
   });
 
   it('S10: unknown provider falls back to 50 for rate-limit', () => {
-    const m = makeModel('nothing', 'sensenova');
+    const m = makeModel('nothing', 'custom');
     assert.equal(scoreModel(m, 'rate-limit'), 50);
   });
 });

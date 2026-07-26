@@ -49,16 +49,17 @@ export abstract class OpenAICompatibleProvider extends BaseProvider {
   }
 
   async chat(req: ChatRequest): Promise<ChatResponse> {
-    const res = await this.fetch(`${this.baseUrl()}/chat/completions`, {
+    const res = this.observeResponse(req.model, await this.fetch(`${this.baseUrl()}/chat/completions`, {
       method: 'POST',
       headers: this.buildHeaders(),
       body: JSON.stringify({ ...req, stream: false }),
-    });
+    }));
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`${this.id} chat failed ${res.status}: ${text}`);
     }
     const data = (await res.json()) as OpenAILikeResponse;
+    this.observeUsage(req.model, data.usage);
     const choice = data.choices[0];
     const msg = choice?.message;
     const primary = typeof msg?.content === 'string' ? msg.content : '';
@@ -77,11 +78,15 @@ export abstract class OpenAICompatibleProvider extends BaseProvider {
   }
 
   async *stream(req: ChatRequest): AsyncIterable<StreamChunk> {
-    const res = await this.fetch(`${this.baseUrl()}/chat/completions`, {
+    const res = this.observeResponse(req.model, await this.fetch(`${this.baseUrl()}/chat/completions`, {
       method: 'POST',
       headers: this.buildHeaders(),
-      body: JSON.stringify({ ...req, stream: true }),
-    });
+      body: JSON.stringify({
+        ...req,
+        stream: true,
+        stream_options: { include_usage: true },
+      }),
+    }));
     if (!res.ok || !res.body) {
       const text = await res.text();
       throw new Error(`${this.id} stream failed ${res.status}: ${text}`);
@@ -104,6 +109,7 @@ export abstract class OpenAICompatibleProvider extends BaseProvider {
         if (payload === '[DONE]') return;
         try {
           const json = JSON.parse(payload) as OpenAILikeResponse;
+          if (json.usage) this.observeUsage(req.model, json.usage);
           const choice = json.choices[0];
           const primaryDelta = choice?.delta?.content ?? '';
           const reasoningDelta =

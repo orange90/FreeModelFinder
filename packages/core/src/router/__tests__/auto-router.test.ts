@@ -167,7 +167,7 @@ describe('AutoRouter.preflight', () => {
 
   it('PF3: switches when model is cooling and a fallback exists', async () => {
     const cooling = makeModel('cool', 'gemini');
-    const alt = makeModel('llama-70b', 'cerebras');
+    const alt = makeModel('llama-70b', 'nvidia');
     const { router, notices } = makeRouter([cooling, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -215,7 +215,7 @@ describe('AutoRouter.preflight', () => {
 
   it('PF6: matches cooldown by bare model name when prefixed with provider:', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -228,15 +228,15 @@ describe('AutoRouter.preflight', () => {
 
   it('PF7: pickFallback filters out cooling models', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alsoCool = makeModel('also-cool', 'cerebras');
-    const good = makeModel('good', 'cerebras');
+    const alsoCool = makeModel('also-cool', 'nvidia');
+    const good = makeModel('good', 'nvidia');
     const { router } = makeRouter([cool, alsoCool, good]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
       resetAt: FUTURE(),
       message: '',
     });
-    router.markRateLimited('also-cool', 'cerebras', {
+    router.markRateLimited('also-cool', 'nvidia', {
       isRateLimit: true,
       resetAt: FUTURE(),
       message: '',
@@ -249,7 +249,7 @@ describe('AutoRouter.preflight', () => {
   it('PF8: pickFallback filters out models whose provider is cooling', async () => {
     const cool = makeModel('trigger', 'openrouter');
     const otherOR = makeModel('another-or', 'openrouter');
-    const good = makeModel('good', 'cerebras');
+    const good = makeModel('good', 'nvidia');
     const { router } = makeRouter([cool, otherOR, good]);
     router.markRateLimited('trigger', 'openrouter', {
       isRateLimit: true,
@@ -258,16 +258,16 @@ describe('AutoRouter.preflight', () => {
     });
     const r = await router.preflight('openrouter:trigger');
     assert.equal(r.switched, true);
-    if (r.switched) assert.equal(r.model.provider, 'cerebras');
+    if (r.switched) assert.equal(r.model.provider, 'nvidia');
   });
 
   it('PF9: fallbackChain wins over score', async () => {
     const cool = makeModel('cool', 'gemini');
-    const preferred = makeModel('llama-70b', 'cerebras');
-    const better = makeModel('llama-405b', 'cerebras');
+    const preferred = makeModel('llama-70b', 'nvidia');
+    const better = makeModel('llama-405b', 'nvidia');
     const { router } = makeRouter(
       [cool, preferred, better],
-      makeSettings({ fallbackChain: ['cerebras:llama-70b'] }),
+      makeSettings({ fallbackChain: ['nvidia:llama-70b'] }),
     );
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -281,18 +281,18 @@ describe('AutoRouter.preflight', () => {
 
   it('PF10: falls back to score when all fallbackChain entries are unavailable', async () => {
     const cool = makeModel('cool', 'gemini');
-    const chainA = makeModel('chain-a', 'cerebras');
-    const scoreWinner = makeModel('llama-70b', 'cerebras');
+    const chainA = makeModel('chain-a', 'nvidia');
+    const scoreWinner = makeModel('llama-70b', 'nvidia');
     const { router } = makeRouter(
       [cool, chainA, scoreWinner],
-      makeSettings({ fallbackChain: ['cerebras:chain-a'] }),
+      makeSettings({ fallbackChain: ['nvidia:chain-a'] }),
     );
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
       resetAt: FUTURE(),
       message: '',
     });
-    router.markRateLimited('chain-a', 'cerebras', {
+    router.markRateLimited('chain-a', 'nvidia', {
       isRateLimit: true,
       resetAt: FUTURE(),
       message: '',
@@ -304,7 +304,7 @@ describe('AutoRouter.preflight', () => {
 
   it('PF11: rememberPreference kicks in after first switch', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('llama-70b', 'cerebras');
+    const alt = makeModel('llama-70b', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -317,15 +317,15 @@ describe('AutoRouter.preflight', () => {
 
   it('PF12: originalPreference not overwritten by later switches', async () => {
     const cool1 = makeModel('cool1', 'gemini');
-    const cool2 = makeModel('cool2', 'cerebras');
-    const alt = makeModel('alt', 'cerebras');
+    const cool2 = makeModel('cool2', 'nvidia');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool1, cool2, alt]);
     router.markRateLimited('cool1', 'gemini', {
       isRateLimit: true,
       resetAt: FUTURE(),
       message: '',
     });
-    router.markRateLimited('cool2', 'cerebras', {
+    router.markRateLimited('cool2', 'nvidia', {
       isRateLimit: true,
       resetAt: FUTURE(),
       message: '',
@@ -337,7 +337,7 @@ describe('AutoRouter.preflight', () => {
 
   it('PF13: excluded model cannot fallback to itself (case-insensitive & prefixed)', async () => {
     const cool = makeModel('COOL', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -354,7 +354,7 @@ describe('AutoRouter.pickFallback (strategy)', () => {
   it('F1: capability picks the highest-capability model', async () => {
     const excluded = makeModel('excluded', 'gemini');
     const small = makeModel('llama-3b', 'siliconflow');
-    const big = makeModel('llama-70b', 'cerebras');
+    const big = makeModel('llama-70b', 'nvidia');
     const { router } = makeRouter(
       [excluded, small, big],
       makeSettings({ strategy: 'capability' }),
@@ -363,16 +363,16 @@ describe('AutoRouter.pickFallback (strategy)', () => {
     assert.equal(fb?.id, 'llama-70b');
   });
 
-  it('F2: speed picks cerebras over slow models', async () => {
-    const excluded = makeModel('excluded', 'gemini');
+  it('F2: speed picks gemini-flash over slow models', async () => {
+    const excluded = makeModel('excluded', 'openrouter');
     const slow = makeModel('claude-3-opus', 'openrouter');
-    const fast = makeModel('llama-3-8b', 'cerebras');
+    const fast = makeModel('gemini-2.0-flash', 'gemini');
     const { router } = makeRouter(
       [excluded, slow, fast],
       makeSettings({ strategy: 'speed' }),
     );
     const fb = await router.pickFallback('excluded');
-    assert.equal(fb?.provider, 'cerebras');
+    assert.equal(fb?.provider, 'gemini');
   });
 
   it('F3: rate-limit picks the profile with highest rpmLimit', async () => {
@@ -461,7 +461,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 
   it('B2: returns null when preferred == current', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router, notices } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -476,7 +476,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 
   it('B3: does not switch back while preferred is still cooling', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -489,7 +489,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 
   it('B4: switches back after cooldown clears and clears preference', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     // Cool with resetAt in the past so preflight can NOT proc; but we
     // seed rememberPreference manually to isolate this path.
@@ -504,7 +504,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 
   it('B5: does not switch back while preferred provider still cooling', async () => {
     const cool = makeModel('cool', 'openrouter');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     // manually seed provider cooldown
     router.markRateLimited('cool', 'openrouter', {
@@ -519,7 +519,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
   });
 
   it('B6: returns null when preferred model no longer exists in list', async () => {
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([alt]);
     router.rememberPreference('vanished');
     assert.equal(await router.maybeSwitchBack('alt'), null);
@@ -527,7 +527,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 
   it('B7: does not switch back when matched model provider is cooling (indirect)', async () => {
     const cool = makeModel('preferred', 'openrouter');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     // provider cooling triggered by a different model
     router.markRateLimited('other', 'openrouter', {
@@ -541,7 +541,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 
   it('B8: preferred lookup is case-insensitive', async () => {
     const cool = makeModel('CooL', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router } = makeRouter([cool, alt]);
     router.rememberPreference('cool');
     const notice = await router.maybeSwitchBack('alt');
@@ -552,7 +552,7 @@ describe('AutoRouter.maybeSwitchBack', () => {
 describe('AutoRouter switch-notice content', () => {
   it('N1: model-scope switch message mentions "已达到请求限制"', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router, notices } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -579,7 +579,7 @@ describe('AutoRouter switch-notice content', () => {
 
   it('N3: message includes localized strategy label', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router, notices } = makeRouter(
       [cool, alt],
       makeSettings({ strategy: 'speed' }),
@@ -595,7 +595,7 @@ describe('AutoRouter switch-notice content', () => {
 
   it('N4: resetAt is formatted as YYYY-MM-DD HH:mm:ss', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router, notices } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
@@ -608,7 +608,7 @@ describe('AutoRouter switch-notice content', () => {
 
   it('N5: switch-back message contains "限制已解除"', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router, notices } = makeRouter([cool, alt]);
     router.rememberPreference('cool');
     await router.maybeSwitchBack('alt');
@@ -618,7 +618,7 @@ describe('AutoRouter switch-notice content', () => {
 
   it('N6: onNotice is invoked exactly once per switch', async () => {
     const cool = makeModel('cool', 'gemini');
-    const alt = makeModel('alt', 'cerebras');
+    const alt = makeModel('alt', 'nvidia');
     const { router, notices } = makeRouter([cool, alt]);
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,

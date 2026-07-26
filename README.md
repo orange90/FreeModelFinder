@@ -7,6 +7,7 @@ FreeModelFinder 把多个提供商的免费大模型汇总到一个本地网关�
 - 实时模型目录：读取当前账号实际可见的免费模型，不维护容易过期的静态榜单
 - 本地多协议网关：OpenAI `/v1/chat/completions`、Anthropic `/v1/messages`、Gemini `/v1beta/...`
 - Web UI：浏览模型、查看 provider 拉取失败原因、流式对话和管理密钥
+- 配额观测：在模型卡片显示会话 Token、重置时间和 RPM / RPH / RPD 等多时间窗剩余额度
 - CLI：管理密钥、切换默认模型、列出模型和终端聊天
 - 自动路由：遇到上游限流时，可按模型规格、速度或配额启发式选择备用模型
 
@@ -24,7 +25,6 @@ FreeModelFinder 把多个提供商的免费大模型汇总到一个本地网关�
 | Cohere | 只列入 Trial Key 可调用的聊天模型；它们共享开发测试速率限制 |
 | Hugging Face | 只接受上游模型接口明确报告零价格的实时推理端点 |
 | SenseNova | 只接受输入、输出价格都为 0 的文本模型 |
-| DeepSeek / DashScope | 试用赠金不等于免费模型，因此收费型号不会进入目录 |
 
 其他已实现 provider 使用其官方免费开发额度或明确的免费型号列表。免费政策会变化，UI 会同时显示 provider 拉取失败，不会用旧缓存伪装成功。
 
@@ -95,6 +95,14 @@ gemini:gemini-3.5-flash
 网关认证默认关闭。若在设置页启用了认证，请把生成的本地 Gateway Key 作为 Bearer Token 传入。Web UI 只会从本机读取这个 Key。
 
 Anthropic 兼容端点为 `POST http://127.0.0.1:11435/v1/messages`。Gemini 兼容 Base URL 为 `http://127.0.0.1:11435/v1beta`。
+
+## 配额显示说明
+
+模型页优先读取上游返回的 `RateLimit-*` / `X-RateLimit-*` / `Retry-After` 响应头，并支持同时展示请求或 Token 的秒、分钟、小时、天和月等多个时间窗。没有标准额度响应头时，页面只会使用已知规则与经过本地网关的请求做估算，并明确标记“本地估算”；其他客户端或控制台产生的用量无法由本地会话感知。
+
+每个额度窗口都带有 `model` 或 `provider` scope。Provider scope 只维护一份共享计数：OpenRouter 免费模型 RPD、Cohere 月调用数、ModelScope 账号日总量发生变化时，同 Provider 的所有模型卡片会一起更新；模型级限制仍分别计算。Cloudflare 的每日 Neuron 池同样标记为共享，但上游未报告实际 Neuron 消耗时，剩余值会保持未知。
+
+“检测额度”会向所选模型发送一次最多生成 8 tokens 的轻量请求。Provider 不提供剩余额度接口或响应头时，可用性和本地会话 Token 仍会更新，但剩余额度会保持“未知”，不会伪造精确数字。
 
 ## CLI
 

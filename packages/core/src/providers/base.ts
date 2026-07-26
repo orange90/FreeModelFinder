@@ -2,14 +2,27 @@ import type {
   ChatRequest,
   ChatResponse,
   ModelInfo,
-  ProviderCredentials,
   ProviderId,
+  ProviderCredentials,
+  QuotaWindow,
   StreamChunk,
 } from '../types.js';
 
 export interface ProviderContext {
   credentials: ProviderCredentials;
   fetchImpl?: typeof fetch;
+  onResponse?: (event: {
+    provider: ProviderId;
+    model: string;
+    status: number;
+    headers: Headers;
+  }) => void;
+  onUsage?: (event: {
+    provider: ProviderId;
+    model: string;
+    usage?: ChatResponse['usage'];
+  }) => void;
+  onQuotaWindows?: (event: { provider: ProviderId; windows: QuotaWindow[] }) => void;
 }
 
 export abstract class BaseProvider {
@@ -20,6 +33,24 @@ export abstract class BaseProvider {
 
   protected get fetch(): typeof fetch {
     return this.ctx.fetchImpl ?? globalThis.fetch;
+  }
+
+  protected observeResponse(model: string, response: Response): Response {
+    this.ctx.onResponse?.({
+      provider: this.id,
+      model,
+      status: response.status,
+      headers: response.headers,
+    });
+    return response;
+  }
+
+  protected observeUsage(model: string, usage?: ChatResponse['usage']): void {
+    this.ctx.onUsage?.({ provider: this.id, model, usage });
+  }
+
+  protected observeProviderQuota(windows: QuotaWindow[]): void {
+    this.ctx.onQuotaWindows?.({ provider: this.id, windows });
   }
 
   abstract listModels(): Promise<ModelInfo[]>;

@@ -35,6 +35,15 @@ type CustomModelDef = {
   contextWindow?: number;
 };
 
+type CustomSourceDef = {
+  id: string;
+  label?: string;
+  baseUrl: string;
+  apiKey?: string;
+  hasKey?: boolean;
+  models: CustomModelDef[];
+};
+
 type ConfigRes = {
   port: number;
   defaultModel?: string;
@@ -52,6 +61,7 @@ type ConfigRes = {
     hasKey: boolean;
     baseUrl: string;
     models: CustomModelDef[];
+    sources?: CustomSourceDef[];
   };
 };
 
@@ -105,14 +115,13 @@ export function SettingsView({
   const [copied, setCopied] = useState<string | null>(null);
 
   const [customSectionOpen, setCustomSectionOpen] = useState(true);
-  const [customBaseUrl, setCustomBaseUrl] = useState('');
-  const [customApiKey, setCustomApiKey] = useState('');
-  const [customKeyVisible, setCustomKeyVisible] = useState(false);
-  const [customModels, setCustomModels] = useState<CustomModelDef[]>([]);
-  const [customNewModelId, setCustomNewModelId] = useState('');
-  const [customNewModelName, setCustomNewModelName] = useState('');
-  const [customNewModelCtx, setCustomNewModelCtx] = useState('');
+  const [customSources, setCustomSources] = useState<CustomSourceDef[]>([]);
+  const [customKeyVisible, setCustomKeyVisible] = useState<Record<string, boolean>>({});
   const [customSaveState, setCustomSaveState] = useState<SaveState>('idle');
+  const [customNewSourceName, setCustomNewSourceName] = useState('');
+  const [customModelDraft, setCustomModelDraft] = useState<
+    Record<string, { id: string; name: string; ctx: string }>
+  >({});
 
   type AutoRouteInfo = {
     enabled: boolean;
@@ -195,8 +204,20 @@ export function SettingsView({
           }));
         }
         if (c.custom) {
-          setCustomBaseUrl(c.custom.baseUrl ?? '');
-          setCustomModels(Array.isArray(c.custom.models) ? c.custom.models : []);
+          const list = Array.isArray(c.custom.sources) && c.custom.sources.length > 0
+            ? c.custom.sources
+            : c.custom.baseUrl
+              ? [
+                  {
+                    id: 'default',
+                    label: 'Custom',
+                    baseUrl: c.custom.baseUrl,
+                    hasKey: c.custom.hasKey,
+                    models: Array.isArray(c.custom.models) ? c.custom.models : [],
+                  },
+                ]
+              : [];
+          setCustomSources(list.map((s) => ({ ...s, models: s.models ?? [] })));
         }
       })
       .catch(() => setGatewayError('未能连接到本地网关，请先运行 `fmf serve`。'));
@@ -357,51 +378,109 @@ export function SettingsView({
     }
   }
 
-  function addCustomModel() {
-    const id = customNewModelId.trim();
-    if (!id) return;
-    if (customModels.some((m) => m.id === id)) {
-      setToast({ kind: 'error', text: `模型 ${id} 已存在` });
-      return;
-    }
-    const ctxRaw = customNewModelCtx.trim();
-    const ctxNum = ctxRaw ? Number(ctxRaw) : NaN;
-    const entry: CustomModelDef = {
-      id,
-      displayName: customNewModelName.trim() || undefined,
-      contextWindow: Number.isFinite(ctxNum) && ctxNum > 0 ? ctxNum : undefined,
-    };
-    setCustomModels((list) => [...list, entry]);
-    setCustomNewModelId('');
-    setCustomNewModelName('');
-    setCustomNewModelCtx('');
+  function slugifySourceId(raw: string): string {
+    const base = raw
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-_]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return base || 'source';
   }
 
-  function removeCustomModel(id: string) {
-    setCustomModels((list) => list.filter((m) => m.id !== id));
+  function addCustomSource() {
+    const name = customNewSourceName.trim();
+    if (!name) {
+      setToast({ kind: 'error', text: '请填写源名称' });
+      return;
+    }
+    let id = slugifySourceId(name);
+    if (customSources.some((s) => s.id === id)) {
+      let i = 2;
+      while (customSources.some((s) => s.id === `${id}-${i}`)) i++;
+      id = `${id}-${i}`;
+    }
+    setCustomSources((list) => [
+      ...list,
+      { id, label: name, baseUrl: '', apiKey: '', models: [] },
+    ]);
+    setCustomNewSourceName('');
+  }
+
+  function removeCustomSource(sourceId: string) {
+    setCustomSources((list) => list.filter((s) => s.id !== sourceId));
+  }
+
+  function patchCustomSource(sourceId: string, patch: Partial<CustomSourceDef>) {
+    setCustomSources((list) =>
+      list.map((s) => (s.id === sourceId ? { ...s, ...patch } : s)),
+    );
+  }
+
+  function addModelToSource(sourceId: string) {
+    const draft = customModelDraft[sourceId] ?? { id: '', name: '', ctx: '' };
+    const id = draft.id.trim();
+    if (!id) return;
+    const source = customSources.find((s) => s.id === sourceId);
+    if (!source) return;
+    if (source.models.some((m) => m.id === id)) {
+      setToast({ kind: 'error', text: `${sourceId} 已存在模型 ${id}` });
+      return;
+    }
+    const ctxNum = draft.ctx.trim() ? Number(draft.ctx) : NaN;
+    const entry: CustomModelDef = {
+      id,
+      displayName: draft.name.trim() || undefined,
+      contextWindow: Number.isFinite(ctxNum) && ctxNum > 0 ? ctxNum : undefined,
+    };
+    patchCustomSource(sourceId, { models: [...source.models, entry] });
+    setCustomModelDraft((d) => ({ ...d, [sourceId]: { id: '', name: '', ctx: '' } }));
+  }
+
+  function removeModelFromSource(sourceId: string, modelId: string) {
+    const source = customSources.find((s) => s.id === sourceId);
+    if (!source) return;
+    patchCustomSource(sourceId, {
+      models: source.models.filter((m) => m.id !== modelId),
+    });
   }
 
   async function saveCustomProvider() {
-    const baseUrl = customBaseUrl.trim();
-    if (!baseUrl) {
-      setToast({ kind: 'error', text: '请先填写 Base URL' });
+    if (customSources.length === 0) {
+      setToast({ kind: 'error', text: '请至少添加一个自定义源' });
       return;
     }
-    if (customModels.length === 0) {
-      setToast({ kind: 'error', text: '请至少添加一个模型 ID' });
-      return;
+    for (const s of customSources) {
+      if (!s.baseUrl.trim()) {
+        setToast({ kind: 'error', text: `源「${s.label || s.id}」缺少 Base URL` });
+        return;
+      }
+      if (s.models.length === 0) {
+        setToast({
+          kind: 'error',
+          text: `源「${s.label || s.id}」至少需要一个模型`,
+        });
+        return;
+      }
     }
     setCustomSaveState('saving');
     try {
+      const payloadSources = customSources.map((s) => {
+        const nextKey =
+          typeof s.apiKey === 'string' && s.apiKey.trim() ? s.apiKey.trim() : undefined;
+        return {
+          id: s.id,
+          label: s.label,
+          baseUrl: s.baseUrl.trim(),
+          // If user did not type a new key but there was one before, keep it by omitting the field.
+          ...(nextKey !== undefined ? { apiKey: nextKey } : {}),
+          models: s.models,
+        };
+      });
       const body: Record<string, unknown> = {
         provider: 'custom',
         enabled: true,
-        baseUrl,
-        models: customModels,
+        sources: payloadSources,
       };
-      const apiKey = customApiKey.trim();
-      if (apiKey) body.apiKey = apiKey;
-      else if (!cfg?.custom?.hasKey) body.apiKey = 'sk-none';
       const res = await fetch(`${GATEWAY}/api/providers`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -418,14 +497,15 @@ export function SettingsView({
         throw new Error(`HTTP ${res.status}${detail}`);
       }
       setToast({ kind: 'success', text: '自定义模型已保存' });
-      setCustomApiKey('');
       setCustomSaveState('saved');
       setTimeout(() => setCustomSaveState('idle'), 1600);
       const refreshed = await fetch(`${GATEWAY}/api/config`).then((r) => r.json() as Promise<ConfigRes>);
       setCfg(refreshed);
       if (refreshed.custom) {
-        setCustomBaseUrl(refreshed.custom.baseUrl ?? '');
-        setCustomModels(refreshed.custom.models ?? []);
+        const list = Array.isArray(refreshed.custom.sources) && refreshed.custom.sources.length > 0
+          ? refreshed.custom.sources
+          : [];
+        setCustomSources(list.map((s) => ({ ...s, apiKey: '', models: s.models ?? [] })));
       }
       if (onModelsRefresh) {
         try {
@@ -452,14 +532,11 @@ export function SettingsView({
           provider: 'custom',
           enabled: false,
           clearCredentials: true,
-          models: [],
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setToast({ kind: 'success', text: '已清除自定义模型配置' });
-      setCustomBaseUrl('');
-      setCustomApiKey('');
-      setCustomModels([]);
+      setCustomSources([]);
       setCustomSaveState('idle');
       const refreshed = await fetch(`${GATEWAY}/api/config`).then((r) => r.json() as Promise<ConfigRes>);
       setCfg(refreshed);
@@ -1306,7 +1383,12 @@ export function SettingsView({
             <Sparkles size={14} strokeWidth={1.75} className="text-muted-foreground" />
             <h2 className="text-sm font-semibold tracking-tight text-foreground">自定义模型</h2>
             <span className="text-xs text-muted-foreground">
-              {customModels.length > 0 ? `${customModels.length} 个模型` : '通过 OpenAI 兼容协议接入你自己的模型'}
+              {customSources.length > 0
+                ? `${customSources.length} 个源 · ${customSources.reduce(
+                    (n, s) => n + s.models.length,
+                    0,
+                  )} 个模型`
+                : '通过 OpenAI 兼容协议接入你自己的模型（支持多源）'}
             </span>
           </div>
           <ChevronDown
@@ -1320,159 +1402,255 @@ export function SettingsView({
         </button>
         {customSectionOpen && (
           <div className="space-y-4 rounded-lg border border-border bg-surface p-4 shadow-sm">
-            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <div className="space-y-1.5">
-                <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground" htmlFor="custom-base-url">
-                  <Globe2 size={12} strokeWidth={1.75} /> Base URL
-                </label>
-                <input
-                  id="custom-base-url"
-                  type="text"
-                  className="w-full rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                  placeholder="https://api.example.com/v1"
-                  value={customBaseUrl}
-                  onChange={(e) => setCustomBaseUrl(e.target.value)}
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <p className="text-xs text-muted-foreground">
-                  OpenAI 兼容端点根路径，通常以 <code className="font-mono">/v1</code> 结尾。
-                </p>
+            {customSources.length === 0 ? (
+              <div className="rounded-md border border-dashed border-border bg-surface-muted/30 px-3 py-4 text-center text-xs text-muted-foreground">
+                尚未添加自定义源。可以为每个 Base URL 单独配置 API Key 和模型列表。
               </div>
-              <div className="space-y-1.5">
-                <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground" htmlFor="custom-api-key">
-                  <KeyRound size={12} strokeWidth={1.75} /> API Key
-                </label>
-                <div className="relative">
-                  <input
-                    id="custom-api-key"
-                    type={customKeyVisible ? 'text' : 'password'}
-                    className="w-full rounded-md border border-input bg-surface px-3 py-2 pr-9 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                    placeholder={cfg?.custom?.hasKey ? '••••••••••（留空则保持不变）' : '粘贴 API Key（本地无鉴权可留空）'}
-                    value={customApiKey}
-                    onChange={(e) => setCustomApiKey(e.target.value)}
-                    autoComplete="off"
-                    spellCheck={false}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setCustomKeyVisible((v) => !v)}
-                    aria-label={customKeyVisible ? '隐藏 Key' : '显示 Key'}
-                    className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    {customKeyVisible ? (
-                      <EyeOff size={13} strokeWidth={1.75} />
-                    ) : (
-                      <Eye size={13} strokeWidth={1.75} />
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  若为本地推理（如 Ollama、LM Studio）无需鉴权，可留空。
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="text-xs font-medium text-muted-foreground">模型列表</div>
-              {customModels.length > 0 ? (
-                <ul className="space-y-1.5">
-                  {customModels.map((m) => (
+            ) : (
+              <ul className="space-y-3">
+                {customSources.map((src) => {
+                  const draft = customModelDraft[src.id] ?? { id: '', name: '', ctx: '' };
+                  const isKeyVisible = !!customKeyVisible[src.id];
+                  const modelIdInputId = `custom-model-id-${src.id}`;
+                  return (
                     <li
-                      key={m.id}
-                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface-muted/40 px-3 py-2"
+                      key={src.id}
+                      className="space-y-3 rounded-lg border border-border bg-surface-muted/30 p-3"
                     >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <code className="truncate font-mono text-sm text-foreground">{m.id}</code>
-                          {m.displayName && (
-                            <span className="text-xs text-muted-foreground">· {m.displayName}</span>
-                          )}
-                          {m.contextWindow && (
-                            <Badge tone="neutral">
-                              {m.contextWindow.toLocaleString()} ctx
-                            </Badge>
-                          )}
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <input
+                            type="text"
+                            className="min-w-0 rounded-md border border-input bg-surface px-2 py-1 text-sm font-medium text-foreground shadow-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                            placeholder="源名称"
+                            value={src.label ?? ''}
+                            onChange={(e) =>
+                              patchCustomSource(src.id, { label: e.target.value })
+                            }
+                            aria-label={`源 ${src.id} 名称`}
+                          />
+                          <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
+                            custom:{src.id}
+                          </code>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeCustomSource(src.id)}
+                          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          aria-label={`删除源 ${src.id}`}
+                        >
+                          <Trash2 size={12} strokeWidth={1.75} />
+                          删除源
+                        </button>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                            <Globe2 size={12} strokeWidth={1.75} /> Base URL
+                          </div>
+                          <input
+                            type="text"
+                            className="w-full rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                            placeholder="https://api.example.com/v1"
+                            value={src.baseUrl}
+                            onChange={(e) =>
+                              patchCustomSource(src.id, { baseUrl: e.target.value })
+                            }
+                            autoComplete="off"
+                            spellCheck={false}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                            <KeyRound size={12} strokeWidth={1.75} /> API Key
+                          </div>
+                          <div className="relative">
+                            <input
+                              type={isKeyVisible ? 'text' : 'password'}
+                              className="w-full rounded-md border border-input bg-surface px-3 py-2 pr-9 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                              placeholder={
+                                src.hasKey
+                                  ? '••••••••••（留空则保持不变）'
+                                  : '粘贴 API Key（本地无鉴权可留空）'
+                              }
+                              value={src.apiKey ?? ''}
+                              onChange={(e) =>
+                                patchCustomSource(src.id, { apiKey: e.target.value })
+                              }
+                              autoComplete="off"
+                              spellCheck={false}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setCustomKeyVisible((v) => ({ ...v, [src.id]: !v[src.id] }))
+                              }
+                              aria-label={isKeyVisible ? '隐藏 Key' : '显示 Key'}
+                              className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              {isKeyVisible ? (
+                                <EyeOff size={13} strokeWidth={1.75} />
+                              ) : (
+                                <Eye size={13} strokeWidth={1.75} />
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeCustomModel(m.id)}
-                        aria-label={`删除 ${m.id}`}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <Trash2 size={13} strokeWidth={1.75} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="rounded-md border border-dashed border-border bg-surface-muted/30 px-3 py-4 text-center text-xs text-muted-foreground">
-                  尚未添加模型，请在下方输入模型 ID 后点击「添加」
-                </div>
-              )}
 
-              <div className="grid gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto]">
-                <input
-                  type="text"
-                  className="rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                  placeholder="模型 ID，例如 gpt-4o-mini"
-                  value={customNewModelId}
-                  onChange={(e) => setCustomNewModelId(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addCustomModel();
-                    }
-                  }}
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <input
-                  type="text"
-                  className="rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                  placeholder="显示名称（可选）"
-                  value={customNewModelName}
-                  onChange={(e) => setCustomNewModelName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addCustomModel();
-                    }
-                  }}
-                  autoComplete="off"
-                />
-                <input
-                  type="number"
-                  min={1}
-                  className="rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                  placeholder="上下文 (tokens)"
-                  value={customNewModelCtx}
-                  onChange={(e) => setCustomNewModelCtx(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addCustomModel();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={addCustomModel}
-                  disabled={!customNewModelId.trim()}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <Plus size={13} strokeWidth={2} />
-                  添加
-                </button>
-              </div>
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-muted-foreground">
+                          模型列表
+                        </div>
+                        {src.models.length > 0 ? (
+                          <ul className="space-y-1.5">
+                            {src.models.map((m) => (
+                              <li
+                                key={m.id}
+                                className="flex items-center justify-between gap-2 rounded-md border border-border bg-surface px-3 py-2"
+                              >
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <code className="truncate font-mono text-sm text-foreground">
+                                      {m.id}
+                                    </code>
+                                    {m.displayName && (
+                                      <span className="text-xs text-muted-foreground">
+                                        · {m.displayName}
+                                      </span>
+                                    )}
+                                    {m.contextWindow && (
+                                      <Badge tone="neutral">
+                                        {m.contextWindow.toLocaleString()} ctx
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeModelFromSource(src.id, m.id)}
+                                  aria-label={`删除 ${m.id}`}
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                >
+                                  <Trash2 size={13} strokeWidth={1.75} />
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="rounded-md border border-dashed border-border bg-surface/60 px-3 py-3 text-center text-xs text-muted-foreground">
+                            尚未添加模型，请在下方输入模型 ID 后点击「添加」
+                          </div>
+                        )}
+
+                        <div className="grid gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto]">
+                          <input
+                            id={modelIdInputId}
+                            type="text"
+                            className="rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                            placeholder="模型 ID，例如 gpt-4o-mini"
+                            value={draft.id}
+                            onChange={(e) =>
+                              setCustomModelDraft((d) => ({
+                                ...d,
+                                [src.id]: { ...draft, id: e.target.value },
+                              }))
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addModelToSource(src.id);
+                              }
+                            }}
+                            autoComplete="off"
+                            spellCheck={false}
+                          />
+                          <input
+                            type="text"
+                            className="rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                            placeholder="显示名称（可选）"
+                            value={draft.name}
+                            onChange={(e) =>
+                              setCustomModelDraft((d) => ({
+                                ...d,
+                                [src.id]: { ...draft, name: e.target.value },
+                              }))
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addModelToSource(src.id);
+                              }
+                            }}
+                            autoComplete="off"
+                          />
+                          <input
+                            type="number"
+                            min={1}
+                            className="rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                            placeholder="上下文 (tokens)"
+                            value={draft.ctx}
+                            onChange={(e) =>
+                              setCustomModelDraft((d) => ({
+                                ...d,
+                                [src.id]: { ...draft, ctx: e.target.value },
+                              }))
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addModelToSource(src.id);
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => addModelToSource(src.id)}
+                            disabled={!draft.id.trim()}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <Plus size={13} strokeWidth={2} />
+                            添加
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2 rounded-md border border-dashed border-border bg-surface-muted/30 p-3">
+              <input
+                type="text"
+                className="min-w-0 flex-1 rounded-md border border-input bg-surface px-3 py-2 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                placeholder="新源名称（例如 “本地 Ollama”、“公司内网”）"
+                value={customNewSourceName}
+                onChange={(e) => setCustomNewSourceName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCustomSource();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={addCustomSource}
+                disabled={!customNewSourceName.trim()}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Plus size={13} strokeWidth={2} />
+                添加源
+              </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => void saveCustomProvider()}
-                disabled={customSaveState === 'saving'}
+                disabled={customSaveState === 'saving' || customSources.length === 0}
                 className={classNames(
                   'inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   customSaveState === 'error'
@@ -1495,7 +1673,7 @@ export function SettingsView({
                       ? '重试'
                       : '保存自定义模型'}
               </button>
-              {cfg?.custom?.enabled && cfg.custom.hasKey && (
+              {cfg?.custom?.enabled && (
                 <button
                   type="button"
                   onClick={() => void clearCustomProvider()}
@@ -1506,7 +1684,7 @@ export function SettingsView({
                   清除全部
                 </button>
               )}
-              {cfg?.custom?.enabled && cfg.custom.hasKey && (
+              {cfg?.custom?.enabled && customSources.length > 0 && (
                 <Badge tone="success">
                   <Dot tone="success" />
                   已启用
