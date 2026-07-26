@@ -15,7 +15,7 @@
 
 <!-- FREE_MODELS_TABLE:START -->
 
-> 自动生成，请勿手动编辑；数据源：`free-models.json`。最后更新：2026-07-24
+> 自动生成，请勿手动编辑；数据源：`free-models.json`。最后更新：2026-07-26
 
 | 提供商 | 模型 | 模态 | 上下文 (K) | 速率限制 | 吞吐 (tps) | 智能水平 | API Base URL |
 | --- | --- | --- | ---: | --- | ---: | --- | --- |
@@ -53,8 +53,8 @@
 | [HuggingFace Router](https://huggingface.co) | `google/gemma-3-27b-it` | 文本 | 128 | — | 55 | AA 58 · Elo 1230 | `https://router.huggingface.co/v1` |
 | [HuggingFace Router](https://huggingface.co) | `MiniMaxAI/MiniMax-M1-80k` | 文本 | 80 | — | 40 | AA 62 · Elo 1240 | `https://router.huggingface.co/v1` |
 | [SenseNova (商汤)](https://platform.sensenova.cn) | `sensenova-6.7-flash-lite` | 文本 | 256 | 5 RPM | 40 | AA 68 · Elo 1245 | `https://token.sensenova.cn/v1` |
-| [SenseNova (商汤)](https://platform.sensenova.cn) | `deepseek-v4-flash` | 推理 | 1024 | 5 RPM | 30 | AA 85 · Elo 1340 | `https://token.sensenova.cn/v1` |
-| [SenseNova (商汤)](https://platform.sensenova.cn) | `glm-5.2` | 文本 | 1024 | 5 RPM | 30 | AA 78 · Elo 1305 | `https://token.sensenova.cn/v1` |
+| [SenseNova (商汤)](https://platform.sensenova.cn) | `deepseek-v4-flash` | 推理 | 1,024 | 5 RPM | 30 | AA 85 · Elo 1340 | `https://token.sensenova.cn/v1` |
+| [SenseNova (商汤)](https://platform.sensenova.cn) | `glm-5.2` | 文本 | 1,024 | 5 RPM | 30 | AA 78 · Elo 1305 | `https://token.sensenova.cn/v1` |
 
 ### 各提供商免费额度说明
 
