@@ -1,115 +1,155 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Compass, KeyRound, MessageSquare, Search } from 'lucide-react';
-import { ThemeToggle } from './theme';
+import {
+  KeyRound,
+  MessageSquare,
+  RefreshCw,
+  Search,
+  Wifi,
+  WifiOff,
+} from 'lucide-react';
 import { FinderView } from './components/FinderView';
-import { QuotaExceededModal } from './components/QuotaExceededModal';
 import { SettingsView } from './components/SettingsView';
 import { TesterView, type Msg } from './components/TesterView';
-import { BottomNav, SegmentedTabs, type SegmentedItem } from './components/SegmentedTabs';
+import { BottomNav, type SegmentedItem } from './components/SegmentedTabs';
+import { ThemeToggle } from './theme';
+import { modelValue, type ModelItem, type ModelsResponse, type ProviderFailure } from './lib/models';
 import { GATEWAY, classNames, withUiHeaders } from './lib/utils';
-import {
-  bumpUsage,
-  checkQuotaExceeded,
-  findModelQuota,
-  getCurrentUsage,
-  type QuotaExceededKind,
-  type QuotaInfo,
-} from './lib/usage';
 
-type ModelItem = { id: string; provider: string; display_name?: string };
 type TabKey = 'finder' | 'tester' | 'settings';
 
 const TABS: readonly SegmentedItem<TabKey>[] = [
-  { key: 'finder', label: '模型寻找', Icon: Search },
-  { key: 'tester', label: '测试模型', Icon: MessageSquare },
-  { key: 'settings', label: '模型配置', Icon: KeyRound },
+  { key: 'finder', label: '模型', Icon: Search },
+  { key: 'tester', label: '测试', Icon: MessageSquare },
+  { key: 'settings', label: '设置', Icon: KeyRound },
 ];
+
+const PAGE_COPY: Record<TabKey, { title: string; description: string }> = {
+  finder: { title: '免费模型', description: '实时发现与筛选' },
+  tester: { title: '对话测试', description: '直接比较模型表现' },
+  settings: { title: '本地设置', description: '来源、路由与接口' },
+};
+
+async function requestModels(): Promise<ModelsResponse> {
+  const response = await fetch(`${GATEWAY}/v1/models`, withUiHeaders());
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(detail || `gateway error ${response.status}`);
+  }
+  return response.json() as Promise<ModelsResponse>;
+}
 
 export default function Home() {
   const [models, setModels] = useState<ModelItem[]>([]);
-  const [model, setModel] = useState<string>('');
+  const [model, setModel] = useState('');
   const [tab, setTab] = useState<TabKey>('finder');
-  const [tabInitialized, setTabInitialized] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [modelLoading, setModelLoading] = useState(true);
   const [gatewayReachable, setGatewayReachable] = useState<boolean | null>(null);
-  const [quotaModal, setQuotaModal] = useState<
-    | {
-        kind: QuotaExceededKind;
-        quota: QuotaInfo;
-        limit: number;
-      }
-    | null
-  >(null);
+  const [failures, setFailures] = useState<ProviderFailure[]>([]);
 
-  useEffect(() => {
-    fetch(`${GATEWAY}/v1/models`, withUiHeaders())
-      .then((r) => r.json())
-      .then((d: { data: ModelItem[] }) => {
-        const list = d.data ?? [];
-        setModels(list);
-        setGatewayReachable(true);
-        if (list[0]) setModel(`${list[0].provider}:${list[0].id}`);
-        if (!tabInitialized) {
-          setTab(list.length > 0 ? 'tester' : 'finder');
-          setTabInitialized(true);
-        }
-      })
-      .catch(() => {
-        setGatewayReachable(false);
-        if (!tabInitialized) {
-          setTab('finder');
-          setTabInitialized(true);
-        }
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const applyModels = useCallback((payload: ModelsResponse) => {
+    const list = Array.isArray(payload.data) ? payload.data.filter((item) => item.free !== false) : [];
+    setModels(list);
+    setFailures(payload.fmf?.failed_providers ?? []);
+    setGatewayReachable(true);
+    setModel((current) => {
+      if (current && list.some((item) => modelValue(item) === current)) return current;
+      return list[0] ? modelValue(list[0]) : '';
+    });
+    return list;
   }, []);
 
-  const refreshModels = useCallback(async () => {
-    try {
-      const res = await fetch(`${GATEWAY}/v1/models`, withUiHeaders());
-      const d: { data: ModelItem[] } = await res.json();
-      const list = d.data ?? [];
-      setModels(list);
-      setGatewayReachable(true);
-      setModel((prev) => {
-        if (prev && list.some((m) => `${m.provider}:${m.id}` === prev)) return prev;
-        return list[0] ? `${list[0].provider}:${list[0].id}` : '';
-      });
-      return list;
-    } catch {
-      setGatewayReachable(false);
-      return [] as ModelItem[];
-    }
+  const refreshModels = useCallback(
+    async (force = false): Promise<ModelItem[]> => {
+      setModelLoading(true);
+      try {
+        if (force) {
+          const refreshed = await fetch(
+            `${GATEWAY}/v1/models/refresh`,
+            withUiHeaders({ method: 'POST' }),
+          );
+          if (!refreshed.ok) throw new Error(`refresh failed ${refreshed.status}`);
+        }
+        return applyModels(await requestModels());
+      } catch {
+        setGatewayReachable(false);
+        return [];
+      } finally {
+        setModelLoading(false);
+      }
+    },
+    [applyModels],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      setModelLoading(true);
+      try {
+        const [modelPayload, config] = await Promise.all([
+          requestModels(),
+          fetch(`${GATEWAY}/api/config`, withUiHeaders()).then(async (response) => {
+            if (!response.ok) throw new Error(`config error ${response.status}`);
+            return response.json() as Promise<{ defaultModel?: string }>;
+          }),
+        ]);
+        if (cancelled) return;
+        const list = applyModels(modelPayload);
+        const preferred = config.defaultModel;
+        if (preferred && list.some((item) => modelValue(item) === preferred)) {
+          setModel(preferred);
+        } else if (list[0]) {
+          const fallback = modelValue(list[0]);
+          setModel(fallback);
+          void fetch(
+            `${GATEWAY}/api/default-model`,
+            withUiHeaders({
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ model: fallback }),
+            }),
+          );
+        }
+      } catch {
+        if (!cancelled) setGatewayReachable(false);
+      } finally {
+        if (!cancelled) setModelLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [applyModels]);
+
+  const selectModel = useCallback((value: string) => {
+    setModel(value);
+    if (!value) return;
+    void fetch(`${GATEWAY}/api/default-model`, {
+      ...withUiHeaders({
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ model: value }),
+      }),
+    }).catch(() => {
+      // The in-memory selection still works when persistence is temporarily unavailable.
+    });
   }, []);
 
   async function send() {
     if (!input.trim() || streaming || !model) return;
 
-    const quota = findModelQuota(model);
-    if (quota) {
-      const usage = getCurrentUsage(model);
-      const exceeded = checkQuotaExceeded(quota, usage);
-      if (exceeded) {
-        const limit = exceeded === 'day' ? (quota.reqPerDay ?? 0) : (quota.reqPerMin ?? 0);
-        setQuotaModal({ kind: exceeded, quota, limit });
-        return;
-      }
-    }
-
-    const next: Msg[] = [...messages, { role: 'user', content: input }];
-    setMessages(next);
+    const next: Msg[] = [...messages, { role: 'user', content: input.trim() }];
+    const assistantIndex = next.length;
+    setMessages([...next, { role: 'assistant', content: '' }]);
     setInput('');
     setStreaming(true);
 
-    const assistantIdx = next.length;
-    setMessages([...next, { role: 'assistant', content: '' }]);
-
     try {
-      const res = await fetch(
+      const response = await fetch(
         `${GATEWAY}/v1/chat/completions`,
         withUiHeaders({
           method: 'POST',
@@ -117,179 +157,220 @@ export default function Home() {
           body: JSON.stringify({ model, messages: next, stream: true }),
         }),
       );
-      if (!res.ok || !res.body) throw new Error(`gateway error ${res.status}`);
-      bumpUsage(model);
-      const reader = res.body.getReader();
+      if (!response.ok || !response.body) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(detail || `gateway error ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-      let acc = '';
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split('\n');
-        buffer = parts.pop() ?? '';
-        for (const raw of parts) {
+      let accumulated = '';
+      let finished = false;
+
+      while (!finished) {
+        const chunk = await reader.read();
+        finished = chunk.done;
+        buffer += decoder.decode(chunk.value, { stream: !chunk.done });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const raw of lines) {
           const line = raw.trim();
           if (!line.startsWith('data:')) continue;
           const payload = line.slice(5).trim();
-          if (payload === '[DONE]') continue;
+          if (!payload || payload === '[DONE]') continue;
           try {
-            const json = JSON.parse(payload);
-            const delta = json.choices?.[0]?.delta?.content ?? '';
-            if (delta) {
-              acc += delta;
-              setMessages((prev) => {
-                const copy = [...prev];
-                copy[assistantIdx] = { role: 'assistant', content: acc };
-                return copy;
-              });
+            const json = JSON.parse(payload) as {
+              choices?: Array<{ delta?: { content?: string } }>;
+              error?: string | { message?: string };
+            };
+            if (json.error) {
+              const message =
+                typeof json.error === 'string' ? json.error : json.error.message ?? 'upstream error';
+              throw new Error(message);
             }
-          } catch {
-            /* ignore */
+            const delta = json.choices?.[0]?.delta?.content ?? '';
+            if (!delta) continue;
+            accumulated += delta;
+            const content = accumulated;
+            setMessages((current) => {
+              const copy = [...current];
+              copy[assistantIndex] = { role: 'assistant', content };
+              return copy;
+            });
+          } catch (error) {
+            if (error instanceof SyntaxError) continue;
+            throw error;
           }
         }
       }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setMessages((prev) => {
-        const copy = [...prev];
-        copy[assistantIdx] = { role: 'assistant', content: `[error] ${msg}` };
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      setMessages((current) => {
+        const copy = [...current];
+        copy[assistantIndex] = { role: 'assistant', content: `[error] ${detail}` };
         return copy;
       });
     } finally {
       setStreaming(false);
-      if (quota) {
-        const latest = getCurrentUsage(model);
-        const exceededAfter = checkQuotaExceeded(quota, latest);
-        if (exceededAfter) {
-          const limit =
-            exceededAfter === 'day' ? (quota.reqPerDay ?? 0) : (quota.reqPerMin ?? 0);
-          setQuotaModal({ kind: exceededAfter, quota, limit });
-        }
-      }
     }
   }
 
-  const hasModels = models.length > 0;
-  const enabledProviders = Array.from(new Set(models.map((m) => m.provider)));
-  const quota = model ? findModelQuota(model) : null;
-  const usage = model ? getCurrentUsage(model) : null;
+  const currentPage = PAGE_COPY[tab];
 
   return (
-    <main className="mx-auto flex h-screen w-full max-w-[1440px] flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-30 relative flex h-14 items-center justify-between gap-3 border-b border-border bg-background px-4 md:px-6">
-        <div className="flex items-center gap-3">
-          <div
-            aria-hidden
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary"
+    <main className="h-[100dvh] min-h-0 bg-background text-foreground">
+      <div className="mx-auto grid h-full min-h-0 max-w-[1600px] md:grid-cols-[220px_minmax(0,1fr)]">
+        <aside className="hidden min-h-0 flex-col border-r border-border bg-surface px-4 py-5 md:flex">
+          <button
+            type="button"
+            onClick={() => setTab('finder')}
+            className="flex items-center gap-3 rounded-xl px-2 py-1.5 text-left"
           >
-            <Compass size={17} strokeWidth={1.75} />
-          </div>
-          <div className="leading-tight">
-            <h1 className="font-semibold tracking-tight text-foreground">
-              <span className="text-lg text-primary">Free</span>
-              <span className="text-sm text-muted-foreground">ModelFinder</span>
-            </h1>
-            <p className="hidden text-xs text-muted-foreground sm:block">
-              免费大模型发现与测试工作台
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-foreground text-xs font-bold tracking-tight text-background">
+              FM
+            </span>
+            <span>
+              <span className="block text-sm font-semibold tracking-[-0.02em]">FreeModelFinder</span>
+              <span className="block text-[11px] text-muted-foreground">Local model gateway</span>
+            </span>
+          </button>
+
+          <nav className="mt-10 space-y-1" aria-label="主导航">
+            {TABS.map((item) => {
+              const active = item.key === tab;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTab(item.key)}
+                  className={classNames(
+                    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                    active
+                      ? 'bg-foreground text-background'
+                      : 'text-muted-foreground hover:bg-surface-muted hover:text-foreground',
+                  )}
+                >
+                  <item.Icon size={16} strokeWidth={active ? 2 : 1.75} />
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto rounded-2xl border border-border bg-background p-3.5">
+            <div className="flex items-center gap-2">
+              <span
+                className={classNames(
+                  'h-2 w-2 rounded-full',
+                  gatewayReachable == null
+                    ? 'bg-muted-foreground'
+                    : gatewayReachable
+                      ? 'bg-success'
+                      : 'bg-destructive',
+                )}
+              />
+              <span className="text-xs font-medium text-foreground">
+                {gatewayReachable == null
+                  ? '正在连接'
+                  : gatewayReachable
+                    ? '网关在线'
+                    : '网关离线'}
+              </span>
+            </div>
+            <p className="mt-2 truncate font-mono text-[10px] text-muted-foreground">{GATEWAY}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {models.length} 个免费模型
             </p>
           </div>
-        </div>
+        </aside>
 
-        <div className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block">
-          <div className="pointer-events-auto">
-            <SegmentedTabs
-              items={TABS}
-              value={tab}
-              onChange={setTab}
-              ariaLabel="主导航"
-            />
-          </div>
-        </div>
+        <section className="flex min-h-0 min-w-0 flex-col">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-5 md:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-foreground text-[10px] font-bold text-background md:hidden">
+                FM
+              </div>
+              <div className="min-w-0">
+                <h1 className="truncate text-sm font-semibold tracking-[-0.02em]">
+                  {currentPage.title}
+                </h1>
+                <p className="truncate text-[11px] text-muted-foreground">
+                  {currentPage.description}
+                </p>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-        </div>
-      </header>
+            <div className="flex items-center gap-2">
+              <div
+                className={classNames(
+                  'hidden items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[11px] sm:flex',
+                  gatewayReachable
+                    ? 'border-success/20 bg-success/5 text-success'
+                    : 'border-border bg-surface text-muted-foreground',
+                )}
+              >
+                {gatewayReachable ? <Wifi size={12} /> : <WifiOff size={12} />}
+                {gatewayReachable ? '已连接' : '未连接'}
+              </div>
+              <button
+                type="button"
+                aria-label="同步模型"
+                title="同步模型"
+                onClick={() => void refreshModels(true)}
+                disabled={modelLoading}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition hover:bg-surface-muted hover:text-foreground disabled:opacity-50"
+              >
+                <RefreshCw size={15} className={modelLoading ? 'animate-spin' : undefined} />
+              </button>
+              <ThemeToggle className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/10" />
+            </div>
+          </header>
 
-      <div className="flex-1 overflow-hidden">
-        {tab === 'finder' ? (
-          <div className="h-full overflow-y-auto">
-            <FinderView
-              gatewayReachable={gatewayReachable}
-              hasModels={hasModels}
-              configuredProviderCount={enabledProviders.length}
-            />
+          <div className="min-h-0 flex-1 overflow-hidden">
+            {tab === 'finder' ? (
+              <div className="h-full overflow-y-auto">
+                <FinderView
+                  models={models}
+                  selectedModel={model}
+                  gatewayReachable={gatewayReachable}
+                  loading={modelLoading}
+                  failures={failures}
+                  onSelectModel={selectModel}
+                  onOpenTester={() => setTab('tester')}
+                  onOpenSettings={() => setTab('settings')}
+                  onRefresh={() => void refreshModels(true)}
+                />
+              </div>
+            ) : tab === 'tester' ? (
+              <TesterView
+                messages={messages}
+                streaming={streaming}
+                input={input}
+                model={model}
+                models={models}
+                setInput={setInput}
+                send={send}
+                onModelChange={selectModel}
+                onClear={() => setMessages([])}
+              />
+            ) : (
+              <div className="h-full overflow-y-auto">
+                <SettingsView
+                  models={models}
+                  model={model}
+                  onModelChange={selectModel}
+                  onModelsRefresh={() => refreshModels(false)}
+                />
+              </div>
+            )}
           </div>
-        ) : tab === 'tester' ? (
-          <TesterView
-            messages={messages}
-            streaming={streaming}
-            input={input}
-            model={model}
-            setInput={setInput}
-            send={send}
-            hasModels={hasModels}
-            quota={quota}
-            usage={usage}
-          />
-        ) : (
-          <div className="h-full overflow-y-auto">
-            <SettingsView
-              models={models}
-              model={model}
-              onModelChange={setModel}
-              onModelsRefresh={refreshModels}
-            />
-          </div>
-        )}
+
+          <BottomNav items={TABS} value={tab} onChange={setTab} />
+        </section>
       </div>
 
-      <div className="flex h-7 items-center justify-between border-t border-border bg-surface-muted/40 px-4 text-xs text-muted-foreground">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5">
-            <span
-              className={classNames(
-                'h-1.5 w-1.5 rounded-full',
-                gatewayReachable == null
-                  ? 'bg-muted-foreground/60'
-                  : gatewayReachable
-                    ? 'bg-success'
-                    : 'bg-destructive',
-              )}
-            />
-            网关
-            {gatewayReachable == null
-              ? '检测中'
-              : gatewayReachable
-                ? '已连接'
-                : '未连接'}
-          </span>
-          <span className="hidden text-muted-foreground/60 sm:inline">·</span>
-          <span className="hidden sm:inline">
-            {enabledProviders.length} 个平台 · {models.length} 个模型
-          </span>
-        </div>
-        <span className="hidden truncate font-mono text-xs sm:inline">{GATEWAY}</span>
-      </div>
-
-      <BottomNav items={TABS} value={tab} onChange={setTab} />
-
-      {quotaModal && (
-        <QuotaExceededModal
-          kind={quotaModal.kind}
-          quota={quotaModal.quota}
-          limit={quotaModal.limit}
-          onConfirm={() => {
-            setQuotaModal(null);
-            if (typeof window !== 'undefined') {
-              window.location.href = '/settings';
-            }
-          }}
-          onClose={() => setQuotaModal(null)}
-        />
-      )}
     </main>
   );
 }

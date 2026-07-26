@@ -2,7 +2,12 @@ import './proxy.js';
 import { randomBytes } from 'node:crypto';
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
-import { ProviderRegistry, loadConfig, updateConfig } from '@freemodelfinder/core';
+import {
+  ProviderIdSchema,
+  ProviderRegistry,
+  loadConfig,
+  updateConfig,
+} from '@freemodelfinder/core';
 import { registerOpenAIRoutes } from './routes/openai.js';
 import { registerAnthropicRoutes } from './routes/anthropic.js';
 import { registerGeminiRoutes } from './routes/gemini.js';
@@ -15,7 +20,7 @@ export interface ServerOptions {
   watchIntervalMs?: number;
 }
 
-const PROTECTED_PREFIXES = ['/v1/', '/anthropic/', '/gemini/'];
+const PROTECTED_PREFIXES = ['/v1/', '/v1beta/'];
 
 const LOOPBACK_HOSTS = new Set([
   '127.0.0.1',
@@ -54,7 +59,7 @@ function hasLocalOrigin(req: FastifyRequest): boolean {
     if (typeof raw !== 'string' || !raw) continue;
     try {
       const u = new URL(raw);
-      if (u.protocol === 'tauri:' || u.protocol === 'file:') return true;
+      if (u.protocol === 'tauri:') return true;
       if (LOCAL_ORIGIN_HOSTS.has(u.hostname)) return true;
     } catch {
       /* ignore malformed origin */
@@ -67,7 +72,7 @@ function isTrustedLocalUiRequest(req: FastifyRequest): boolean {
   if (!isLoopbackAddress(req.socket?.remoteAddress ?? null)) return false;
   const clientHeader = req.headers['x-fmf-client'];
   if (typeof clientHeader === 'string' && clientHeader.toLowerCase() === 'ui') {
-    return true;
+    return hasLocalOrigin(req);
   }
   const hasOrigin = !!(req.headers['origin'] || req.headers['referer']);
   if (!hasOrigin) {
@@ -86,7 +91,24 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
   listen: (port?: number, host?: string) => Promise<string>;
 }> {
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } });
-  await app.register(cors, { origin: true });
+  await app.register(cors, {
+    origin(origin, callback) {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      try {
+        const url = new URL(origin);
+        callback(
+          null,
+          url.protocol === 'tauri:' ||
+            LOCAL_ORIGIN_HOSTS.has(url.hostname),
+        );
+      } catch {
+        callback(null, false);
+      }
+    },
+  });
 
   let registry =
     opts.registry ??
@@ -137,7 +159,15 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
       providers: Object.fromEntries(
         Object.entries(cfg.providers).map(([id, s]) => [
           id,
-          { enabled: s?.enabled ?? false, hasKey: !!s?.credentials?.apiKey },
+          {
+            enabled: s?.enabled ?? false,
+            hasKey: !!s?.credentials?.apiKey,
+            credentialError: s?.credentialError,
+            accountId:
+              id === 'cloudflare' && typeof s?.credentials?.extra?.accountId === 'string'
+                ? s.credentials.extra.accountId
+                : undefined,
+          },
         ]),
       ),
       custom: {
@@ -156,15 +186,30 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
       enabled?: boolean;
       baseUrl?: string;
       clearCredentials?: boolean;
+      accountId?: string;
       models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
     };
   }>(
     '/api/providers',
     async (req, reply) => {
-      const { provider, apiKey, enabled, baseUrl, clearCredentials, models } = req.body ?? {};
+      const {
+        provider,
+        apiKey,
+        enabled,
+        baseUrl,
+        clearCredentials,
+        accountId,
+        models,
+      } = req.body ?? {};
       if (!provider) return reply.code(400).send({ error: 'provider required' });
+      const parsedProvider = ProviderIdSchema.safeParse(provider);
+      if (!parsedProvider.success || parsedProvider.data === 'ollama') {
+        return reply.code(400).send({ error: `unsupported provider: ${provider}` });
+      }
+      const providerId = parsedProvider.data;
       const cleanApiKey = typeof apiKey === 'string' ? apiKey.trim() : apiKey;
       const cleanBaseUrl = typeof baseUrl === 'string' ? baseUrl.trim() : baseUrl;
+      const cleanAccountId = typeof accountId === 'string' ? accountId.trim() : undefined;
       const cleanModels = Array.isArray(models)
         ? models
             .map((m) => ({
@@ -182,7 +227,7 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
         : undefined;
       try {
         const next = await updateConfig((cfg) => {
-          const cur = (cfg.providers[provider as never] ?? { enabled: false }) as {
+          const cur = (cfg.providers[providerId] ?? { enabled: false }) as {
             enabled: boolean;
             credentials?: {
               apiKey: string;
@@ -192,9 +237,12 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
           };
           const shouldClear = clearCredentials === true || cleanApiKey === '';
           const prevExtra = cur.credentials?.extra ?? {};
-          const nextExtra =
-            cleanModels !== undefined ? { ...prevExtra, models: cleanModels } : prevExtra;
-          cfg.providers[provider as never] = {
+          const nextExtra = {
+            ...prevExtra,
+            ...(cleanModels !== undefined ? { models: cleanModels } : {}),
+            ...(cleanAccountId !== undefined ? { accountId: cleanAccountId } : {}),
+          };
+          cfg.providers[providerId] = {
             ...cur,
             enabled: enabled ?? cur.enabled,
             credentials: shouldClear
@@ -213,7 +261,7 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
                       extra: nextExtra,
                     }
                   : undefined,
-          } as never;
+          };
           return cfg;
         });
         registry = new ProviderRegistry(next);
@@ -226,7 +274,7 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
           code === 'EPERM' || code === 'EACCES'
             ? '（配置目录写入被拒绝，请检查 ~/.freemodelfinder 权限或设置 FREEMODELFINDER_HOME 到有写权限的目录）'
             : '';
-        req.log.error({ err, provider }, 'failed to save provider config');
+        req.log.error({ err, provider: providerId }, 'failed to save provider config');
         return reply.code(500).send({ error: `${message}${hint}`, code });
       }
     },

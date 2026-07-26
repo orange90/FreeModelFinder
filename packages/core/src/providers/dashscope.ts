@@ -7,7 +7,7 @@ const DASHSCOPE_STATIC_MODELS: ModelInfo[] = [
     provider: 'dashscope',
     displayName: 'Qwen-Turbo',
     contextWindow: 128_000,
-    free: true,
+    free: false,
     description: 'Alibaba Bailian free tier: 1M tokens per model / 3 months.',
   },
   {
@@ -15,21 +15,21 @@ const DASHSCOPE_STATIC_MODELS: ModelInfo[] = [
     provider: 'dashscope',
     displayName: 'Qwen-Plus',
     contextWindow: 128_000,
-    free: true,
+    free: false,
   },
   {
     id: 'qwen-max',
     provider: 'dashscope',
     displayName: 'Qwen-Max',
     contextWindow: 32_768,
-    free: true,
+    free: false,
   },
   {
     id: 'deepseek-v3',
     provider: 'dashscope',
     displayName: 'DeepSeek-V3 (via Bailian)',
     contextWindow: 64_000,
-    free: true,
+    free: false,
   },
 ];
 

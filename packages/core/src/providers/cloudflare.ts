@@ -66,6 +66,9 @@ export class CloudflareProvider extends BaseProvider {
   }
 
   async listModels(): Promise<ModelInfo[]> {
+    // A token without its account id cannot call Workers AI. Validate the
+    // complete credential pair before advertising these static models.
+    this.accountId();
     return CF_STATIC_MODELS;
   }
 

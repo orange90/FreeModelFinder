@@ -51,7 +51,7 @@ export function chatCommand(): Command {
       const ask = () =>
         new Promise<string>((resolve) => rl.question(chalk.cyan('you> '), resolve));
 
-      while (true) {
+      for (;;) {
         const line = (await ask()).trim();
         if (!line) continue;
         if (line === '/exit' || line === '/quit') {

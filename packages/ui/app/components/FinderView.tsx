@@ -1,1069 +1,377 @@
 'use client';
 
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  BookOpen,
+  ArrowUpRight,
   Check,
-  ChevronDown,
-  Cpu,
-  ExternalLink,
-  Filter,
-  Gauge,
-  Key,
-  ListFilter,
-  RotateCcw,
+  CircleAlert,
+  KeyRound,
+  RefreshCw,
   Search,
-  Sparkles,
-  Timer,
-  X,
-  Zap,
+  SlidersHorizontal,
+  Sparkle,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { Badge, Dot } from './Badge';
-import { StatCard } from './StatCard';
-import { Drawer } from './Drawer';
-import { classNames, formatK, formatNumber, GATEWAY } from '../lib/utils';
+import { SETTINGS_PROVIDERS } from '../lib/platforms';
 import {
-  MODALITY_LABEL,
-  PLATFORMS,
-  getAllEnrichedRows,
-  type EnrichedModel,
-  type Modality,
-} from '../lib/platforms';
+  formatContext,
+  modelValue,
+  type ModelItem,
+  type ProviderFailure,
+} from '../lib/models';
+import { classNames, GATEWAY } from '../lib/utils';
 
-type SortKey =
-  | 'name'
-  | 'provider'
-  | 'family'
-  | 'modality'
-  | 'contextK'
-  | 'reqPerMin'
-  | 'reqPerDay'
-  | 'throughputTps'
-  | 'intelligenceIndex'
-  | 'arenaElo';
-type SortDir = 'asc' | 'desc';
+type SortMode = 'provider' | 'context' | 'name';
 
-type QuickFilter = 'high-capability' | 'fast' | 'long-context';
+const PROVIDER_MARKS = [
+  'bg-emerald-500',
+  'bg-blue-500',
+  'bg-violet-500',
+  'bg-amber-500',
+  'bg-rose-500',
+  'bg-cyan-500',
+] as const;
 
-const QUICK_FILTERS: { key: QuickFilter; label: string; Icon: LucideIcon; desc: string }[] = [
-  { key: 'high-capability', label: '高能力', Icon: Sparkles, desc: 'Intelligence ≥ 70' },
-  { key: 'fast', label: '速度优先', Icon: Zap, desc: '吞吐 ≥ 150 tps' },
-  { key: 'long-context', label: '长上下文', Icon: BookOpen, desc: '上下文 ≥ 128K' },
-];
+function providerLabel(id: string): string {
+  return SETTINGS_PROVIDERS.find((provider) => provider.id === id)?.label ?? id;
+}
 
-const PROVIDER_TONE: Record<string, 'primary' | 'purple' | 'sky'> = {
-  openrouter: 'purple',
-  gemini: 'sky',
-};
-
-const MODALITY_TONE: Record<Modality, 'neutral' | 'success' | 'purple'> = {
-  text: 'neutral',
-  vision: 'success',
-  reasoning: 'purple',
-};
+function providerMark(id: string): string {
+  let hash = 0;
+  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return PROVIDER_MARKS[hash % PROVIDER_MARKS.length]!;
+}
 
 export function FinderView({
+  models,
+  selectedModel,
   gatewayReachable,
-  hasModels,
-  configuredProviderCount,
+  loading,
+  failures,
+  onSelectModel,
+  onOpenTester,
+  onOpenSettings,
+  onRefresh,
 }: {
+  models: ModelItem[];
+  selectedModel: string;
   gatewayReachable: boolean | null;
-  hasModels: boolean;
-  configuredProviderCount: number;
+  loading: boolean;
+  failures: ProviderFailure[];
+  onSelectModel: (model: string) => void;
+  onOpenTester: () => void;
+  onOpenSettings: () => void;
+  onRefresh: () => void;
 }) {
-  const allRows = useMemo(() => getAllEnrichedRows(), []);
-  const allFamilies = useMemo(
-    () =>
-      Array.from(
-        new Set(allRows.map((r) => r.family).filter((f): f is string => !!f)),
-      ).sort(),
-    [allRows],
-  );
-
   const [query, setQuery] = useState('');
-  const [providerFilter, setProviderFilter] = useState<Set<string>>(
-    new Set(PLATFORMS.map((p) => p.id)),
-  );
-  const [modalityFilter, setModalityFilter] = useState<Set<Modality>>(
-    new Set(['text', 'vision', 'reasoning']),
-  );
-  const [familyFilter, setFamilyFilter] = useState<Set<string>>(new Set(allFamilies));
-  const [quickFilter, setQuickFilter] = useState<Set<QuickFilter>>(new Set());
-  const [sortKey, setSortKey] = useState<SortKey>('intelligenceIndex');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [moreFilterOpen, setMoreFilterOpen] = useState(false);
-  const [platformGuideId, setPlatformGuideId] = useState<string | null>(null);
+  const [provider, setProvider] = useState('all');
+  const [sort, setSort] = useState<SortMode>('provider');
 
-  function toggle<T>(set: Set<T>, key: T): Set<T> {
-    const next = new Set(set);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    return next;
-  }
+  const providers = useMemo(
+    () => Array.from(new Set(models.map((model) => model.provider))).sort(),
+    [models],
+  );
 
-  const rows = useMemo(() => {
-    return allRows
-      .filter((r) => providerFilter.has(r.providerId))
-      .filter((r) => !r.modality || modalityFilter.has(r.modality))
-      .filter((r) => !r.family || familyFilter.has(r.family))
-      .filter((r) => {
-        if (!quickFilter.size) return true;
-        if (
-          quickFilter.has('high-capability') &&
-          (r.intelligenceIndex == null || r.intelligenceIndex < 70)
-        )
-          return false;
-        if (
-          quickFilter.has('fast') &&
-          (r.throughputTps == null || r.throughputTps < 150)
-        )
-          return false;
-        if (
-          quickFilter.has('long-context') &&
-          (r.contextK == null || r.contextK < 128)
-        )
-          return false;
-        return true;
-      })
-      .filter((r) => {
-        if (!query.trim()) return true;
-        const q = query.trim().toLowerCase();
-        return (
-          r.name.toLowerCase().includes(q) ||
-          (r.note?.toLowerCase().includes(q) ?? false) ||
-          r.providerLabel.toLowerCase().includes(q) ||
-          (r.family?.toLowerCase().includes(q) ?? false)
-        );
+  const visibleModels = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return models
+      .filter((model) => provider === 'all' || model.provider === provider)
+      .filter((model) => {
+        if (!normalizedQuery) return true;
+        return [
+          model.id,
+          model.display_name,
+          model.description,
+          providerLabel(model.provider),
+        ].some((value) => value?.toLowerCase().includes(normalizedQuery));
       })
       .sort((a, b) => {
-        const dir = sortDir === 'asc' ? 1 : -1;
-        const field: keyof EnrichedModel =
-          sortKey === 'provider' ? 'providerLabel' : (sortKey as keyof EnrichedModel);
-        const av = a[field];
-        const bv = b[field];
-        if (av == null && bv == null) return 0;
-        if (av == null) return 1;
-        if (bv == null) return -1;
-        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
-        return String(av).localeCompare(String(bv)) * dir;
+        if (sort === 'context') {
+          return (b.context_window ?? 0) - (a.context_window ?? 0);
+        }
+        if (sort === 'name') {
+          return (a.display_name ?? a.id).localeCompare(b.display_name ?? b.id);
+        }
+        return (
+          providerLabel(a.provider).localeCompare(providerLabel(b.provider)) ||
+          (a.display_name ?? a.id).localeCompare(b.display_name ?? b.id)
+        );
       });
-  }, [allRows, providerFilter, modalityFilter, familyFilter, quickFilter, query, sortKey, sortDir]);
+  }, [models, provider, query, sort]);
 
-  const stats = useMemo(() => {
-    const smart = allRows.reduce<EnrichedModel | null>((acc, r) => {
-      if (r.intelligenceIndex == null) return acc;
-      if (!acc || (acc.intelligenceIndex ?? 0) < r.intelligenceIndex) return r;
-      return acc;
-    }, null);
-    const fastest = allRows.reduce<EnrichedModel | null>((acc, r) => {
-      if (r.throughputTps == null) return acc;
-      if (!acc || (acc.throughputTps ?? 0) < r.throughputTps) return r;
-      return acc;
-    }, null);
-    return { smart, fastest };
-  }, [allRows]);
-
-  const filtersActive =
-    query.trim() !== '' ||
-    providerFilter.size !== PLATFORMS.length ||
-    modalityFilter.size !== 3 ||
-    familyFilter.size !== allFamilies.length ||
-    quickFilter.size > 0;
-
-  function resetFilters() {
-    setQuery('');
-    setProviderFilter(new Set(PLATFORMS.map((p) => p.id)));
-    setModalityFilter(new Set(['text', 'vision', 'reasoning']));
-    setFamilyFilter(new Set(allFamilies));
-    setQuickFilter(new Set());
-    setSortKey('intelligenceIndex');
-    setSortDir('desc');
-  }
-
-  function onSort(key: SortKey) {
-    if (sortKey === key) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortKey(key);
-      setSortDir(key === 'name' || key === 'provider' || key === 'family' ? 'asc' : 'desc');
-    }
-  }
-
-  const platformGuide = PLATFORMS.find((p) => p.id === platformGuideId) ?? null;
+  const largestContext = useMemo(
+    () => models.reduce((largest, model) => Math.max(largest, model.context_window ?? 0), 0),
+    [models],
+  );
 
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-4 pb-10 pt-5 md:px-6 lg:px-8">
-      {gatewayReachable === false && (
-        <div className="mb-4 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3.5 py-2.5 text-sm text-destructive">
-          <Dot tone="danger" />
-          <span>
-            未能连接到本地网关（<code className="font-mono text-xs">{GATEWAY}</code>）。请确认已启动
-            <code className="mx-1 font-mono text-xs">fmf serve</code>或桌面端已运行。
-          </span>
-        </div>
-      )}
-      {gatewayReachable && !hasModels && (
-        <div className="mb-4 flex items-start gap-2 rounded-md border border-primary/25 bg-primary/5 px-3.5 py-2.5 text-sm text-primary">
-          <Dot tone="primary" />
-          <span>
-            网关已连接，但你还没有配置任何 API Key。
-            <a href="/settings" className="ml-1 underline underline-offset-2">
-              前往设置页
-            </a>
-            粘贴 Key 后即可使用。
-          </span>
-        </div>
-      )}
-
-      <section
-        aria-label="概览"
-        className="mb-5 rounded-lg border border-border/60 bg-section-a px-3 py-4 md:px-4"
-      >
-        <div className="mb-2 flex items-end justify-between">
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight text-foreground">免费模型寻找</h1>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              汇总当前可用的免费大模型，按能力、速度和上下文快速筛选。
+    <div className="mx-auto w-full max-w-6xl px-5 py-7 md:px-8 md:py-10">
+      <section className="border-b border-border pb-7">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+              <span className="h-px w-6 bg-primary" />
+              Live catalog
+            </div>
+            <h1 className="text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
+              只看真正能免费调用的模型
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+              列表来自已配置 provider 的实时接口，并经过零价格、官方免费层白名单和文本生成能力三重筛选。
+              试用赠金或明确收费的模型不会出现在这里。
             </p>
           </div>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="可发现模型"
-            value={String(allRows.length)}
-            hint={`来自 ${PLATFORMS.length} 个平台`}
-            tone="ok"
-            icon={<Cpu size={14} strokeWidth={1.75} />}
-          />
-          <StatCard
-            label="已配置平台"
-            value={`${configuredProviderCount} / ${PLATFORMS.length}`}
-            hint={configuredProviderCount > 0 ? '至少启用了一个' : '尚未配置 Key'}
-            tone={configuredProviderCount > 0 ? 'ok' : 'warn'}
-            icon={<Key size={14} strokeWidth={1.75} />}
-          />
-          <StatCard
-            label="最高能力模型"
-            value={stats.smart?.name ?? '—'}
-            hint={
-              stats.smart?.intelligenceIndex != null
-                ? `Intelligence Index ${stats.smart.intelligenceIndex}`
-                : undefined
-            }
-            tone="ok"
-            icon={<Sparkles size={14} strokeWidth={1.75} />}
-          />
-          <StatCard
-            label="最快响应"
-            value={stats.fastest?.name ?? '—'}
-            hint={
-              stats.fastest?.throughputTps != null
-                ? `${stats.fastest.throughputTps} tokens/s`
-                : undefined
-            }
-            tone="ok"
-            icon={<Zap size={14} strokeWidth={1.75} />}
-          />
+
+          <div className="grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-surface">
+            <Metric label="免费模型" value={loading ? '—' : String(models.length)} />
+            <Metric label="可用来源" value={loading ? '—' : String(providers.length)} />
+            <Metric
+              label="最大上下文"
+              value={largestContext ? formatContext(largestContext).split(' ')[0]! : '—'}
+            />
+          </div>
         </div>
       </section>
 
-      <section
-        aria-label="筛选"
-        className="mb-4 space-y-3 rounded-lg border border-border/60 bg-section-b px-3 py-3 md:px-4"
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative min-w-[220px] flex-1">
+      {gatewayReachable === false && (
+        <Notice
+          tone="error"
+          title="本地网关没有响应"
+          body={`请先启动 fmf serve。当前地址：${GATEWAY}`}
+          action="打开设置"
+          onAction={onOpenSettings}
+        />
+      )}
+
+      {gatewayReachable === true && models.length === 0 && !loading && (
+        <Notice
+          tone="neutral"
+          title="还没有可用的免费模型"
+          body="添加至少一个 provider key；如果已经添加，请检查下方的连接错误。"
+          action="配置来源"
+          onAction={onOpenSettings}
+        />
+      )}
+
+      {failures.length > 0 && (
+        <div className="mt-5 rounded-2xl border border-warning/30 bg-warning/5 px-4 py-3">
+          <div className="flex items-start gap-3">
+            <CircleAlert className="mt-0.5 shrink-0 text-warning" size={17} />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">
+                {failures.length} 个来源本次同步失败
+              </p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                {failures
+                  .map((failure) => `${providerLabel(failure.id)}：${failure.error}`)
+                  .join('　·　')}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <section className="mt-7">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          <label className="relative min-w-0 flex-1">
             <Search
-              size={14}
-              strokeWidth={1.75}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              size={16}
             />
+            <span className="sr-only">搜索模型</span>
             <input
-              className="w-full rounded-md border border-input bg-surface py-2 pl-9 pr-9 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-              placeholder="搜索模型名 / 平台 / 系列…"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="搜索模型"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="搜索模型、来源或用途"
+              className="h-11 w-full rounded-xl border border-input bg-surface pl-10 pr-4 text-sm shadow-sm outline-none transition placeholder:text-muted-foreground/70 focus:border-ring focus:ring-4 focus:ring-ring/10"
             />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                aria-label="清空搜索"
-                className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+          </label>
+
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0">
+            <select
+              aria-label="按来源筛选"
+              value={provider}
+              onChange={(event) => setProvider(event.target.value)}
+              className="h-11 min-w-[148px] rounded-xl border border-input bg-surface px-3 text-sm outline-none focus:border-ring focus:ring-4 focus:ring-ring/10"
+            >
+              <option value="all">全部来源</option>
+              {providers.map((id) => (
+                <option key={id} value={id}>
+                  {providerLabel(id)}
+                </option>
+              ))}
+            </select>
+            <label className="relative">
+              <SlidersHorizontal
+                aria-hidden
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                size={15}
+              />
+              <span className="sr-only">排序方式</span>
+              <select
+                value={sort}
+                onChange={(event) => setSort(event.target.value as SortMode)}
+                className="h-11 min-w-[148px] rounded-xl border border-input bg-surface pl-9 pr-3 text-sm outline-none focus:border-ring focus:ring-4 focus:ring-ring/10"
               >
-                <X size={12} strokeWidth={2} />
-              </button>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setMoreFilterOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-md border border-input bg-surface px-3 py-2 text-sm font-medium text-foreground shadow-sm transition hover:border-border-strong hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ListFilter size={14} strokeWidth={1.75} />
-            更多筛选
-            {(providerFilter.size !== PLATFORMS.length ||
-              modalityFilter.size !== 3 ||
-              familyFilter.size !== allFamilies.length) && (
-              <span className="ml-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                {providerFilter.size !== PLATFORMS.length ? 1 : 0}
-                {modalityFilter.size !== 3 ? 1 : 0}
-                {familyFilter.size !== allFamilies.length ? 1 : 0}
-              </span>
-            )}
-          </button>
-
-          {filtersActive && (
+                <option value="provider">按来源排序</option>
+                <option value="context">上下文优先</option>
+                <option value="name">按名称排序</option>
+              </select>
+            </label>
             <button
               type="button"
-              onClick={resetFilters}
-              className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onClick={onRefresh}
+              disabled={loading}
+              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-3.5 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface-muted disabled:opacity-60"
             >
-              <RotateCcw size={13} strokeWidth={1.75} />
-              重置
-            </button>
-          )}
-
-          <div className="ml-auto text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">{rows.length}</span>
-            <span className="mx-1 text-muted-foreground/60">/</span>
-            <span>{allRows.length}</span>
-            <span className="ml-1">个模型</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterLabel icon={Filter}>快捷筛选</FilterLabel>
-          {QUICK_FILTERS.map((qf) => {
-            const active = quickFilter.has(qf.key);
-            return (
-              <button
-                key={qf.key}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setQuickFilter((s) => toggle(s, qf.key))}
-                title={qf.desc}
-                className={classNames(
-                  'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  active
-                    ? 'border-primary/40 bg-primary/10 text-primary'
-                    : 'border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground',
-                )}
-              >
-                <qf.Icon size={13} strokeWidth={1.75} />
-                {qf.label}
-              </button>
-            );
-          })}
-
-          <span className="mx-2 hidden h-4 w-px bg-border sm:inline-block" aria-hidden />
-
-          <FilterLabel>平台</FilterLabel>
-          <MultiSelectDropdown
-            label="平台"
-            options={PLATFORMS.map((p) => ({ value: p.id, label: p.label }))}
-            selected={providerFilter}
-            onChange={setProviderFilter}
-          />
-
-          <span className="mx-2 hidden h-4 w-px bg-border sm:inline-block" aria-hidden />
-
-          <FilterLabel>模态</FilterLabel>
-          {(['text', 'vision', 'reasoning'] as Modality[]).map((m) => {
-            const active = modalityFilter.has(m);
-            return (
-              <button
-                key={m}
-                type="button"
-                aria-pressed={active}
-                onClick={() => setModalityFilter((s) => toggle(s, m))}
-                className={classNames(
-                  'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  active
-                    ? 'border-primary/30 bg-primary/10 text-primary'
-                    : 'border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground',
-                )}
-              >
-                {MODALITY_LABEL[m]}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section
-        aria-label="模型列表"
-        className="overflow-hidden rounded-lg border border-border bg-surface"
-      >
-        <div className="hidden grid-cols-[minmax(0,3fr)_120px_88px_96px_100px_120px] gap-3 border-b border-border bg-surface-muted/60 px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground md:grid">
-          <SortHeader onClick={() => onSort('name')} active={sortKey === 'name'} dir={sortDir}>
-            模型
-          </SortHeader>
-          <SortHeader onClick={() => onSort('provider')} active={sortKey === 'provider'} dir={sortDir}>
-            平台
-          </SortHeader>
-          <SortHeader onClick={() => onSort('modality')} active={sortKey === 'modality'} dir={sortDir}>
-            模态
-          </SortHeader>
-          <SortHeader
-            onClick={() => onSort('contextK')}
-            active={sortKey === 'contextK'}
-            dir={sortDir}
-            align="right"
-          >
-            上下文
-          </SortHeader>
-          <SortHeader
-            onClick={() => onSort('throughputTps')}
-            active={sortKey === 'throughputTps'}
-            dir={sortDir}
-            align="right"
-          >
-            速度
-          </SortHeader>
-          <SortHeader
-            onClick={() => onSort('intelligenceIndex')}
-            active={sortKey === 'intelligenceIndex'}
-            dir={sortDir}
-            align="right"
-            title="综合能力评分：Artificial Analysis Intelligence Index（0–100，越高越强，参考 LMSYS Chatbot Arena Elo）"
-          >
-            能力
-          </SortHeader>
-        </div>
-
-        {rows.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-            <Filter size={20} strokeWidth={1.5} />
-            <p>没有匹配的模型 —— 试试放宽筛选条件。</p>
-            {filtersActive && (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-3 py-1 text-xs text-foreground hover:border-border-strong"
-              >
-                <RotateCcw size={12} strokeWidth={1.75} />
-                重置筛选
-              </button>
-            )}
-          </div>
-        )}
-
-        <ul className="divide-y divide-border">
-          {rows.map((r) => {
-            const key = `${r.providerId}:${r.name}`;
-            const isOpen = expanded === key;
-            return (
-              <li key={key}>
-                <ModelRow
-                  row={r}
-                  isOpen={isOpen}
-                  onToggle={() => setExpanded(isOpen ? null : key)}
-                  onOpenGuide={() => setPlatformGuideId(r.providerId)}
-                />
-                {isOpen && (
-                  <div className="border-t border-border bg-surface-muted/40 px-4 py-4 md:px-6">
-                    <ExpandedDetail row={r} onOpenGuide={() => setPlatformGuideId(r.providerId)} />
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-        <p>
-          能力评分参考{' '}
-          <span className="font-medium text-foreground">Artificial Analysis Intelligence Index</span>{' '}
-          与 LMSYS Chatbot Arena Elo，仅供横向参考。
-        </p>
-        <button
-          type="button"
-          onClick={() => setPlatformGuideId(PLATFORMS[0]!.id)}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-foreground shadow-sm hover:border-border-strong"
-        >
-          <BookOpen size={13} strokeWidth={1.75} />
-          平台注册指引
-        </button>
-      </div>
-
-      <Drawer
-        open={moreFilterOpen}
-        onClose={() => setMoreFilterOpen(false)}
-        title="更多筛选"
-        description="按模型系列细化筛选。"
-      >
-        <div className="space-y-4">
-          <div>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              模型系列
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {allFamilies.map((f) => {
-                const active = familyFilter.has(f);
-                return (
-                  <button
-                    key={f}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => setFamilyFilter((s) => toggle(s, f))}
-                    className={classNames(
-                      'rounded-full border px-2.5 py-1 text-xs font-medium transition',
-                      active
-                        ? 'border-primary/30 bg-primary/10 text-primary'
-                        : 'border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground',
-                    )}
-                  >
-                    {f}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          <div className="border-t border-border pt-4 text-xs text-muted-foreground">
-            <button
-              type="button"
-              onClick={() => {
-                setFamilyFilter(new Set(allFamilies));
-              }}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-foreground hover:border-border-strong"
-            >
-              <RotateCcw size={12} strokeWidth={1.75} />
-              重置系列筛选
+              <RefreshCw size={15} className={loading ? 'animate-spin' : undefined} />
+              同步
             </button>
           </div>
         </div>
-      </Drawer>
 
-      <Drawer
-        open={platformGuide !== null}
-        onClose={() => setPlatformGuideId(null)}
-        title="平台注册指引"
-        description="选择一个平台查看注册流程与获取 API Key 的方法。"
-      >
-        {platformGuide && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-1.5">
-              {PLATFORMS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setPlatformGuideId(p.id)}
+        <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            显示 {visibleModels.length} / {models.length} 个模型
+          </span>
+          <span className="hidden sm:inline">最近一次请求结果 · 不展示推测价格</span>
+        </div>
+
+        {loading && models.length === 0 ? (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {Array.from({ length: 6 }, (_, index) => (
+              <div
+                key={index}
+                className="h-44 animate-pulse rounded-2xl border border-border bg-surface-muted/60"
+              />
+            ))}
+          </div>
+        ) : visibleModels.length > 0 ? (
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {visibleModels.map((item) => {
+              const value = modelValue(item);
+              const selected = value === selectedModel;
+              return (
+                <article
+                  key={value}
                   className={classNames(
-                    'rounded-full border px-2.5 py-1 text-xs font-medium transition',
-                    platformGuide.id === p.id
-                      ? 'border-primary/30 bg-primary/10 text-primary'
-                      : 'border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground',
+                    'group flex min-h-44 flex-col rounded-2xl border bg-surface p-5 transition',
+                    selected
+                      ? 'border-primary/50 shadow-[0_0_0_3px_hsl(var(--primary)/0.08)]'
+                      : 'border-border hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md',
                   )}
                 >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-            <div className="space-y-4 rounded-lg border border-border bg-surface p-4">
-              <p className="text-sm leading-relaxed text-foreground/90">{platformGuide.summary}</p>
-              <div>
-                <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  需要准备
-                </h4>
-                <ul className="space-y-1 text-sm text-foreground/90">
-                  {platformGuide.requirements.map((r, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-muted-foreground" />
-                      <span>{r}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  注册步骤
-                </h4>
-                <ol className="space-y-2 text-sm text-foreground/90">
-                  {platformGuide.registerSteps.map((s, i) => (
-                    <li key={i} className="flex gap-2.5">
-                      <span className="mt-0.5 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-border bg-surface-muted text-xs font-medium text-muted-foreground">
-                        {i + 1}
-                      </span>
-                      <span>{s}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              {platformGuide.limits && (
-                <div className="rounded-md border border-border bg-surface-muted px-3 py-2 text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">额度说明：</span>
-                  {platformGuide.limits}
-                </div>
-              )}
-              <div className="flex flex-wrap gap-2 pt-1">
-                <a
-                  href={platformGuide.registerUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
-                >
-                  注册账号
-                  <ExternalLink size={12} strokeWidth={2} />
-                </a>
-                <a
-                  href={platformGuide.keyUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground shadow-sm hover:border-border-strong"
-                >
-                  获取 API Key
-                  <ExternalLink size={12} strokeWidth={2} />
-                </a>
-                <a
-                  href={platformGuide.homepage}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
-                >
-                  官网
-                  <ExternalLink size={12} strokeWidth={2} />
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-      </Drawer>
-    </div>
-  );
-}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                        <span className={classNames('h-2 w-2 rounded-full', providerMark(item.provider))} />
+                        {providerLabel(item.provider)}
+                      </div>
+                      <h2 className="mt-2 line-clamp-2 text-base font-semibold leading-6 tracking-[-0.02em] text-foreground">
+                        {item.display_name ?? item.id}
+                      </h2>
+                    </div>
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-success/10 px-2 py-1 text-[11px] font-semibold text-success">
+                      <Check size={11} strokeWidth={2.5} />
+                      免费
+                    </span>
+                  </div>
 
-function FilterLabel({
-  icon: Icon,
-  children,
-}: {
-  icon?: LucideIcon;
-  children: React.ReactNode;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-      {Icon && <Icon size={12} strokeWidth={1.75} />}
-      {children}
-    </span>
-  );
-}
+                  <code className="mt-2 line-clamp-1 text-[11px] text-muted-foreground" title={item.id}>
+                    {item.id}
+                  </code>
 
-function MultiSelectDropdown({
-  label,
-  options,
-  selected,
-  onChange,
-}: {
-  label: string;
-  options: { value: string; label: string }[];
-  selected: Set<string>;
-  onChange: (next: Set<string>) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+                  <p className="mt-3 line-clamp-2 flex-1 text-xs leading-5 text-muted-foreground">
+                    {item.description || '已通过该来源的免费模型规则，可用于文本对话。'}
+                  </p>
 
-  useEffect(() => {
-    if (!open) return;
-    function onDocClick(e: MouseEvent) {
-      if (!containerRef.current) return;
-      if (!containerRef.current.contains(e.target as Node)) setOpen(false);
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('mousedown', onDocClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDocClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  const total = options.length;
-  const count = selected.size;
-  const allSelected = count === total;
-  const noneSelected = count === 0;
-
-  const summary = allSelected
-    ? '全部'
-    : noneSelected
-      ? '未选择'
-      : count === 1
-        ? (options.find((o) => selected.has(o.value))?.label ?? `${count} 项`)
-        : `${count} 项`;
-
-  function toggleValue(value: string) {
-    const next = new Set(selected);
-    if (next.has(value)) next.delete(value);
-    else next.add(value);
-    onChange(next);
-  }
-
-  function selectAll() {
-    onChange(new Set(options.map((o) => o.value)));
-  }
-
-  function clearAll() {
-    onChange(new Set());
-  }
-
-  return (
-    <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className={classNames(
-          'inline-flex max-w-[220px] items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          !allSelected && !noneSelected
-            ? 'border-primary/30 bg-primary/10 text-primary'
-            : 'border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground',
-        )}
-      >
-        <span className="truncate">{summary}</span>
-        {!allSelected && !noneSelected && (
-          <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-            {count}
-          </span>
-        )}
-        <ChevronDown
-          size={13}
-          strokeWidth={1.75}
-          className={classNames('transition', open && 'rotate-180')}
-        />
-      </button>
-
-      {open && (
-        <div
-          role="listbox"
-          aria-label={label}
-          aria-multiselectable="true"
-          className="absolute left-0 top-full z-30 mt-1.5 w-64 overflow-hidden rounded-md border border-border bg-surface shadow-lg"
-        >
-          <div className="flex items-center justify-between border-b border-border bg-surface-muted/60 px-2.5 py-1.5 text-xs">
-            <span className="text-muted-foreground">
-              已选 <span className="font-medium text-foreground">{count}</span> / {total}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={selectAll}
-                className="text-primary transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                全选
-              </button>
-              <span className="text-border">|</span>
-              <button
-                type="button"
-                onClick={clearAll}
-                className="text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                清空
-              </button>
-            </div>
-          </div>
-          <ul className="max-h-64 overflow-y-auto py-1">
-            {options.map((opt) => {
-              const active = selected.has(opt.value);
-              return (
-                <li key={opt.value}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={active}
-                    onClick={() => toggleValue(opt.value)}
-                    className={classNames(
-                      'flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                      active
-                        ? 'bg-primary/5 text-foreground'
-                        : 'text-muted-foreground hover:bg-surface-muted hover:text-foreground',
-                    )}
-                  >
-                    <span
+                  <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+                    <span className="text-xs font-medium text-foreground">
+                      {formatContext(item.context_window)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelectModel(value);
+                        onOpenTester();
+                      }}
                       className={classNames(
-                        'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition',
-                        active
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-surface',
+                        'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition',
+                        selected
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-foreground hover:bg-surface-muted',
                       )}
                     >
-                      {active && <Check size={11} strokeWidth={3} />}
-                    </span>
-                    <span className="truncate">{opt.label}</span>
-                  </button>
-                </li>
+                      {selected ? '继续测试' : '用它测试'}
+                      <ArrowUpRight size={13} />
+                    </button>
+                  </div>
+                </article>
               );
             })}
-          </ul>
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl border border-dashed border-border px-6 py-16 text-center">
+            <Search className="mx-auto text-muted-foreground/60" size={24} />
+            <p className="mt-3 text-sm font-medium text-foreground">没有匹配的模型</p>
+            <p className="mt-1 text-xs text-muted-foreground">换一个关键词或来源试试。</p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
 
-function SortHeader({
-  children,
-  onClick,
-  active,
-  dir,
-  align = 'left',
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-[94px] px-4 py-3.5 text-center">
+      <div className="text-lg font-semibold tracking-[-0.03em] text-foreground">{value}</div>
+      <div className="mt-0.5 whitespace-nowrap text-[11px] text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function Notice({
+  tone,
   title,
+  body,
+  action,
+  onAction,
 }: {
-  children: React.ReactNode;
-  onClick: () => void;
-  active: boolean;
-  dir: SortDir;
-  align?: 'left' | 'right';
-  title?: string;
+  tone: 'error' | 'neutral';
+  title: string;
+  body: string;
+  action: string;
+  onAction: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      aria-label={title}
+    <div
       className={classNames(
-        'inline-flex select-none items-center gap-1 transition hover:text-foreground focus-visible:outline-none',
-        align === 'right' ? 'justify-end text-right' : 'text-left',
-        active && 'text-foreground',
+        'mt-5 flex flex-col justify-between gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center',
+        tone === 'error'
+          ? 'border-destructive/30 bg-destructive/5'
+          : 'border-border bg-surface',
       )}
     >
-      <span>{children}</span>
-      <span className="text-[10px] opacity-70">
-        {active ? (dir === 'asc' ? '↑' : '↓') : '↕'}
-      </span>
-    </button>
-  );
-}
-
-function ModelRow({
-  row,
-  isOpen,
-  onToggle,
-  onOpenGuide,
-}: {
-  row: EnrichedModel;
-  isOpen: boolean;
-  onToggle: () => void;
-  onOpenGuide: () => void;
-}) {
-  const providerTone = PROVIDER_TONE[row.providerId] ?? 'neutral';
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-expanded={isOpen}
-      className={classNames(
-        'grid w-full grid-cols-1 gap-x-3 gap-y-2 px-4 py-3 text-left transition md:grid-cols-[minmax(0,3fr)_120px_88px_96px_100px_120px] md:items-center md:py-2.5',
-        isOpen ? 'bg-surface-muted/50' : 'hover:bg-surface-muted/40',
-      )}
-    >
-      <div className="min-w-0">
-        <div className="flex items-baseline gap-2">
-          <span className="truncate text-sm font-semibold text-foreground">
-            {row.note ?? row.name}
-          </span>
-          {row.family && (
-            <span className="hidden text-xs text-muted-foreground sm:inline">{row.family}</span>
-          )}
-        </div>
-        <code
-          className="mt-0.5 block truncate font-mono text-xs text-muted-foreground"
-          title={row.name}
-        >
-          {row.name}
-        </code>
-      </div>
-
-      <div className="md:pl-0">
-        <Badge tone={providerTone as any}>{row.providerLabel}</Badge>
-      </div>
-
-      <div>
-        {row.modality && (
-          <Badge tone={MODALITY_TONE[row.modality] as any}>{MODALITY_LABEL[row.modality]}</Badge>
-        )}
-      </div>
-
-      <div className="text-sm text-foreground md:text-right">
-        {row.contextK != null ? (
-          <span className="font-mono tabular-nums">{formatK(row.contextK)}</span>
+      <div className="flex items-start gap-3">
+        {tone === 'error' ? (
+          <CircleAlert className="mt-0.5 shrink-0 text-destructive" size={17} />
         ) : (
-          <span className="text-muted-foreground">—</span>
+          <KeyRound className="mt-0.5 shrink-0 text-primary" size={17} />
         )}
-      </div>
-
-      <div className="md:text-right">
-        {row.throughputTps != null ? (
-          <SpeedBar tps={row.throughputTps} />
-        ) : (
-          <span className="text-sm text-muted-foreground">—</span>
-        )}
-      </div>
-
-      <div className="md:text-right">
-        {row.intelligenceIndex != null ? (
-          <CapabilityBar index={row.intelligenceIndex} />
-        ) : (
-          <span className="text-sm text-muted-foreground">—</span>
-        )}
-      </div>
-    </button>
-  );
-}
-
-function SpeedBar({ tps }: { tps: number }) {
-  const pct = Math.min(100, Math.round((tps / 800) * 100));
-  const tone =
-    tps >= 400
-      ? 'bg-primary'
-      : tps >= 150
-        ? 'bg-success'
-        : tps >= 60
-          ? 'bg-sky-500'
-          : 'bg-muted-foreground/60';
-  return (
-    <div className="flex items-center gap-2 md:justify-end">
-      <span className="w-12 shrink-0 text-right font-mono text-xs tabular-nums text-foreground">
-        {tps}
-      </span>
-      <div className="h-1 w-16 overflow-hidden rounded-full bg-surface-muted">
-        <div className={classNames('h-full rounded-full', tone)} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function CapabilityBar({ index }: { index: number }) {
-  const pct = Math.min(100, Math.max(0, index));
-  const tier =
-    index >= 80
-      ? { label: '顶级', tone: 'bg-primary', text: 'text-primary' }
-      : index >= 65
-        ? { label: '强', tone: 'bg-success', text: 'text-success' }
-        : index >= 45
-          ? { label: '一般', tone: 'bg-sky-500', text: 'text-sky-600 dark:text-sky-300' }
-          : { label: '入门', tone: 'bg-muted-foreground/60', text: 'text-muted-foreground' };
-  return (
-    <div className="flex items-center gap-2 md:justify-end">
-      <span className={classNames('shrink-0 text-xs font-medium', tier.text)}>{tier.label}</span>
-      <span className="w-8 shrink-0 text-right font-mono text-xs tabular-nums text-foreground">
-        {index}
-      </span>
-      <div className="h-1 w-16 overflow-hidden rounded-full bg-surface-muted">
-        <div className={classNames('h-full rounded-full', tier.tone)} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function ExpandedDetail({
-  row,
-  onOpenGuide,
-}: {
-  row: EnrichedModel;
-  onOpenGuide: () => void;
-}) {
-  const platform = PLATFORMS.find((p) => p.id === row.providerId);
-  return (
-    <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-      <div className="space-y-3">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          模型详情
-        </div>
-        <dl className="grid grid-cols-[80px_1fr] gap-y-1.5 text-sm">
-          <dt className="text-muted-foreground">Model ID</dt>
-          <dd className="font-mono text-xs text-foreground/90">{row.name}</dd>
-          {row.family && (
-            <>
-              <dt className="text-muted-foreground">系列</dt>
-              <dd className="text-foreground">{row.family}</dd>
-            </>
-          )}
-          {row.note && (
-            <>
-              <dt className="text-muted-foreground">说明</dt>
-              <dd className="text-foreground">{row.note}</dd>
-            </>
-          )}
-          {row.intelligenceIndex != null && (
-            <>
-              <dt className="text-muted-foreground">能力评分</dt>
-              <dd className="text-foreground">
-                Intelligence Index {row.intelligenceIndex}
-                {row.arenaElo != null && (
-                  <span className="ml-2 text-muted-foreground">· Arena Elo ≈ {row.arenaElo}</span>
-                )}
-              </dd>
-            </>
-          )}
-          <dt className="text-muted-foreground">额度</dt>
-          <dd className="text-foreground">
-            <span className="inline-flex items-center gap-1 font-mono text-xs">
-              <Timer size={12} strokeWidth={1.75} className="text-muted-foreground" />
-              {row.reqPerMin ?? '—'} <span className="text-muted-foreground">req/min</span>
-              <span className="mx-1 text-muted-foreground">·</span>
-              {row.reqPerDay != null ? formatNumber(row.reqPerDay) : '—'}{' '}
-              <span className="text-muted-foreground">req/day</span>
-            </span>
-          </dd>
-          {row.throughputTps != null && (
-            <>
-              <dt className="text-muted-foreground">吞吐</dt>
-              <dd className="text-foreground">
-                <span className="inline-flex items-center gap-1 font-mono text-xs">
-                  <Gauge size={12} strokeWidth={1.75} className="text-muted-foreground" />
-                  {row.throughputTps} <span className="text-muted-foreground">tokens/s</span>
-                </span>
-              </dd>
-            </>
-          )}
-        </dl>
-      </div>
-
-      <div className="space-y-3">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          下一步
-        </div>
-        <p className="text-sm text-muted-foreground">
-          在 <span className="font-medium text-foreground">{row.providerLabel}</span> 完成注册并生成
-          API Key 后，前往设置页粘贴保存即可开始使用。
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <a
-            href="/settings"
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90"
-          >
-            <Key size={13} strokeWidth={1.75} />
-            配置 API Key
-          </a>
-          <button
-            type="button"
-            onClick={onOpenGuide}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition hover:border-border-strong"
-          >
-            <BookOpen size={13} strokeWidth={1.75} />
-            查看注册指引
-          </button>
-          {platform && (
-            <a
-              href={platform.keyUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-            >
-              获取 Key
-              <ExternalLink size={12} strokeWidth={2} />
-            </a>
-          )}
+        <div>
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{body}</p>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={onAction}
+        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-foreground px-3 py-2 text-xs font-semibold text-background transition hover:opacity-85"
+      >
+        {action}
+        <Sparkle size={12} />
+      </button>
     </div>
   );
 }

@@ -13,11 +13,10 @@
     "dev:ui": "pnpm --filter @freemodelfinder/ui dev",
     "dev:cli": "pnpm --filter @freemodelfinder/cli dev",
     "dev": "pnpm -r --parallel --filter=./packages/{core,server,ui} dev",
-    "lint": "eslint \"packages/*/src/**/*.{ts,tsx}\" --max-warnings=0",
+    "lint": "eslint \"packages/**/*.{ts,tsx}\" --max-warnings=0",
     "typecheck": "pnpm -r --filter=./packages/* typecheck",
     "test": "pnpm -r --filter=./packages/* run test",
-    "clean": "pnpm -r exec rm -rf dist .next .turbo node_modules/.cache",
-    "update:readme": "node scripts/update-readme.mjs"
+    "clean": "pnpm -r exec rm -rf dist .next .turbo node_modules/.cache"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

@@ -9,11 +9,15 @@ interface CohereModel {
 }
 
 const COHERE_FREE_ALLOW_LIST = [
+  'command-a-plus',
+  'command-a-03-2025',
   'command-a-reasoning-08-2025',
+  'command-a-translate-08-2025',
   'command-a-vision-07-2025',
   'command-r-plus-08-2024',
   'command-r-08-2024',
   'command-r7b-12-2024',
+  'north-mini-code',
 ] as const;
 
 const COHERE_FREE_ALLOW_MAP: ReadonlyMap<string, string> = new Map(
@@ -44,7 +48,8 @@ export class CohereProvider extends OpenAICompatibleProvider {
     for (const m of chatModels) {
       const rawId = m.id ?? m.name;
       if (!rawId) continue;
-      const canonical = COHERE_FREE_ALLOW_MAP.get(rawId.toLowerCase()) ?? rawId;
+      const canonical = COHERE_FREE_ALLOW_MAP.get(rawId.toLowerCase());
+      if (!canonical) continue;
       picked.push({
         id: canonical,
         provider: this.id,

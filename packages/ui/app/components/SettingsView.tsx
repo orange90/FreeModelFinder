@@ -25,7 +25,7 @@ import { Badge, Dot } from './Badge';
 import { StatCard } from './StatCard';
 import { ModelChangesBanner } from './ModelChangesBanner';
 import { classNames, GATEWAY, withUiHeaders } from '../lib/utils';
-import { lookupCapabilityScore, SETTINGS_PROVIDERS } from '../lib/platforms';
+import { SETTINGS_PROVIDERS } from '../lib/platforms';
 
 type ModelItem = { id: string; provider: string; display_name?: string };
 
@@ -38,7 +38,15 @@ type CustomModelDef = {
 type ConfigRes = {
   port: number;
   defaultModel?: string;
-  providers: Record<string, { enabled: boolean; hasKey: boolean }>;
+  providers: Record<
+    string,
+    {
+      enabled: boolean;
+      hasKey: boolean;
+      credentialError?: string;
+      accountId?: string;
+    }
+  >;
   custom?: {
     enabled: boolean;
     hasKey: boolean;
@@ -79,6 +87,7 @@ export function SettingsView({
 }) {
   const [cfg, setCfg] = useState<ConfigRes | null>(null);
   const [keys, setKeys] = useState<Record<string, string>>({});
+  const [accountIds, setAccountIds] = useState<Record<string, string>>({});
   const [visible, setVisible] = useState<Record<string, boolean>>({});
   const [saveStates, setSaveStates] = useState<Record<string, SaveState>>({});
   const [toast, setToast] = useState<Toast>(null);
@@ -178,6 +187,13 @@ export function SettingsView({
       .then((r) => r.json())
       .then((c: ConfigRes) => {
         setCfg(c);
+        const cloudflareAccountId = c.providers.cloudflare?.accountId;
+        if (cloudflareAccountId) {
+          setAccountIds((current) => ({
+            ...current,
+            cloudflare: cloudflareAccountId,
+          }));
+        }
         if (c.custom) {
           setCustomBaseUrl(c.custom.baseUrl ?? '');
           setCustomModels(Array.isArray(c.custom.models) ? c.custom.models : []);
@@ -274,7 +290,14 @@ export function SettingsView({
       const res = await fetch(`${GATEWAY}/api/providers`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ provider: providerId, apiKey, enabled: true }),
+        body: JSON.stringify({
+          provider: providerId,
+          apiKey,
+          enabled: true,
+          ...(providerId === 'cloudflare'
+            ? { accountId: accountIds.cloudflare?.trim() ?? '' }
+            : {}),
+        }),
       });
       if (res.ok) {
         setToast({ kind: 'success', text: `已保存 ${providerId} 的 API Key` });
@@ -629,19 +652,11 @@ export function SettingsView({
               {models.length === 0 && (
                 <option value="">暂无模型 — 请先在下方配置 API Key</option>
               )}
-              {models.map((m) => {
-                const score = lookupCapabilityScore({ name: m.id });
-                const suffix =
-                  m.provider !== 'siliconflow' && score.intelligenceIndex != null
-                    ? ` · 能力 ${score.intelligenceIndex}`
-                    : '';
-                return (
-                  <option key={`${m.provider}:${m.id}`} value={`${m.provider}:${m.id}`}>
-                    [{m.provider}] {m.id}
-                    {suffix}
-                  </option>
-                );
-              })}
+              {models.map((m) => (
+                <option key={`${m.provider}:${m.id}`} value={`${m.provider}:${m.id}`}>
+                  [{m.provider}] {m.display_name ?? m.id}
+                </option>
+              ))}
             </select>
             <p className="mt-2 text-xs text-muted-foreground">
               选择后将用于"测试模型"页面的对话请求。
@@ -753,7 +768,11 @@ export function SettingsView({
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {(
                   [
-                    { id: 'capability', label: '能力优先', desc: '选择评分最高的模型' },
+                    {
+                      id: 'capability',
+                      label: '规格优先',
+                      desc: '按模型规模与上下文估算',
+                    },
                     { id: 'speed', label: '速度优先', desc: '优先低延迟 Provider' },
                     { id: 'rate-limit', label: '请求限制优先', desc: '优先高 RPM 配额' },
                   ] as const
@@ -1141,8 +1160,30 @@ export function SettingsView({
                       </a>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">{p.hint}</p>
+                    {state?.credentialError && (
+                      <p className="mt-1 text-xs text-destructive">
+                        本地凭据无法解密，请重新保存这个 Key。
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row">
+                    {p.id === 'cloudflare' && (
+                      <input
+                        type="text"
+                        className="min-w-0 flex-1 rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                        placeholder="Cloudflare Account ID"
+                        value={accountIds.cloudflare ?? ''}
+                        onChange={(e) =>
+                          setAccountIds((current) => ({
+                            ...current,
+                            cloudflare: e.target.value,
+                          }))
+                        }
+                        aria-label="Cloudflare Account ID"
+                        autoComplete="off"
+                        spellCheck={false}
+                      />
+                    )}
                     <div className="relative flex-1">
                       <input
                         type={isVisible ? 'text' : 'password'}
@@ -1151,7 +1192,11 @@ export function SettingsView({
                         value={keys[p.id] ?? ''}
                         onChange={(e) => setKeys((k) => ({ ...k, [p.id]: e.target.value }))}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && keys[p.id]) {
+                          if (
+                            e.key === 'Enter' &&
+                            keys[p.id] &&
+                            (p.id !== 'cloudflare' || accountIds.cloudflare?.trim())
+                          ) {
                             e.preventDefault();
                             void save(p.id);
                           }
@@ -1184,7 +1229,11 @@ export function SettingsView({
                             : 'bg-primary text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
                       )}
                       onClick={() => void save(p.id)}
-                      disabled={!keys[p.id] || saveState === 'saving'}
+                      disabled={
+                        !keys[p.id] ||
+                        (p.id === 'cloudflare' && !accountIds.cloudflare?.trim()) ||
+                        saveState === 'saving'
+                      }
                     >
                       {saveState === 'saving' && (
                         <Loader2 size={13} strokeWidth={2} className="animate-spin" />

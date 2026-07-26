@@ -6,6 +6,10 @@ interface SenseNovaModel {
   object?: string;
   owned_by?: string;
   output_modalities?: string[];
+  pricing?: {
+    prompt?: string;
+    completion?: string;
+  };
 }
 
 const SENSENOVA_STATIC_MODELS: readonly Omit<ModelInfo, 'provider'>[] = [
@@ -49,15 +53,17 @@ export class SenseNovaProvider extends OpenAICompatibleProvider {
           .filter((m): m is SenseNovaModel => typeof m?.id === 'string' && m.id.length > 0)
           .filter((m) => {
             const outs = m.output_modalities;
-            if (!Array.isArray(outs) || outs.length === 0) return true;
-            return outs.includes('text');
+            if (Array.isArray(outs) && !outs.includes('text')) return false;
+            const prompt = Number(m.pricing?.prompt ?? Number.NaN);
+            const completion = Number(m.pricing?.completion ?? Number.NaN);
+            return prompt === 0 && completion === 0;
           })
           .map<ModelInfo>((m) => ({
             id: m.id,
             provider: this.id,
             displayName: m.id,
             free: true,
-            description: 'SenseNova free tier, share fair-use rate limit.',
+            description: 'SenseNova API reports zero input and output price for this text model.',
           }));
         if (dynamic.length > 0) return dynamic;
       }

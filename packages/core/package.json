@@ -17,7 +17,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test src/router/__tests__/*.test.ts"
+    "test": "node --import tsx --test src/router/__tests__/*.test.ts src/providers/__tests__/*.test.ts src/registry/__tests__/*.test.ts"
   },
   "dependencies": {
     "zod": "^3.23.4"

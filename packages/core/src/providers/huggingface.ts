@@ -87,7 +87,7 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
         displayName: canonical,
         contextWindow: ctx,
         free: true,
-        description: `HuggingFace Router free tier${backendDesc}: ~300 requests/hour shared across models.`,
+        description: `Hugging Face reports a live zero-price endpoint${backendDesc}; paid router models are excluded.`,
       });
     }
     if (models.length === 0) {

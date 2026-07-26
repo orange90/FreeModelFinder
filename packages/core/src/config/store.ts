@@ -2,8 +2,20 @@ import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { closeSync, existsSync, mkdirSync, openSync, unlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { ProviderIdSchema } from '../types.js';
 import type { AppConfig, ProviderId, ProviderSettings } from '../types.js';
 import { decryptString, encryptString, looksEncrypted } from './crypto.js';
+
+function decryptSecret(payload: string): string {
+  let current = payload;
+  // Older releases could persist a ciphertext that had already been encrypted
+  // once. Unwrap a small, bounded number of legacy layers so the UI never
+  // mistakes ciphertext for a usable credential.
+  for (let layer = 0; layer < 3 && looksEncrypted(current); layer += 1) {
+    current = decryptString(current);
+  }
+  return current;
+}
 
 function canWrite(dir: string): boolean {
   try {
@@ -64,7 +76,17 @@ const DEFAULT_CONFIG: AppConfig = {
     mistral: { enabled: false },
     cloudflare: { enabled: false },
     github: { enabled: false },
+    cohere: { enabled: false },
+    huggingface: { enabled: false },
+    sensenova: { enabled: false },
     custom: { enabled: false },
+  },
+  gateway: {
+    requireAuth: false,
+  },
+  autoRoute: {
+    enabled: false,
+    strategy: 'capability',
   },
 };
 
@@ -106,7 +128,7 @@ function decryptProviders(config: AppConfig): AppConfig {
       try {
         clone.credentials = {
           ...clone.credentials!,
-          apiKey: decryptString(rawKey),
+          apiKey: decryptSecret(rawKey),
         };
       } catch (err) {
         // CRITICAL: never fall back to the raw ciphertext. Doing so would
@@ -136,7 +158,7 @@ function decryptProviders(config: AppConfig): AppConfig {
   const gwKey = gateway?.apiKey;
   if (gateway && gwKey) {
     try {
-      gateway = { ...gateway, apiKey: decryptString(gwKey) };
+      gateway = { ...gateway, apiKey: decryptSecret(gwKey) };
     } catch {
       if (looksEncrypted(gwKey)) {
         gateway = { ...gateway, apiKey: undefined };
@@ -144,6 +166,22 @@ function decryptProviders(config: AppConfig): AppConfig {
     }
   }
   return { ...config, providers, gateway };
+}
+
+function normalizeConfig(input: AppConfig): AppConfig {
+  const providers: AppConfig['providers'] = { ...DEFAULT_CONFIG.providers };
+  for (const [id, settings] of Object.entries(input.providers ?? {})) {
+    const parsed = ProviderIdSchema.safeParse(id);
+    if (!parsed.success || !settings) continue;
+    providers[parsed.data] = settings;
+  }
+  return {
+    ...DEFAULT_CONFIG,
+    ...input,
+    providers,
+    gateway: { ...DEFAULT_CONFIG.gateway, ...input.gateway },
+    autoRoute: { ...DEFAULT_CONFIG.autoRoute!, ...input.autoRoute },
+  };
 }
 
 export async function loadConfig(): Promise<AppConfig> {
@@ -154,7 +192,7 @@ export async function loadConfig(): Promise<AppConfig> {
   }
   const raw = await readFile(CONFIG_PATH, 'utf8');
   const parsed = JSON.parse(raw) as AppConfig;
-  return decryptProviders({ ...DEFAULT_CONFIG, ...parsed });
+  return decryptProviders(normalizeConfig(parsed));
 }
 
 export async function saveConfig(config: AppConfig): Promise<void> {

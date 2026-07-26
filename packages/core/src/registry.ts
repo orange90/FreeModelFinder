@@ -118,9 +118,10 @@ export class ProviderRegistry {
   }
 
   listEnabledProviders(): ProviderId[] {
-    return (Object.keys(this.config.providers) as ProviderId[]).filter(
-      (id) => this.config.providers[id]?.enabled && this.config.providers[id]?.credentials?.apiKey,
-    );
+    return (Object.keys(PROVIDER_CTORS) as Array<Exclude<ProviderId, 'ollama'>>).filter((id) => {
+      const settings = this.config.providers[id];
+      return !!(settings?.enabled && settings.credentials?.apiKey);
+    });
   }
 
   async listAllModels(force = false): Promise<ListAllModelsResult> {
@@ -130,7 +131,7 @@ export class ProviderRegistry {
     }
     const enabled = this.listEnabledProviders();
     const results = await Promise.allSettled(
-      enabled.map((id) => this.getProvider(id).listModels()),
+      enabled.map(async (id) => this.getProvider(id).listModels()),
     );
     const models: ModelInfo[] = [];
     const succeededProviders: ProviderId[] = [];
@@ -140,7 +141,14 @@ export class ProviderRegistry {
       const id = enabled[i]!;
       if (r.status === 'fulfilled') {
         succeededProviders.push(id);
-        models.push(...r.value);
+        models.push(
+          ...r.value.filter(
+            (model) =>
+              model.free === true &&
+              typeof model.id === 'string' &&
+              model.id.trim().length > 0,
+          ),
+        );
       } else {
         const err = r.reason;
         failedProviders.push({
@@ -149,7 +157,15 @@ export class ProviderRegistry {
         });
       }
     }
-    const result: ListAllModelsResult = { models, succeededProviders, failedProviders };
+    const deduped = new Map<string, ModelInfo>();
+    for (const model of models) {
+      deduped.set(`${model.provider}:${model.id}`.toLowerCase(), model);
+    }
+    const result: ListAllModelsResult = {
+      models: [...deduped.values()],
+      succeededProviders,
+      failedProviders,
+    };
     this.modelsCache = result;
     this.cacheAt = Date.now();
     return result;

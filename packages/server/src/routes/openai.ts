@@ -100,7 +100,7 @@ async function dispatchWithAutoRoute(
 export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => ProviderRegistry) {
   app.get('/v1/models', async (_req, reply) => {
     const reg = getRegistry();
-    const { models } = await reg.listAllModels();
+    const { models, succeededProviders, failedProviders } = await reg.listAllModels();
     return reply.send({
       object: 'list',
       data: models.map((m) => ({
@@ -111,7 +111,14 @@ export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => Pr
         display_name: m.displayName,
         context_window: m.contextWindow,
         provider: m.provider,
+        free: m.free,
+        description: m.description,
       })),
+      fmf: {
+        enabled_providers: reg.listEnabledProviders(),
+        succeeded_providers: succeededProviders,
+        failed_providers: failedProviders,
+      },
     });
   });
 

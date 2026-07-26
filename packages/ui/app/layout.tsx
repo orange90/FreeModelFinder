@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata = {
   title: 'FreeModelFinder',
-  description: 'Chat with free LLMs via a local gateway',
+  description: '发现、验证并统一调用真正免费的 AI 模型',
 };
 
 const themeInitScript = `
@@ -20,7 +20,7 @@ const themeInitScript = `
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className="font-sans antialiased">
+    <html lang="zh-CN" suppressHydrationWarning className="font-sans antialiased">
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
