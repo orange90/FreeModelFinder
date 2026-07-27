@@ -21,11 +21,16 @@ try {
   await run(
     npmCommand,
     ['install', '--package-lock-only', '--ignore-scripts', '--no-audit', '--no-fund'],
-    { cwd: scratchDir, maxBuffer: 20 * 1024 * 1024 },
+    {
+      cwd: scratchDir,
+      maxBuffer: 20 * 1024 * 1024,
+      shell: process.platform === 'win32',
+    },
   );
   const result = await run(npmCommand, ['audit', '--omit=dev', '--audit-level=moderate'], {
     cwd: scratchDir,
     maxBuffer: 20 * 1024 * 1024,
+    shell: process.platform === 'win32',
   });
   process.stdout.write(result.stdout);
 } finally {
