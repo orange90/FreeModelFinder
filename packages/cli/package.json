@@ -1,6 +1,6 @@
 {
   "name": "freemodelfinder",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.1",
   "description": "Discover and route free LLM models through a local OpenAI, Anthropic and Gemini compatible gateway.",
   "type": "module",
   "main": "./dist/index.js",
@@ -43,7 +43,7 @@
     "test": "node --import tsx --test src/__tests__/*.test.ts",
     "test:coverage": "c8 --all --include='src/**/*.ts' --exclude='src/__tests__/**' --check-coverage --lines=80 node --import tsx --test src/__tests__/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "prepack": "node scripts/clean.mjs && pnpm --filter @freemodelfinder/core test && pnpm --filter @freemodelfinder/server test && pnpm --filter @freemodelfinder/ui test && pnpm test && pnpm run build && node scripts/verify-package.mjs",
+    "prepack": "node scripts/clean.mjs && pnpm --workspace-root test && pnpm run build && node scripts/verify-package.mjs",
     "prepublishOnly": "node scripts/deny-source-publish.mjs"
   },
   "dependencies": {

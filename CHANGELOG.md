@@ -4,7 +4,7 @@ All notable changes to FreeModelFinder are documented here.
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-07-26
+## [0.1.0-rc.1] - 2026-07-27
 
 - Publish the `freemodelfinder` npm package with the `fmf` CLI.
 - Serve the web UI and compatible API gateway from one loopback address.
@@ -13,5 +13,5 @@ All notable changes to FreeModelFinder are documented here.
 - Add local quota observation, provider failure reporting and automatic routing.
 - Encrypt provider, custom-source and gateway credentials with the v3 local format.
 
-[Unreleased]: https://github.com/orange90/FreeModelFinder/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/orange90/FreeModelFinder/releases/tag/v0.1.0
+[Unreleased]: https://github.com/orange90/FreeModelFinder/compare/v0.1.0-rc.1...HEAD
+[0.1.0-rc.1]: https://github.com/orange90/FreeModelFinder/releases/tag/v0.1.0-rc.1

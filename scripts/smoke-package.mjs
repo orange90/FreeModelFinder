@@ -15,11 +15,16 @@ const scratchDir = await mkdtemp(join(tmpdir(), 'freemodelfinder-pack-'));
 const installDir = resolve(scratchDir, 'install');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const pnpmCommand = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
+const sourceManifest = JSON.parse(
+  await readFile(resolve(repoDir, 'packages/cli/package.json'), 'utf8'),
+);
+const expectedVersion = sourceManifest.version;
 
 async function runCommand(command, args, options = {}) {
   return run(command, args, {
     cwd: repoDir,
     maxBuffer: 20 * 1024 * 1024,
+    shell: process.platform === 'win32',
     ...options,
   });
 }
@@ -123,7 +128,7 @@ try {
     cwd: installDir,
     env,
   });
-  assert.equal(version.stdout.trim(), '0.1.0');
+  assert.equal(version.stdout.trim(), expectedVersion);
   const status = await runCommand(process.execPath, [entry, 'status'], { cwd: installDir, env });
   assert.match(status.stdout, /FreeModelFinder/);
 
@@ -143,7 +148,7 @@ try {
   const healthBody = await health.json();
   assert.equal(healthBody.ok, true);
   assert.equal(healthBody.service, 'freemodelfinder');
-  assert.equal(healthBody.version, '0.1.0');
+  assert.equal(healthBody.version, expectedVersion);
   assert.equal(typeof healthBody.ts, 'number');
   const homepage = await waitFor(`${origin}/`);
   const html = await homepage.text();

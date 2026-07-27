@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer as createTcpServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -10,6 +10,10 @@ import { serveCommand } from '../commands/serve.js';
 
 const packageDir = resolve(import.meta.dirname, '../..');
 const entry = resolve(packageDir, 'src/index.ts');
+const packageManifest = JSON.parse(await readFile(resolve(packageDir, 'package.json'), 'utf8')) as {
+  version: string;
+};
+const expectedVersion = packageManifest.version;
 const testRoot = await mkdtemp(join(tmpdir(), 'freemodelfinder-cli-'));
 
 after(async () => {
@@ -60,7 +64,7 @@ describe('fmf CLI', () => {
   it('reports the package version and rejects invalid ports', async () => {
     const version = await runCli(['--version']);
     assert.equal(version.code, 0);
-    assert.equal(version.stdout.trim(), '0.1.0');
+    assert.equal(version.stdout.trim(), expectedVersion);
 
     const invalid = await runCli(['serve', '--port', '70000']);
     assert.equal(invalid.code, 1);
@@ -132,7 +136,7 @@ describe('fmf CLI', () => {
       }
     }
     assert.ok(health?.ok, 'gateway did not become healthy');
-    assert.equal(((await health.json()) as { version: string }).version, '0.1.0');
+    assert.equal(((await health.json()) as { version: string }).version, expectedVersion);
     assert.match(stdout, new RegExp(`127\\.0\\.0\\.1:${port}`));
     child.kill('SIGTERM');
     await once(child, 'exit');
