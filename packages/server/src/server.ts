@@ -23,7 +23,7 @@ export interface ServerOptions {
 }
 
 const PROTECTED_PREFIXES = ['/v1/', '/v1beta/'];
-export const SERVER_VERSION = '0.1.0-rc.2';
+export const SERVER_VERSION = '0.1.0-rc.3';
 
 const LOOPBACK_HOSTS = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost']);
 

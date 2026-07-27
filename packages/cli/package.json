@@ -1,6 +1,6 @@
 {
   "name": "freemodelfinder",
-  "version": "0.1.0-rc.2",
+  "version": "0.1.0-rc.3",
   "description": "Discover and route free LLM models through a local OpenAI, Anthropic and Gemini compatible gateway.",
   "type": "module",
   "main": "./dist/index.js",

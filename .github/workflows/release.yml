@@ -69,10 +69,6 @@ jobs:
 
       - name: Publish to npm with Trusted Publishing
         run: npm publish ./packages/cli/dist --access public --provenance --tag "${{ steps.release_meta.outputs.dist_tag }}"
-        env:
-          # This secret is used only for the one-time bootstrap RC. Delete it
-          # after npm Trusted Publishing is configured; OIDC then takes over.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
 
       - name: Create GitHub Release
         env:
