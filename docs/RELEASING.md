@@ -17,7 +17,7 @@ The macOS/Tauri project is not part of these gates.
 npm cannot configure a Trusted Publisher until the package exists. The first prerelease therefore uses a temporary granular automation token:
 
 1. Change all release manifests and `SERVER_VERSION` to `0.1.0-rc.2`; `pnpm verify:release` must pass.
-2. Because `freemodelfinder` does not exist yet, create a granular npm token with the shortest practical expiry, `Read and write` access to `All Packages`, and `Bypass 2FA` enabled. Store it temporarily as the GitHub Actions secret `NPM_BOOTSTRAP_TOKEN`, then revoke it immediately after the bootstrap publish.
+2. Because `freemodelfinder` does not exist yet, create a granular npm token with the shortest practical expiry, `Read and write` access to `All Packages`, and `Bypass 2FA` enabled. Store it temporarily as the GitHub Actions secret `NPM_BOOTSTRAP_TOKEN`, then revoke it after the first OIDC-only publish succeeds.
 3. Merge through green CI, then push the protected tag `v0.1.0-rc.2`. `release.yml` chooses the `next` dist-tag for prerelease versions.
 4. Install from the public registry in a clean environment and verify the model catalog, one non-streaming chat, and one streaming chat:
 
@@ -40,7 +40,7 @@ In the npm package settings, configure:
 
 The release job runs on a GitHub-hosted runner, grants only the required `id-token: write`, uses Node 24 and npm 11.18.0, and publishes directly with `npm publish`. The public package receives npm provenance automatically; the command also keeps the explicit `--provenance` safety flag.
 
-After a successful OIDC prerelease test, delete the `NPM_BOOTSTRAP_TOKEN` GitHub secret and revoke the token at npm. Set npm publishing access to require 2FA and disallow traditional tokens if that policy is compatible with the maintainer recovery process.
+Publish `v0.1.0-rc.3` without `NODE_AUTH_TOKEN` as the OIDC-only verification release. After it succeeds, delete the `NPM_BOOTSTRAP_TOKEN` GitHub secret and revoke the token at npm. Set npm publishing access to require 2FA and disallow traditional tokens if that policy is compatible with the maintainer recovery process.
 
 ## Final `v0.1.0`
 

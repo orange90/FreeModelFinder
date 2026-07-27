@@ -4,6 +4,10 @@ All notable changes to FreeModelFinder are documented here.
 
 ## [Unreleased]
 
+## [0.1.0-rc.3] - 2026-07-27
+
+- Switch npm publication from the one-time bootstrap token to GitHub Actions OIDC Trusted Publishing.
+
 ## [0.1.0-rc.2] - 2026-07-27
 
 - Publish the `freemodelfinder` npm package with the `fmf` CLI.
@@ -13,5 +17,6 @@ All notable changes to FreeModelFinder are documented here.
 - Add local quota observation, provider failure reporting and automatic routing.
 - Encrypt provider, custom-source and gateway credentials with the v3 local format.
 
-[Unreleased]: https://github.com/orange90/FreeModelFinder/compare/v0.1.0-rc.2...HEAD
+[Unreleased]: https://github.com/orange90/FreeModelFinder/compare/v0.1.0-rc.3...HEAD
+[0.1.0-rc.3]: https://github.com/orange90/FreeModelFinder/compare/v0.1.0-rc.2...v0.1.0-rc.3
 [0.1.0-rc.2]: https://github.com/orange90/FreeModelFinder/releases/tag/v0.1.0-rc.2
