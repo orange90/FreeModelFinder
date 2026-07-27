@@ -12,17 +12,17 @@ This repository publishes one public npm package, `freemodelfinder`. The Core, S
 
 The macOS/Tauri project is not part of these gates.
 
-## Bootstrap `0.1.0-rc.1`
+## Bootstrap `0.1.0-rc.2`
 
 npm cannot configure a Trusted Publisher until the package exists. The first prerelease therefore uses a temporary granular automation token:
 
-1. Change all release manifests and `SERVER_VERSION` to `0.1.0-rc.1`; `pnpm verify:release` must pass.
-2. Create a granular npm token restricted to the new `freemodelfinder` package, with the shortest practical expiry and publish permission. Store it temporarily as the GitHub Actions secret `NPM_BOOTSTRAP_TOKEN`.
-3. Merge through green CI, then push the protected tag `v0.1.0-rc.1`. `release.yml` chooses the `next` dist-tag for prerelease versions.
+1. Change all release manifests and `SERVER_VERSION` to `0.1.0-rc.2`; `pnpm verify:release` must pass.
+2. Because `freemodelfinder` does not exist yet, create a granular npm token with the shortest practical expiry, `Read and write` access to `All Packages`, and `Bypass 2FA` enabled. Store it temporarily as the GitHub Actions secret `NPM_BOOTSTRAP_TOKEN`, then revoke it immediately after the bootstrap publish.
+3. Merge through green CI, then push the protected tag `v0.1.0-rc.2`. `release.yml` chooses the `next` dist-tag for prerelease versions.
 4. Install from the public registry in a clean environment and verify the model catalog, one non-streaming chat, and one streaming chat:
 
    ```bash
-   npm install -g freemodelfinder@0.1.0-rc.1
+   npm install -g freemodelfinder@0.1.0-rc.2
    fmf serve --open
    ```
 

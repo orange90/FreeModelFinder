@@ -1,6 +1,6 @@
 {
   "name": "@freemodelfinder/repo",
-  "version": "0.1.0-rc.1",
+  "version": "0.1.0-rc.2",
   "private": true,
   "description": "Development monorepo for the FreeModelFinder local LLM gateway, web UI and CLI.",
   "packageManager": "pnpm@11.17.0",
