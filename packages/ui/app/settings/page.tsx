@@ -18,9 +18,7 @@ export default function Settings() {
           </a>
           <div className="leading-tight">
             <h1 className="text-sm font-semibold tracking-tight">设置</h1>
-            <p className="hidden text-xs text-muted-foreground sm:block">
-              配置各平台的 API Key
-            </p>
+            <p className="hidden text-xs text-muted-foreground sm:block">配置各平台的 API Key</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

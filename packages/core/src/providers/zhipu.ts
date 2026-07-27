@@ -20,13 +20,6 @@ const ZHIPU_STATIC_MODELS: ModelInfo[] = [
     free: true,
     description: 'Zhipu GLM-4.7-Flash, permanently free, 200K context, strong coding.',
   },
-  {
-    id: 'glm-4-plus',
-    provider: 'zhipu',
-    displayName: 'GLM-4-Plus',
-    contextWindow: 128_000,
-    free: false,
-  },
 ];
 
 export class ZhipuProvider extends OpenAICompatibleProvider {

@@ -38,7 +38,12 @@ function isFreeProvider(p: HFProviderEntry): boolean {
   if (p.is_free === true) return true;
   const inPrice = p.pricing?.input;
   const outPrice = p.pricing?.output;
-  if (typeof inPrice === 'number' && typeof outPrice === 'number' && inPrice === 0 && outPrice === 0) {
+  if (
+    typeof inPrice === 'number' &&
+    typeof outPrice === 'number' &&
+    inPrice === 0 &&
+    outPrice === 0
+  ) {
     return true;
   }
   return false;
@@ -74,9 +79,7 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
       seen.add(canonical);
       const ctx =
         m.context_length ??
-        freeProviders
-          .map((p) => p.context_length)
-          .find((v): v is number => typeof v === 'number');
+        freeProviders.map((p) => p.context_length).find((v): v is number => typeof v === 'number');
       const backendNames = freeProviders
         .map((p) => p.provider)
         .filter((v): v is string => typeof v === 'string' && v.length > 0);

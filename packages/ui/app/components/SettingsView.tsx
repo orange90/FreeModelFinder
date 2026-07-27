@@ -53,7 +53,6 @@ type ConfigRes = {
       enabled: boolean;
       hasKey: boolean;
       credentialError?: string;
-      accountId?: string;
     }
   >;
   custom?: {
@@ -97,7 +96,6 @@ export function SettingsView({
 }) {
   const [cfg, setCfg] = useState<ConfigRes | null>(null);
   const [keys, setKeys] = useState<Record<string, string>>({});
-  const [accountIds, setAccountIds] = useState<Record<string, string>>({});
   const [visible, setVisible] = useState<Record<string, boolean>>({});
   const [saveStates, setSaveStates] = useState<Record<string, SaveState>>({});
   const [toast, setToast] = useState<Toast>(null);
@@ -196,27 +194,21 @@ export function SettingsView({
       .then((r) => r.json())
       .then((c: ConfigRes) => {
         setCfg(c);
-        const cloudflareAccountId = c.providers.cloudflare?.accountId;
-        if (cloudflareAccountId) {
-          setAccountIds((current) => ({
-            ...current,
-            cloudflare: cloudflareAccountId,
-          }));
-        }
         if (c.custom) {
-          const list = Array.isArray(c.custom.sources) && c.custom.sources.length > 0
-            ? c.custom.sources
-            : c.custom.baseUrl
-              ? [
-                  {
-                    id: 'default',
-                    label: 'Custom',
-                    baseUrl: c.custom.baseUrl,
-                    hasKey: c.custom.hasKey,
-                    models: Array.isArray(c.custom.models) ? c.custom.models : [],
-                  },
-                ]
-              : [];
+          const list =
+            Array.isArray(c.custom.sources) && c.custom.sources.length > 0
+              ? c.custom.sources
+              : c.custom.baseUrl
+                ? [
+                    {
+                      id: 'default',
+                      label: 'Custom',
+                      baseUrl: c.custom.baseUrl,
+                      hasKey: c.custom.hasKey,
+                      models: Array.isArray(c.custom.models) ? c.custom.models : [],
+                    },
+                  ]
+                : [];
           setCustomSources(list.map((s) => ({ ...s, models: s.models ?? [] })));
         }
       })
@@ -289,9 +281,7 @@ export function SettingsView({
       }
       const json = await res.json().catch(() => null);
       const reply: string =
-        json?.choices?.[0]?.message?.content ??
-        json?.choices?.[0]?.delta?.content ??
-        '';
+        json?.choices?.[0]?.message?.content ?? json?.choices?.[0]?.delta?.content ?? '';
       setPing({
         state: 'ok',
         latencyMs,
@@ -315,19 +305,13 @@ export function SettingsView({
           provider: providerId,
           apiKey,
           enabled: true,
-          ...(providerId === 'cloudflare'
-            ? { accountId: accountIds.cloudflare?.trim() ?? '' }
-            : {}),
         }),
       });
       if (res.ok) {
         setToast({ kind: 'success', text: `已保存 ${providerId} 的 API Key` });
         setKeys((k) => ({ ...k, [providerId]: '' }));
         setSaveStates((s) => ({ ...s, [providerId]: 'saved' }));
-        setTimeout(
-          () => setSaveStates((s) => ({ ...s, [providerId]: 'idle' })),
-          1600,
-        );
+        setTimeout(() => setSaveStates((s) => ({ ...s, [providerId]: 'idle' })), 1600);
         fetch(`${GATEWAY}/api/config`)
           .then((r) => r.json())
           .then(setCfg);
@@ -362,19 +346,13 @@ export function SettingsView({
         }
         setToast({ kind: 'error', text: `保存 ${providerId} 失败${detail}` });
         setSaveStates((s) => ({ ...s, [providerId]: 'error' }));
-        setTimeout(
-          () => setSaveStates((s) => ({ ...s, [providerId]: 'idle' })),
-          1800,
-        );
+        setTimeout(() => setSaveStates((s) => ({ ...s, [providerId]: 'idle' })), 1800);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setToast({ kind: 'error', text: `保存 ${providerId} 失败：${msg}` });
       setSaveStates((s) => ({ ...s, [providerId]: 'error' }));
-      setTimeout(
-        () => setSaveStates((s) => ({ ...s, [providerId]: 'idle' })),
-        1800,
-      );
+      setTimeout(() => setSaveStates((s) => ({ ...s, [providerId]: 'idle' })), 1800);
     }
   }
 
@@ -399,10 +377,7 @@ export function SettingsView({
       while (customSources.some((s) => s.id === `${id}-${i}`)) i++;
       id = `${id}-${i}`;
     }
-    setCustomSources((list) => [
-      ...list,
-      { id, label: name, baseUrl: '', apiKey: '', models: [] },
-    ]);
+    setCustomSources((list) => [...list, { id, label: name, baseUrl: '', apiKey: '', models: [] }]);
     setCustomNewSourceName('');
   }
 
@@ -411,9 +386,7 @@ export function SettingsView({
   }
 
   function patchCustomSource(sourceId: string, patch: Partial<CustomSourceDef>) {
-    setCustomSources((list) =>
-      list.map((s) => (s.id === sourceId ? { ...s, ...patch } : s)),
-    );
+    setCustomSources((list) => list.map((s) => (s.id === sourceId ? { ...s, ...patch } : s)));
   }
 
   function addModelToSource(sourceId: string) {
@@ -499,12 +472,15 @@ export function SettingsView({
       setToast({ kind: 'success', text: '自定义模型已保存' });
       setCustomSaveState('saved');
       setTimeout(() => setCustomSaveState('idle'), 1600);
-      const refreshed = await fetch(`${GATEWAY}/api/config`).then((r) => r.json() as Promise<ConfigRes>);
+      const refreshed = await fetch(`${GATEWAY}/api/config`).then(
+        (r) => r.json() as Promise<ConfigRes>,
+      );
       setCfg(refreshed);
       if (refreshed.custom) {
-        const list = Array.isArray(refreshed.custom.sources) && refreshed.custom.sources.length > 0
-          ? refreshed.custom.sources
-          : [];
+        const list =
+          Array.isArray(refreshed.custom.sources) && refreshed.custom.sources.length > 0
+            ? refreshed.custom.sources
+            : [];
         setCustomSources(list.map((s) => ({ ...s, apiKey: '', models: s.models ?? [] })));
       }
       if (onModelsRefresh) {
@@ -538,7 +514,9 @@ export function SettingsView({
       setToast({ kind: 'success', text: '已清除自定义模型配置' });
       setCustomSources([]);
       setCustomSaveState('idle');
-      const refreshed = await fetch(`${GATEWAY}/api/config`).then((r) => r.json() as Promise<ConfigRes>);
+      const refreshed = await fetch(`${GATEWAY}/api/config`).then(
+        (r) => r.json() as Promise<ConfigRes>,
+      );
       setCfg(refreshed);
       if (onModelsRefresh) {
         try {
@@ -553,7 +531,6 @@ export function SettingsView({
       setCustomSaveState('idle');
     }
   }
-
 
   async function callGateway(body: Record<string, unknown>): Promise<GatewayInfo | null> {
     try {
@@ -697,9 +674,7 @@ export function SettingsView({
           className="flex w-full items-center justify-between rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold tracking-tight text-foreground">
-              当前模型
-            </h2>
+            <h2 className="text-sm font-semibold tracking-tight text-foreground">当前模型</h2>
             <span className="text-xs text-muted-foreground">
               {models.length > 0 ? `${models.length} 个可选` : '暂无可用模型'}
             </span>
@@ -726,9 +701,7 @@ export function SettingsView({
               onChange={(e) => onModelChange?.(e.target.value)}
               disabled={models.length === 0}
             >
-              {models.length === 0 && (
-                <option value="">暂无模型 — 请先在下方配置 API Key</option>
-              )}
+              {models.length === 0 && <option value="">暂无模型 — 请先在下方配置 API Key</option>}
               {models.map((m) => (
                 <option key={`${m.provider}:${m.id}`} value={`${m.provider}:${m.id}`}>
                   [{m.provider}] {m.display_name ?? m.id}
@@ -1006,7 +979,8 @@ export function SettingsView({
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  推荐使用 <code className="font-mono">auto</code>，网关会自动选择当前的默认模型；也可传入具体的
+                  推荐使用 <code className="font-mono">auto</code>
+                  ，网关会自动选择当前的默认模型；也可传入具体的
                   <code className="font-mono"> provider:model</code>。
                 </p>
               </div>
@@ -1107,7 +1081,7 @@ export function SettingsView({
               </div>
               <div className="relative">
                 <pre className="max-h-60 overflow-auto rounded-md border border-border bg-surface-muted/40 p-3 pr-10 font-mono text-[12px] leading-relaxed text-foreground">
-{curlOpenAI}
+                  {curlOpenAI}
                 </pre>
                 <button
                   type="button"
@@ -1124,7 +1098,7 @@ export function SettingsView({
               </div>
               <div className="relative">
                 <pre className="max-h-40 overflow-auto rounded-md border border-border bg-surface-muted/40 p-3 pr-10 font-mono text-[12px] leading-relaxed text-foreground">
-{curlListModels}
+                  {curlListModels}
                 </pre>
                 <button
                   type="button"
@@ -1141,7 +1115,8 @@ export function SettingsView({
               </div>
               {!displayKey && (
                 <p className="text-xs text-muted-foreground">
-                  示例中的 <code className="font-mono">YOUR_API_KEY</code> 将在生成 Key 后自动替换为实际值。
+                  示例中的 <code className="font-mono">YOUR_API_KEY</code> 将在生成 Key
+                  后自动替换为实际值。
                 </p>
               )}
             </div>
@@ -1180,193 +1155,169 @@ export function SettingsView({
             />
           </div>
         </button>
-        {keysSectionOpen && (() => {
-          const addedProviders = SETTINGS_PROVIDERS.filter((p) => {
-            const s = cfg?.providers[p.id];
-            return !!(s?.enabled && s.hasKey);
-          });
-          const unaddedProviders = SETTINGS_PROVIDERS.filter((p) => {
-            const s = cfg?.providers[p.id];
-            return !(s?.enabled && s.hasKey);
-          });
+        {keysSectionOpen &&
+          (() => {
+            const addedProviders = SETTINGS_PROVIDERS.filter((p) => {
+              const s = cfg?.providers[p.id];
+              return !!(s?.enabled && s.hasKey);
+            });
+            const unaddedProviders = SETTINGS_PROVIDERS.filter((p) => {
+              const s = cfg?.providers[p.id];
+              return !(s?.enabled && s.hasKey);
+            });
 
-          const renderCard = (p: (typeof SETTINGS_PROVIDERS)[number]) => {
-            const state = cfg?.providers[p.id];
-            const enabled = !!(state?.enabled && state.hasKey);
-            const isVisible = visible[p.id];
-            const saveState = saveStates[p.id] ?? 'idle';
-            return (
-              <div
-                key={p.id}
-                className="rounded-lg border border-border bg-surface p-4 shadow-sm transition hover:border-border-strong"
-              >
-                <div className="grid gap-4 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] md:items-center">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-foreground">{p.label}</span>
-                      {enabled ? (
-                        <Badge tone="success">
-                          <Dot tone="success" />
-                          已配置
-                        </Badge>
-                      ) : (
-                        <Badge tone="neutral">
-                          <Dot tone="neutral" />
-                          未配置
-                        </Badge>
+            const renderCard = (p: (typeof SETTINGS_PROVIDERS)[number]) => {
+              const state = cfg?.providers[p.id];
+              const enabled = !!(state?.enabled && state.hasKey);
+              const isVisible = visible[p.id];
+              const saveState = saveStates[p.id] ?? 'idle';
+              return (
+                <div
+                  key={p.id}
+                  className="rounded-lg border border-border bg-surface p-4 shadow-sm transition hover:border-border-strong"
+                >
+                  <div className="grid gap-4 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)] md:items-center">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground">{p.label}</span>
+                        {enabled ? (
+                          <Badge tone="success">
+                            <Dot tone="success" />
+                            已配置
+                          </Badge>
+                        ) : (
+                          <Badge tone="neutral">
+                            <Dot tone="neutral" />
+                            未配置
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                        <a
+                          className="inline-flex items-center gap-1 font-medium text-blue-500 underline underline-offset-2 transition hover:text-blue-400"
+                          href={p.link}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          获取 API Key
+                          <ExternalLink size={11} strokeWidth={2} />
+                        </a>
+                        <a
+                          className="inline-flex items-center gap-1 font-medium text-blue-500 underline underline-offset-2 transition hover:text-blue-400"
+                          href={p.guide}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          获取方法
+                          <ExternalLink size={11} strokeWidth={2} />
+                        </a>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{p.hint}</p>
+                      {state?.credentialError && (
+                        <p className="mt-1 text-xs text-destructive">
+                          本地凭据无法解密，请重新保存这个 Key。
+                        </p>
                       )}
                     </div>
-                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                      <a
-                        className="inline-flex items-center gap-1 font-medium text-blue-500 underline underline-offset-2 transition hover:text-blue-400"
-                        href={p.link}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        获取 API Key
-                        <ExternalLink size={11} strokeWidth={2} />
-                      </a>
-                      <a
-                        className="inline-flex items-center gap-1 font-medium text-blue-500 underline underline-offset-2 transition hover:text-blue-400"
-                        href={p.guide}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        获取方法
-                        <ExternalLink size={11} strokeWidth={2} />
-                      </a>
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{p.hint}</p>
-                    {state?.credentialError && (
-                      <p className="mt-1 text-xs text-destructive">
-                        本地凭据无法解密，请重新保存这个 Key。
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    {p.id === 'cloudflare' && (
-                      <input
-                        type="text"
-                        className="min-w-0 flex-1 rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                        placeholder="Cloudflare Account ID"
-                        value={accountIds.cloudflare ?? ''}
-                        onChange={(e) =>
-                          setAccountIds((current) => ({
-                            ...current,
-                            cloudflare: e.target.value,
-                          }))
-                        }
-                        aria-label="Cloudflare Account ID"
-                        autoComplete="off"
-                        spellCheck={false}
-                      />
-                    )}
-                    <div className="relative flex-1">
-                      <input
-                        type={isVisible ? 'text' : 'password'}
-                        className="w-full rounded-md border border-input bg-surface px-3 py-2 pr-9 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
-                        placeholder={state?.hasKey ? '••••••••••（覆盖以更新）' : '粘贴 API Key'}
-                        value={keys[p.id] ?? ''}
-                        onChange={(e) => setKeys((k) => ({ ...k, [p.id]: e.target.value }))}
-                        onKeyDown={(e) => {
-                          if (
-                            e.key === 'Enter' &&
-                            keys[p.id] &&
-                            (p.id !== 'cloudflare' || accountIds.cloudflare?.trim())
-                          ) {
-                            e.preventDefault();
-                            void save(p.id);
-                          }
-                        }}
-                        aria-label={`${p.label} API Key`}
-                        autoComplete="off"
-                        spellCheck={false}
-                      />
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <div className="relative flex-1">
+                        <input
+                          type={isVisible ? 'text' : 'password'}
+                          className="w-full rounded-md border border-input bg-surface px-3 py-2 pr-9 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+                          placeholder={state?.hasKey ? '••••••••••（覆盖以更新）' : '粘贴 API Key'}
+                          value={keys[p.id] ?? ''}
+                          onChange={(e) => setKeys((k) => ({ ...k, [p.id]: e.target.value }))}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && keys[p.id]) {
+                              e.preventDefault();
+                              void save(p.id);
+                            }
+                          }}
+                          aria-label={`${p.label} API Key`}
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setVisible((v) => ({ ...v, [p.id]: !v[p.id] }))}
+                          aria-label={isVisible ? '隐藏 Key' : '显示 Key'}
+                          className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {isVisible ? (
+                            <EyeOff size={13} strokeWidth={1.75} />
+                          ) : (
+                            <Eye size={13} strokeWidth={1.75} />
+                          )}
+                        </button>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => setVisible((v) => ({ ...v, [p.id]: !v[p.id] }))}
-                        aria-label={isVisible ? '隐藏 Key' : '显示 Key'}
-                        className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        {isVisible ? (
-                          <EyeOff size={13} strokeWidth={1.75} />
-                        ) : (
-                          <Eye size={13} strokeWidth={1.75} />
+                        className={classNames(
+                          'inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          saveState === 'error'
+                            ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                            : saveState === 'saved'
+                              ? 'bg-success text-primary-foreground'
+                              : 'bg-primary text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
                         )}
+                        onClick={() => void save(p.id)}
+                        disabled={!keys[p.id] || saveState === 'saving'}
+                      >
+                        {saveState === 'saving' && (
+                          <Loader2 size={13} strokeWidth={2} className="animate-spin" />
+                        )}
+                        {saveState === 'saved' && <Check size={13} strokeWidth={2} />}
+                        {saveState === 'error' && <X size={13} strokeWidth={2} />}
+                        {saveState === 'saving'
+                          ? '保存中…'
+                          : saveState === 'saved'
+                            ? '已保存'
+                            : saveState === 'error'
+                              ? '重试'
+                              : '保存'}
                       </button>
                     </div>
-                    <button
-                      type="button"
-                      className={classNames(
-                        'inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        saveState === 'error'
-                          ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                          : saveState === 'saved'
-                            ? 'bg-success text-primary-foreground'
-                            : 'bg-primary text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
-                      )}
-                      onClick={() => void save(p.id)}
-                      disabled={
-                        !keys[p.id] ||
-                        (p.id === 'cloudflare' && !accountIds.cloudflare?.trim()) ||
-                        saveState === 'saving'
-                      }
-                    >
-                      {saveState === 'saving' && (
-                        <Loader2 size={13} strokeWidth={2} className="animate-spin" />
-                      )}
-                      {saveState === 'saved' && <Check size={13} strokeWidth={2} />}
-                      {saveState === 'error' && <X size={13} strokeWidth={2} />}
-                      {saveState === 'saving'
-                        ? '保存中…'
-                        : saveState === 'saved'
-                          ? '已保存'
-                          : saveState === 'error'
-                            ? '重试'
-                            : '保存'}
-                    </button>
                   </div>
+                </div>
+              );
+            };
+
+            return (
+              <div className="space-y-5">
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2 px-1">
+                    <h3 className="text-xs font-semibold tracking-tight text-foreground">已添加</h3>
+                    <span className="text-xs text-muted-foreground">
+                      {addedProviders.length} 个
+                    </span>
+                  </div>
+                  {addedProviders.length > 0 ? (
+                    <div className="space-y-2.5">{addedProviders.map(renderCard)}</div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-border bg-surface-muted/30 px-4 py-6 text-center text-xs text-muted-foreground">
+                      暂无已添加的来源，保存下方任一 API Key 即可启用
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2 px-1">
+                    <h3 className="text-xs font-semibold tracking-tight text-foreground">未添加</h3>
+                    <span className="text-xs text-muted-foreground">
+                      {unaddedProviders.length} 个
+                    </span>
+                  </div>
+                  {unaddedProviders.length > 0 ? (
+                    <div className="space-y-2.5">{unaddedProviders.map(renderCard)}</div>
+                  ) : (
+                    <div className="rounded-lg border border-dashed border-border bg-surface-muted/30 px-4 py-6 text-center text-xs text-muted-foreground">
+                      所有来源都已添加 🎉
+                    </div>
+                  )}
                 </div>
               </div>
             );
-          };
-
-          return (
-            <div className="space-y-5">
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2 px-1">
-                  <h3 className="text-xs font-semibold tracking-tight text-foreground">已添加</h3>
-                  <span className="text-xs text-muted-foreground">
-                    {addedProviders.length} 个
-                  </span>
-                </div>
-                {addedProviders.length > 0 ? (
-                  <div className="space-y-2.5">{addedProviders.map(renderCard)}</div>
-                ) : (
-                  <div className="rounded-lg border border-dashed border-border bg-surface-muted/30 px-4 py-6 text-center text-xs text-muted-foreground">
-                    暂无已添加的来源，保存下方任一 API Key 即可启用
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2 px-1">
-                  <h3 className="text-xs font-semibold tracking-tight text-foreground">未添加</h3>
-                  <span className="text-xs text-muted-foreground">
-                    {unaddedProviders.length} 个
-                  </span>
-                </div>
-                {unaddedProviders.length > 0 ? (
-                  <div className="space-y-2.5">{unaddedProviders.map(renderCard)}</div>
-                ) : (
-                  <div className="rounded-lg border border-dashed border-border bg-surface-muted/30 px-4 py-6 text-center text-xs text-muted-foreground">
-                    所有来源都已添加 🎉
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })()}
+          })()}
       </section>
 
       <section
@@ -1424,9 +1375,7 @@ export function SettingsView({
                             className="min-w-0 rounded-md border border-input bg-surface px-2 py-1 text-sm font-medium text-foreground shadow-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
                             placeholder="源名称"
                             value={src.label ?? ''}
-                            onChange={(e) =>
-                              patchCustomSource(src.id, { label: e.target.value })
-                            }
+                            onChange={(e) => patchCustomSource(src.id, { label: e.target.value })}
                             aria-label={`源 ${src.id} 名称`}
                           />
                           <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground">
@@ -1454,9 +1403,7 @@ export function SettingsView({
                             className="w-full rounded-md border border-input bg-surface px-3 py-2 font-mono text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground/70 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
                             placeholder="https://api.example.com/v1"
                             value={src.baseUrl}
-                            onChange={(e) =>
-                              patchCustomSource(src.id, { baseUrl: e.target.value })
-                            }
+                            onChange={(e) => patchCustomSource(src.id, { baseUrl: e.target.value })}
                             autoComplete="off"
                             spellCheck={false}
                           />
@@ -1500,9 +1447,7 @@ export function SettingsView({
                       </div>
 
                       <div className="space-y-2">
-                        <div className="text-xs font-medium text-muted-foreground">
-                          模型列表
-                        </div>
+                        <div className="text-xs font-medium text-muted-foreground">模型列表</div>
                         {src.models.length > 0 ? (
                           <ul className="space-y-1.5">
                             {src.models.map((m) => (
@@ -1711,9 +1656,7 @@ export function SettingsView({
         >
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold tracking-tight text-foreground">模型巡检</h2>
-            <span className="text-xs text-muted-foreground">
-              自动发现新增或下架的免费模型
-            </span>
+            <span className="text-xs text-muted-foreground">自动发现新增或下架的免费模型</span>
           </div>
           <ChevronDown
             size={14}

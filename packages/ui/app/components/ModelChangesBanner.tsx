@@ -120,11 +120,7 @@ export function ModelChangesBanner() {
         <span className="text-muted-foreground/80">
           · 最近一次：{formatRelative(data?.watcher.lastRunAt ?? 0)}
         </span>
-        {data && (
-          <span className="text-muted-foreground/80">
-            · 当前 {data.total} 个模型
-          </span>
-        )}
+        {data && <span className="text-muted-foreground/80">· 当前 {data.total} 个模型</span>}
         <div className="ml-auto flex items-center gap-1">
           <button
             type="button"
@@ -154,9 +150,7 @@ export function ModelChangesBanner() {
       </header>
 
       {error && (
-        <div className="px-3.5 py-2 text-xs text-destructive">
-          获取模型变动失败：{error}
-        </div>
+        <div className="px-3.5 py-2 text-xs text-destructive">获取模型变动失败：{error}</div>
       )}
 
       {data?.watcher.lastError && !error && (
@@ -240,9 +234,7 @@ function ChangeColumn({
             </li>
           ))}
           {items.length > 8 && (
-            <li className="text-xs text-muted-foreground">
-              还有 {items.length - 8} 个未显示…
-            </li>
+            <li className="text-xs text-muted-foreground">还有 {items.length - 8} 个未显示…</li>
           )}
         </ul>
       )}

@@ -39,23 +39,15 @@ export function Drawer({
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
-      <div
-        className="absolute inset-0 bg-foreground/50 backdrop-blur-[2px]"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-foreground/50 backdrop-blur-[2px]" onClick={onClose} />
       <div
         style={{ backgroundColor: 'hsl(var(--surface))' }}
-        className={classNames(
-          'absolute flex flex-col border-border shadow-2xl',
-          panelPositionCls,
-        )}
+        className={classNames('absolute flex flex-col border-border shadow-2xl', panelPositionCls)}
       >
         <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
           <div className="min-w-0">
             <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
-            {description && (
-              <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
-            )}
+            {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
           </div>
           <button
             type="button"

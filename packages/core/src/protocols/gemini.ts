@@ -14,7 +14,11 @@ export interface GeminiHttpRequest {
   };
 }
 
-export function geminiToChatRequest(model: string, req: GeminiHttpRequest, stream = false): ChatRequest {
+export function geminiToChatRequest(
+  model: string,
+  req: GeminiHttpRequest,
+  stream = false,
+): ChatRequest {
   const messages: ChatMessage[] = [];
   if (req.systemInstruction) {
     messages.push({

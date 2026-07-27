@@ -1,7 +1,9 @@
 import './proxy.js';
 import { randomBytes } from 'node:crypto';
+import { resolve } from 'node:path';
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
+import fastifyStatic from '@fastify/static';
 import {
   ProviderIdSchema,
   ProviderRegistry,
@@ -14,27 +16,18 @@ import { registerGeminiRoutes } from './routes/gemini.js';
 import { ModelWatcher } from './watcher.js';
 
 export interface ServerOptions {
-  host?: string;
   port?: number;
   registry?: ProviderRegistry;
   watchIntervalMs?: number;
+  uiDir?: string;
 }
 
 const PROTECTED_PREFIXES = ['/v1/', '/v1beta/'];
+export const SERVER_VERSION = '0.1.0';
 
-const LOOPBACK_HOSTS = new Set([
-  '127.0.0.1',
-  '::1',
-  '::ffff:127.0.0.1',
-  'localhost',
-]);
+const LOOPBACK_HOSTS = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost']);
 
-const LOCAL_ORIGIN_HOSTS = new Set([
-  'localhost',
-  '127.0.0.1',
-  '[::1]',
-  'tauri.localhost',
-]);
+const LOCAL_ORIGIN_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', 'tauri.localhost']);
 
 function extractBearer(req: FastifyRequest): string | null {
   const auth = req.headers['authorization'];
@@ -88,7 +81,7 @@ function generateApiKey(): string {
 export async function createServer(opts: ServerOptions = {}): Promise<{
   app: FastifyInstance;
   registry: ProviderRegistry;
-  listen: (port?: number, host?: string) => Promise<string>;
+  listen: (port?: number) => Promise<string>;
 }> {
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } });
   await app.register(cors, {
@@ -99,20 +92,14 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
       }
       try {
         const url = new URL(origin);
-        callback(
-          null,
-          url.protocol === 'tauri:' ||
-            LOCAL_ORIGIN_HOSTS.has(url.hostname),
-        );
+        callback(null, url.protocol === 'tauri:' || LOCAL_ORIGIN_HOSTS.has(url.hostname));
       } catch {
         callback(null, false);
       }
     },
   });
 
-  let registry =
-    opts.registry ??
-    new ProviderRegistry(await loadConfig());
+  let registry = opts.registry ?? new ProviderRegistry(await loadConfig());
 
   const getRegistry = () => registry;
 
@@ -129,6 +116,9 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
 
   app.addHook('preHandler', async (req, reply) => {
     const url = req.url.split('?')[0] ?? req.url;
+    if (url.startsWith('/api/') && !isTrustedLocalUiRequest(req)) {
+      return reply.code(403).send({ error: 'management API is available only to the local UI' });
+    }
     if (!PROTECTED_PREFIXES.some((p) => url.startsWith(p))) return;
     const gateway = registry.getConfig().gateway;
     if (!gateway?.requireAuth || !gateway.apiKey) return;
@@ -144,7 +134,12 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
     });
   });
 
-  app.get('/healthz', async () => ({ ok: true, ts: Date.now() }));
+  app.get('/healthz', async () => ({
+    ok: true,
+    service: 'freemodelfinder',
+    version: SERVER_VERSION,
+    ts: Date.now(),
+  }));
 
   app.get('/api/config', async () => {
     const cfg = registry.getConfig();
@@ -193,10 +188,6 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
             enabled: s?.enabled ?? false,
             hasKey: !!s?.credentials?.apiKey,
             credentialError: s?.credentialError,
-            accountId:
-              id === 'cloudflare' && typeof s?.credentials?.extra?.accountId === 'string'
-                ? s.credentials.extra.accountId
-                : undefined,
           },
         ]),
       ),
@@ -217,7 +208,6 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
       enabled?: boolean;
       baseUrl?: string;
       clearCredentials?: boolean;
-      accountId?: string;
       models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
       sources?: Array<{
         id: string;
@@ -227,163 +217,148 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
         models?: Array<{ id: string; displayName?: string; contextWindow?: number }>;
       }>;
     };
-  }>(
-    '/api/providers',
-    async (req, reply) => {
-      const {
-        provider,
-        apiKey,
-        enabled,
-        baseUrl,
-        clearCredentials,
-        accountId,
-        models,
-        sources,
-      } = req.body ?? {};
-      if (!provider) return reply.code(400).send({ error: 'provider required' });
-      const parsedProvider = ProviderIdSchema.safeParse(provider);
-      if (!parsedProvider.success || parsedProvider.data === 'ollama') {
-        return reply.code(400).send({ error: `unsupported provider: ${provider}` });
-      }
-      const providerId = parsedProvider.data;
-      const cleanApiKey = typeof apiKey === 'string' ? apiKey.trim() : apiKey;
-      const cleanBaseUrl = typeof baseUrl === 'string' ? baseUrl.trim() : baseUrl;
-      const cleanAccountId = typeof accountId === 'string' ? accountId.trim() : undefined;
-      const cleanModels = Array.isArray(models)
-        ? models
-            .map((m) => ({
-              id: typeof m?.id === 'string' ? m.id.trim() : '',
-              displayName:
-                typeof m?.displayName === 'string' && m.displayName.trim()
-                  ? m.displayName.trim()
-                  : undefined,
-              contextWindow:
-                typeof m?.contextWindow === 'number' && m.contextWindow > 0
-                  ? m.contextWindow
-                  : undefined,
-            }))
-            .filter((m) => m.id)
-        : undefined;
-      const cleanSources = Array.isArray(sources)
-        ? sources
-            .map((s) => {
-              const id = typeof s?.id === 'string' ? s.id.trim() : '';
-              const bu = typeof s?.baseUrl === 'string' ? s.baseUrl.trim() : '';
-              if (!id || !bu) return null;
-              const key = typeof s?.apiKey === 'string' ? s.apiKey.trim() : '';
-              const label =
-                typeof s?.label === 'string' && s.label.trim() ? s.label.trim() : undefined;
-              const modelsList = Array.isArray(s?.models)
-                ? s!.models!
-                    .map((m) => ({
-                      id: typeof m?.id === 'string' ? m.id.trim() : '',
-                      displayName:
-                        typeof m?.displayName === 'string' && m.displayName.trim()
-                          ? m.displayName.trim()
-                          : undefined,
-                      contextWindow:
-                        typeof m?.contextWindow === 'number' && m.contextWindow > 0
-                          ? m.contextWindow
-                          : undefined,
-                    }))
-                    .filter((m) => m.id)
-                : [];
-              return {
-                id,
-                label,
-                baseUrl: bu.replace(/\/$/, ''),
-                apiKey: key || undefined,
-                models: modelsList,
-              };
-            })
-            .filter((s): s is NonNullable<typeof s> => !!s)
-        : undefined;
-      try {
-        const next = await updateConfig((cfg) => {
-          const cur = (cfg.providers[providerId] ?? { enabled: false }) as {
-            enabled: boolean;
-            credentials?: {
-              apiKey: string;
-              baseUrl?: string;
-              extra?: Record<string, unknown>;
+  }>('/api/providers', async (req, reply) => {
+    const { provider, apiKey, enabled, baseUrl, clearCredentials, models, sources } =
+      req.body ?? {};
+    if (!provider) return reply.code(400).send({ error: 'provider required' });
+    const parsedProvider = ProviderIdSchema.safeParse(provider);
+    if (!parsedProvider.success || parsedProvider.data === 'ollama') {
+      return reply.code(400).send({ error: `unsupported provider: ${provider}` });
+    }
+    const providerId = parsedProvider.data;
+    const cleanApiKey = typeof apiKey === 'string' ? apiKey.trim() : apiKey;
+    const cleanBaseUrl = typeof baseUrl === 'string' ? baseUrl.trim() : baseUrl;
+    const cleanModels = Array.isArray(models)
+      ? models
+          .map((m) => ({
+            id: typeof m?.id === 'string' ? m.id.trim() : '',
+            displayName:
+              typeof m?.displayName === 'string' && m.displayName.trim()
+                ? m.displayName.trim()
+                : undefined,
+            contextWindow:
+              typeof m?.contextWindow === 'number' && m.contextWindow > 0
+                ? m.contextWindow
+                : undefined,
+          }))
+          .filter((m) => m.id)
+      : undefined;
+    const cleanSources = Array.isArray(sources)
+      ? sources
+          .map((s) => {
+            const id = typeof s?.id === 'string' ? s.id.trim() : '';
+            const bu = typeof s?.baseUrl === 'string' ? s.baseUrl.trim() : '';
+            if (!id || !bu) return null;
+            const key = typeof s?.apiKey === 'string' ? s.apiKey.trim() : '';
+            const label =
+              typeof s?.label === 'string' && s.label.trim() ? s.label.trim() : undefined;
+            const modelsList = Array.isArray(s?.models)
+              ? s!
+                  .models!.map((m) => ({
+                    id: typeof m?.id === 'string' ? m.id.trim() : '',
+                    displayName:
+                      typeof m?.displayName === 'string' && m.displayName.trim()
+                        ? m.displayName.trim()
+                        : undefined,
+                    contextWindow:
+                      typeof m?.contextWindow === 'number' && m.contextWindow > 0
+                        ? m.contextWindow
+                        : undefined,
+                  }))
+                  .filter((m) => m.id)
+              : [];
+            return {
+              id,
+              label,
+              baseUrl: bu.replace(/\/$/, ''),
+              apiKey: key || undefined,
+              models: modelsList,
             };
+          })
+          .filter((s): s is NonNullable<typeof s> => !!s)
+      : undefined;
+    try {
+      const next = await updateConfig((cfg) => {
+        const cur = (cfg.providers[providerId] ?? { enabled: false }) as {
+          enabled: boolean;
+          credentials?: {
+            apiKey: string;
+            baseUrl?: string;
+            extra?: Record<string, unknown>;
           };
-          const shouldClear = clearCredentials === true || cleanApiKey === '';
-          const prevExtra = cur.credentials?.extra ?? {};
+        };
+        const shouldClear = clearCredentials === true || cleanApiKey === '';
+        const prevExtra = cur.credentials?.extra ?? {};
 
-          if (providerId === 'custom') {
-            if (clearCredentials === true) {
-              cfg.providers[providerId] = {
-                ...cur,
-                enabled: enabled ?? false,
-                credentials: undefined,
-              };
-              return cfg;
-            }
-            const nextExtra: Record<string, unknown> = { ...prevExtra };
-            if (cleanSources !== undefined) {
-              nextExtra.sources = cleanSources;
-              delete (nextExtra as { models?: unknown }).models;
-            } else if (cleanModels !== undefined) {
-              nextExtra.models = cleanModels;
-            }
-            const topKey = cleanApiKey ?? cur.credentials?.apiKey ?? '';
-            const topBaseUrl =
-              cleanBaseUrl !== undefined ? cleanBaseUrl : cur.credentials?.baseUrl;
+        if (providerId === 'custom') {
+          if (clearCredentials === true) {
             cfg.providers[providerId] = {
               ...cur,
-              enabled: enabled ?? cur.enabled,
-              credentials: {
-                apiKey: topKey,
-                baseUrl: topBaseUrl,
-                extra: nextExtra,
-              },
+              enabled: enabled ?? false,
+              credentials: undefined,
             };
             return cfg;
           }
-
-          const nextExtra = {
-            ...prevExtra,
-            ...(cleanModels !== undefined ? { models: cleanModels } : {}),
-            ...(cleanAccountId !== undefined ? { accountId: cleanAccountId } : {}),
-          };
+          const nextExtra: Record<string, unknown> = { ...prevExtra };
+          if (cleanSources !== undefined) {
+            nextExtra.sources = cleanSources;
+            delete (nextExtra as { models?: unknown }).models;
+          } else if (cleanModels !== undefined) {
+            nextExtra.models = cleanModels;
+          }
+          const topKey = cleanApiKey ?? cur.credentials?.apiKey ?? '';
+          const topBaseUrl = cleanBaseUrl !== undefined ? cleanBaseUrl : cur.credentials?.baseUrl;
           cfg.providers[providerId] = {
             ...cur,
             enabled: enabled ?? cur.enabled,
-            credentials: shouldClear
-              ? undefined
-              : cleanApiKey
-                ? {
-                    apiKey: cleanApiKey,
-                    baseUrl: cleanBaseUrl ?? cur.credentials?.baseUrl,
-                    extra: nextExtra,
-                  }
-                : cur.credentials
-                  ? {
-                      ...cur.credentials,
-                      baseUrl:
-                        cleanBaseUrl !== undefined ? cleanBaseUrl : cur.credentials.baseUrl,
-                      extra: nextExtra,
-                    }
-                  : undefined,
+            credentials: {
+              apiKey: topKey,
+              baseUrl: topBaseUrl,
+              extra: nextExtra,
+            },
           };
           return cfg;
-        });
-        registry = new ProviderRegistry(next);
-        void watcher.tick(true);
-        return { ok: true };
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        const code = (err as NodeJS.ErrnoException | undefined)?.code;
-        const hint =
-          code === 'EPERM' || code === 'EACCES'
-            ? '（配置目录写入被拒绝，请检查 ~/.freemodelfinder 权限或设置 FREEMODELFINDER_HOME 到有写权限的目录）'
-            : '';
-        req.log.error({ err, provider: providerId }, 'failed to save provider config');
-        return reply.code(500).send({ error: `${message}${hint}`, code });
-      }
-    },
-  );
+        }
+
+        const nextExtra = {
+          ...prevExtra,
+          ...(cleanModels !== undefined ? { models: cleanModels } : {}),
+        };
+        cfg.providers[providerId] = {
+          ...cur,
+          enabled: enabled ?? cur.enabled,
+          credentials: shouldClear
+            ? undefined
+            : cleanApiKey
+              ? {
+                  apiKey: cleanApiKey,
+                  baseUrl: cleanBaseUrl ?? cur.credentials?.baseUrl,
+                  extra: nextExtra,
+                }
+              : cur.credentials
+                ? {
+                    ...cur.credentials,
+                    baseUrl: cleanBaseUrl !== undefined ? cleanBaseUrl : cur.credentials.baseUrl,
+                    extra: nextExtra,
+                  }
+                : undefined,
+        };
+        return cfg;
+      });
+      registry = new ProviderRegistry(next);
+      void watcher.tick(true);
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      const code = (err as NodeJS.ErrnoException | undefined)?.code;
+      const hint =
+        code === 'EPERM' || code === 'EACCES'
+          ? '（配置目录写入被拒绝，请检查 ~/.freemodelfinder 权限或设置 FREEMODELFINDER_HOME 到有写权限的目录）'
+          : '';
+      req.log.error({ err, provider: providerId }, 'failed to save provider config');
+      return reply.code(500).send({ error: `${message}${hint}`, code });
+    }
+  });
 
   app.post<{ Body: { model: string } }>('/api/default-model', async (req, reply) => {
     const { model } = req.body ?? {};
@@ -477,7 +452,7 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
               : action === 'revoke'
                 ? false
                 : action === 'generate'
-                  ? cur.requireAuth ?? true
+                  ? (cur.requireAuth ?? true)
                   : cur.requireAuth,
         };
         return cfg;
@@ -534,15 +509,25 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
     };
   });
 
+  if (opts.uiDir) {
+    const uiRoot = resolve(opts.uiDir);
+    await app.register(fastifyStatic, {
+      root: uiRoot,
+      prefix: '/',
+      index: false,
+    });
+    app.get('/', async (_req, reply) => reply.sendFile('index.html'));
+    app.get('/settings', async (_req, reply) => reply.sendFile('settings.html'));
+  }
+
   return {
     app,
     get registry() {
       return registry;
     },
-    listen: async (port?: number, host?: string) => {
+    listen: async (port?: number) => {
       const p = port ?? opts.port ?? registry.getConfig().port ?? 11435;
-      const h = host ?? opts.host ?? '127.0.0.1';
-      return app.listen({ port: p, host: h });
+      return app.listen({ port: p, host: '127.0.0.1' });
     },
   };
 }

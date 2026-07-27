@@ -29,10 +29,6 @@ type Policy = {
 };
 
 const PROVIDER_POLICIES: Partial<Record<ProviderId, Policy[]>> = {
-  cloudflare: [
-    { resource: 'requests', windowSeconds: 60, limit: 300, scope: 'provider' },
-    { resource: 'neurons', windowSeconds: 86_400, limit: 10_000, scope: 'provider' },
-  ],
   cohere: [
     { resource: 'requests', windowSeconds: 60, limit: 20, scope: 'model' },
     { resource: 'requests', windowSeconds: 2_592_000, limit: 1_000, scope: 'provider' },
@@ -89,12 +85,18 @@ function finite(value: string | null | undefined): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-export function parseResetAt(value: string | null | undefined, now = Date.now()): number | undefined {
+export function parseResetAt(
+  value: string | null | undefined,
+  now = Date.now(),
+): number | undefined {
   if (!value) return undefined;
   const trimmed = value.trim();
-  const duration = trimmed.match(/^(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?(?:(\d+(?:\.\d+)?)s)?$/i);
+  const duration = trimmed.match(
+    /^(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?(?:(\d+(?:\.\d+)?)s)?$/i,
+  );
   if (duration && duration[0]) {
-    const seconds = Number(duration[1] ?? 0) * 3600 + Number(duration[2] ?? 0) * 60 + Number(duration[3] ?? 0);
+    const seconds =
+      Number(duration[1] ?? 0) * 3600 + Number(duration[2] ?? 0) * 60 + Number(duration[3] ?? 0);
     if (seconds > 0) return now + seconds * 1000;
   }
   const numeric = /^-?\d+(?:\.\d+)?$/.test(trimmed) ? Number(trimmed) : undefined;
@@ -115,18 +117,33 @@ function windowFromSeconds(seconds?: number): number | undefined {
 
 function suffixWindow(value: string | undefined): number | undefined {
   switch (value) {
-    case 'second': return 1;
-    case 'minute': return 60;
-    case 'hour': return 3_600;
-    case 'day': return 86_400;
-    case 'month': return 2_592_000;
-    default: return undefined;
+    case 'second':
+      return 1;
+    case 'minute':
+      return 60;
+    case 'hour':
+      return 3_600;
+    case 'day':
+      return 86_400;
+    case 'month':
+      return 2_592_000;
+    default:
+      return undefined;
   }
 }
 
 /** Parse the common x-ratelimit-* and RFC RateLimit response-header families. */
 export function parseQuotaHeaders(headers: Headers, now = Date.now()): QuotaWindow[] {
-  const values = new Map<string, { resource: QuotaResource; windowSeconds?: number; limit?: number; remaining?: number; resetAt?: number }>();
+  const values = new Map<
+    string,
+    {
+      resource: QuotaResource;
+      windowSeconds?: number;
+      limit?: number;
+      remaining?: number;
+      resetAt?: number;
+    }
+  >();
   const ensure = (resource: QuotaResource, windowSeconds?: number) => {
     const k = `${resource}:${windowSeconds ?? 'unknown'}`;
     const current = values.get(k) ?? { resource, windowSeconds };
@@ -136,7 +153,9 @@ export function parseQuotaHeaders(headers: Headers, now = Date.now()): QuotaWind
 
   for (const [rawName, rawValue] of headers.entries()) {
     const name = rawName.toLowerCase();
-    const match = name.match(/^x-ratelimit-(limit|remaining|reset)-(requests|tokens)(?:-(second|minute|hour|day|month))?$/);
+    const match = name.match(
+      /^x-ratelimit-(limit|remaining|reset)-(requests|tokens)(?:-(second|minute|hour|day|month))?$/,
+    );
     if (!match) continue;
     const field = match[1]!;
     const resource = match[2] as QuotaResource;
@@ -161,7 +180,10 @@ export function parseQuotaHeaders(headers: Headers, now = Date.now()): QuotaWind
   const standardReset = headers.get('ratelimit-reset');
   if (standardLimit || standardRemaining || standardReset) {
     const windowMatch = standardLimit?.match(/(?:^|;)\s*w\s*=\s*(\d+)/i);
-    const item = ensure('requests', windowFromSeconds(windowMatch ? Number(windowMatch[1]) : undefined));
+    const item = ensure(
+      'requests',
+      windowFromSeconds(windowMatch ? Number(windowMatch[1]) : undefined),
+    );
     item.limit = finite(standardLimit);
     item.remaining = finite(standardRemaining);
     item.resetAt = parseResetAt(standardReset, now);
@@ -173,12 +195,16 @@ export function parseQuotaHeaders(headers: Headers, now = Date.now()): QuotaWind
   }
 
   return [...values.values()]
-    .filter((item) => item.limit !== undefined || item.remaining !== undefined || item.resetAt !== undefined)
+    .filter(
+      (item) =>
+        item.limit !== undefined || item.remaining !== undefined || item.resetAt !== undefined,
+    )
     .map((item) => ({
       ...item,
-      used: item.limit !== undefined && item.remaining !== undefined
-        ? Math.max(0, item.limit - item.remaining)
-        : undefined,
+      used:
+        item.limit !== undefined && item.remaining !== undefined
+          ? Math.max(0, item.limit - item.remaining)
+          : undefined,
       scope: 'provider' as const,
       source: 'upstream' as const,
     }));
@@ -196,7 +222,6 @@ function responseWindowScope(provider: ProviderId, window: QuotaWindow): QuotaSc
   if (provider === 'openrouter') {
     return window.limit !== undefined || window.remaining !== undefined ? 'provider' : 'model';
   }
-  if (provider === 'cloudflare') return 'provider';
   // Gemini, NVIDIA, SenseNova and similar services commonly vary
   // the limit by model. Shared account pools for those providers are supplied
   // separately through provider policies/control-plane quota discovery.
@@ -258,7 +283,12 @@ export class QuotaTracker {
     state.completionTokens += usage.completion_tokens ?? 0;
     const total = usage.total_tokens ?? (usage.prompt_tokens ?? 0) + (usage.completion_tokens ?? 0);
     state.totalTokens += total;
-    this.tokenEvents.push({ provider: event.provider, model: event.model, at: Date.now(), tokens: total });
+    this.tokenEvents.push({
+      provider: event.provider,
+      model: event.model,
+      at: Date.now(),
+      tokens: total,
+    });
   }
 
   /** Account/control-plane quota applies to every model owned by the provider. */
@@ -269,7 +299,11 @@ export class QuotaTracker {
     );
   }
 
-  recordTest(provider: ProviderId, model: string, result: { ok: boolean; latencyMs: number; error?: string; limited?: boolean }): void {
+  recordTest(
+    provider: ProviderId,
+    model: string,
+    result: { ok: boolean; latencyMs: number; error?: string; limited?: boolean },
+  ): void {
     const state = this.state(provider, model);
     state.lastTestAt = Date.now();
     state.latencyMs = result.latencyMs;
@@ -279,18 +313,23 @@ export class QuotaTracker {
 
   snapshot(provider: ProviderId, model: string, now = Date.now()): ModelQuotaSnapshot {
     const state = this.state(provider, model);
-    const policies = (PROVIDER_POLICIES[provider] ?? []).filter((policy) => !policy.model || policy.model.test(model));
+    const policies = (PROVIDER_POLICIES[provider] ?? []).filter(
+      (policy) => !policy.model || policy.model.test(model),
+    );
     const localWindows: QuotaWindow[] = policies.map((policy) => {
       const since = now - policy.windowSeconds * 1000;
       const matchesScope = (event: { provider: ProviderId; model: string; at: number }) =>
         event.at > since &&
         event.provider === provider &&
         (policy.scope === 'provider' || event.model.toLowerCase() === model.toLowerCase());
-      const used = policy.resource === 'requests'
-        ? this.requestEvents.filter(matchesScope).length
-        : policy.resource === 'tokens'
-          ? this.tokenEvents.filter(matchesScope).reduce((total, event) => total + event.tokens, 0)
-          : undefined;
+      const used =
+        policy.resource === 'requests'
+          ? this.requestEvents.filter(matchesScope).length
+          : policy.resource === 'tokens'
+            ? this.tokenEvents
+                .filter(matchesScope)
+                .reduce((total, event) => total + event.tokens, 0)
+            : undefined;
       return {
         resource: policy.resource,
         windowSeconds: policy.windowSeconds,
@@ -303,24 +342,44 @@ export class QuotaTracker {
       };
     });
     const providerPolicies = (this.providerPolicyWindows.get(provider) ?? []).map((window) => {
-      if (window.resource !== 'requests' || window.limit === undefined || window.remaining !== undefined) {
+      if (
+        window.resource !== 'requests' ||
+        window.limit === undefined ||
+        window.remaining !== undefined
+      ) {
         return window;
       }
       const since = window.windowSeconds ? now - window.windowSeconds * 1000 : this.startedAt;
-      const used = this.requestEvents.filter((event) => event.at > since && event.provider === provider).length;
+      const used = this.requestEvents.filter(
+        (event) => event.at > since && event.provider === provider,
+      ).length;
       return {
         ...window,
         used,
         remaining: Math.max(0, window.limit - used),
-        resetAt: window.resetAt ?? (window.windowSeconds ? nextBoundary(now, window.windowSeconds) : undefined),
+        resetAt:
+          window.resetAt ??
+          (window.windowSeconds ? nextBoundary(now, window.windowSeconds) : undefined),
       };
     });
-    const headerWindows = [...(this.providerHeaderWindows.get(provider) ?? []), ...state.headerWindows];
+    const headerWindows = [
+      ...(this.providerHeaderWindows.get(provider) ?? []),
+      ...state.headerWindows,
+    ];
     const effectiveWindows = [...headerWindows, ...providerPolicies];
-    const headerKeys = new Set(effectiveWindows.map((window) => `${window.resource}:${window.windowSeconds ?? 'unknown'}:${window.scope}`));
+    const headerKeys = new Set(
+      effectiveWindows.map(
+        (window) => `${window.resource}:${window.windowSeconds ?? 'unknown'}:${window.scope}`,
+      ),
+    );
     const windows = [
       ...effectiveWindows,
-      ...localWindows.filter((window) => !headerKeys.has(`${window.resource}:${window.windowSeconds ?? 'unknown'}:${window.scope}`)),
+      ...localWindows.filter(
+        (window) =>
+          !headerKeys.has(
+            `${window.resource}:${window.windowSeconds ?? 'unknown'}:${window.scope}`,
+          ),
+      ),
     ];
     const resetAt = windows
       .map((window) => window.resetAt)

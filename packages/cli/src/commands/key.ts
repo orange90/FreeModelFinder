@@ -3,6 +3,14 @@ import { Command } from 'commander';
 import inquirer from 'inquirer';
 import { loadConfig, updateConfig, type ProviderId } from '@freemodelfinder/core';
 
+type Prompt = <T>(questions: unknown[]) => Promise<T>;
+
+interface KeyCommandDependencies {
+  loadConfig: typeof loadConfig;
+  updateConfig: typeof updateConfig;
+  prompt: Prompt;
+}
+
 const KNOWN_PROVIDERS: Array<{ id: ProviderId; label: string; hint: string }> = [
   { id: 'openrouter', label: 'OpenRouter', hint: 'https://openrouter.ai/keys' },
   { id: 'gemini', label: 'Google Gemini', hint: 'https://aistudio.google.com/apikey' },
@@ -10,21 +18,29 @@ const KNOWN_PROVIDERS: Array<{ id: ProviderId; label: string; hint: string }> = 
   { id: 'siliconflow', label: 'SiliconFlow', hint: 'https://cloud.siliconflow.cn/account/ak' },
   { id: 'modelscope', label: 'ModelScope', hint: 'https://modelscope.cn/my/myaccesstoken' },
   { id: 'nvidia', label: 'NVIDIA NIM', hint: 'https://build.nvidia.com/' },
-  { id: 'cloudflare', label: 'Cloudflare Workers AI', hint: 'https://dash.cloudflare.com/profile/api-tokens' },
   { id: 'github', label: 'GitHub Models', hint: 'https://github.com/settings/tokens' },
+  { id: 'cohere', label: 'Cohere', hint: 'https://dashboard.cohere.com/api-keys' },
+  { id: 'huggingface', label: 'Hugging Face', hint: 'https://huggingface.co/settings/tokens' },
+  { id: 'sensenova', label: 'SenseNova', hint: 'https://platform.sensenova.cn' },
 ];
 
-export function keyCommand(): Command {
+export function keyCommand(dependencies: Partial<KeyCommandDependencies> = {}): Command {
+  const readConfig = dependencies.loadConfig ?? loadConfig;
+  const writeConfig = dependencies.updateConfig ?? updateConfig;
+  const prompt: Prompt =
+    dependencies.prompt ??
+    ((questions) => inquirer.prompt(questions as never) as Promise<unknown> as never);
   const cmd = new Command('key').description('Manage provider API keys');
 
   cmd
     .command('list')
     .description('List configured providers')
     .action(async () => {
-      const cfg = await loadConfig();
+      const cfg = await readConfig();
       for (const { id, label, hint } of KNOWN_PROVIDERS) {
         const s = cfg.providers[id];
-        const status = s?.enabled && s.credentials?.apiKey ? chalk.green('enabled') : chalk.gray('disabled');
+        const status =
+          s?.enabled && s.credentials?.apiKey ? chalk.green('enabled') : chalk.gray('disabled');
         console.log(`${label.padEnd(18)} ${status}   ${chalk.gray(hint)}`);
       }
     });
@@ -35,7 +51,7 @@ export function keyCommand(): Command {
     .action(async (provider?: string) => {
       let pid = provider as ProviderId | undefined;
       if (!pid) {
-        const answer = await inquirer.prompt<{ pid: ProviderId }>([
+        const answer = await prompt<{ pid: ProviderId }>([
           {
             type: 'list',
             name: 'pid',
@@ -45,7 +61,7 @@ export function keyCommand(): Command {
         ]);
         pid = answer.pid;
       }
-      const { apiKey } = await inquirer.prompt<{ apiKey: string }>([
+      const { apiKey } = await prompt<{ apiKey: string }>([
         {
           type: 'password',
           name: 'apiKey',
@@ -57,7 +73,7 @@ export function keyCommand(): Command {
         console.log(chalk.red('empty key, aborted'));
         return;
       }
-      await updateConfig((cfg) => {
+      await writeConfig((cfg) => {
         const cur = cfg.providers[pid!] ?? { enabled: false };
         cfg.providers[pid!] = {
           ...cur,
@@ -73,7 +89,7 @@ export function keyCommand(): Command {
     .command('remove <provider>')
     .description('Remove an API key')
     .action(async (provider: ProviderId) => {
-      await updateConfig((cfg) => {
+      await writeConfig((cfg) => {
         if (cfg.providers[provider]) {
           cfg.providers[provider] = { enabled: false };
         }

@@ -70,9 +70,8 @@ export class OpenRouterProvider extends OpenAICompatibleProvider {
         const c = Number(m.pricing?.completion ?? '0');
         const output = m.architecture?.output_modalities ?? [];
         const isFreeVariant = m.id === 'openrouter/free' || m.id.endsWith(':free');
-        const isUtilityModel = /(?:content[-_ ]?safety|moderation|guard|classifier|embedding|rerank)/i.test(
-          m.id,
-        );
+        const isUtilityModel =
+          /(?:content[-_ ]?safety|moderation|guard|classifier|embedding|rerank)/i.test(m.id);
         return (
           isFreeVariant &&
           !isUtilityModel &&

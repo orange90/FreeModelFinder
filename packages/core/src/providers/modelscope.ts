@@ -99,10 +99,7 @@ const MS_FREE_ALLOW_MAP: ReadonlyMap<string, (typeof MS_FREE_ALLOW_LIST)[number]
   MS_FREE_ALLOW_LIST.map((item) => [item.id.toLowerCase(), item]),
 );
 
-function toModelInfo(
-  entry: (typeof MS_FREE_ALLOW_LIST)[number],
-  provider: ProviderId,
-): ModelInfo {
+function toModelInfo(entry: (typeof MS_FREE_ALLOW_LIST)[number], provider: ProviderId): ModelInfo {
   return {
     id: entry.id,
     provider,

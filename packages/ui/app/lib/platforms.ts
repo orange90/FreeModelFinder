@@ -25,7 +25,7 @@ export const SETTINGS_PROVIDERS = [
     label: 'Cohere',
     link: 'https://dashboard.cohere.com/api-keys',
     guide: 'https://docs.cohere.com/reference/about',
-    hint: 'Trial Key 仅适合开发测试，模型共享较低的免费速率限制',
+    hint: '只显示 Trial / Production Key 都明确免费的 North Mini Code',
   },
   {
     id: 'huggingface',
@@ -61,13 +61,6 @@ export const SETTINGS_PROVIDERS = [
     link: 'https://build.nvidia.com/settings/api-keys',
     guide: 'https://docs.api.nvidia.com/nim/reference/getting-started',
     hint: '使用 build.nvidia.com 开发者 API 的限速免费访问',
-  },
-  {
-    id: 'cloudflare',
-    label: 'Cloudflare Workers AI',
-    link: 'https://dash.cloudflare.com/profile/api-tokens',
-    guide: 'https://developers.cloudflare.com/workers-ai/get-started/rest-api/',
-    hint: '需要 API Token 和 Account ID；免费分配量用尽后请求会失败',
   },
   {
     id: 'github',

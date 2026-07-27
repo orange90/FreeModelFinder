@@ -355,10 +355,7 @@ describe('AutoRouter.pickFallback (strategy)', () => {
     const excluded = makeModel('excluded', 'gemini');
     const small = makeModel('llama-3b', 'siliconflow');
     const big = makeModel('llama-70b', 'nvidia');
-    const { router } = makeRouter(
-      [excluded, small, big],
-      makeSettings({ strategy: 'capability' }),
-    );
+    const { router } = makeRouter([excluded, small, big], makeSettings({ strategy: 'capability' }));
     const fb = await router.pickFallback('excluded');
     assert.equal(fb?.id, 'llama-70b');
   });
@@ -367,10 +364,7 @@ describe('AutoRouter.pickFallback (strategy)', () => {
     const excluded = makeModel('excluded', 'openrouter');
     const slow = makeModel('claude-3-opus', 'openrouter');
     const fast = makeModel('gemini-2.0-flash', 'gemini');
-    const { router } = makeRouter(
-      [excluded, slow, fast],
-      makeSettings({ strategy: 'speed' }),
-    );
+    const { router } = makeRouter([excluded, slow, fast], makeSettings({ strategy: 'speed' }));
     const fb = await router.pickFallback('excluded');
     assert.equal(fb?.provider, 'gemini');
   });
@@ -383,9 +377,7 @@ describe('AutoRouter.pickFallback (strategy)', () => {
       [excluded, winner, other],
       makeSettings({
         strategy: 'rate-limit',
-        profiles: [
-          { id: 'big-rpm', provider: 'sensenova', rpmLimit: 10_000 },
-        ],
+        profiles: [{ id: 'big-rpm', provider: 'sensenova', rpmLimit: 10_000 }],
       }),
     );
     const fb = await router.pickFallback('excluded');
@@ -580,10 +572,7 @@ describe('AutoRouter switch-notice content', () => {
   it('N3: message includes localized strategy label', async () => {
     const cool = makeModel('cool', 'gemini');
     const alt = makeModel('alt', 'nvidia');
-    const { router, notices } = makeRouter(
-      [cool, alt],
-      makeSettings({ strategy: 'speed' }),
-    );
+    const { router, notices } = makeRouter([cool, alt], makeSettings({ strategy: 'speed' }));
     router.markRateLimited('cool', 'gemini', {
       isRateLimit: true,
       resetAt: FUTURE(),
@@ -687,10 +676,9 @@ describe('AutoRouter — general corner cases', () => {
 
   it('E6: unknown strategy label defaults to capability-style', () => {
     // getStrategy returns 'capability' when settings.strategy is missing.
-    const { router } = makeRouter(
-      [],
-      { enabled: true } as unknown as ReturnType<typeof makeSettings>,
-    );
+    const { router } = makeRouter([], { enabled: true } as unknown as ReturnType<
+      typeof makeSettings
+    >);
     assert.equal(router.getStrategy(), 'capability');
     assert.equal(router.strategyLabel(), '能力优先');
   });
@@ -702,9 +690,7 @@ describe('AutoRouter — general corner cases', () => {
 
   it('parseRateLimitError composes with markRateLimited end-to-end', () => {
     const { router } = makeRouter();
-    const parsed = parseRateLimitError(
-      new Error('429 rate limit, retry-after: 5'),
-    );
+    const parsed = parseRateLimitError(new Error('429 rate limit, retry-after: 5'));
     const state = router.markRateLimited('m', 'gemini', parsed);
     assert.ok(state.resetAt > Date.now());
   });

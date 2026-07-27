@@ -247,7 +247,11 @@ export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => Pr
       } catch (err) {
         const parsed = parseRateLimitError(err);
         if (parsed.isRateLimit && router.isEnabled()) {
-          router.markRateLimited(chatReq.model, extractProviderIdFromError(chatReq, reg) as ProviderId, parsed);
+          router.markRateLimited(
+            chatReq.model,
+            extractProviderIdFromError(chatReq, reg) as ProviderId,
+            parsed,
+          );
           router.rememberPreference(originalRequested);
         }
         const msg = err instanceof Error ? err.message : String(err);

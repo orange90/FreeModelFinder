@@ -40,9 +40,7 @@ export class SiliconFlowProvider extends OpenAICompatibleProvider {
     const res = await this.fetch(`${this.baseUrl()}/models`, { headers });
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      throw new Error(
-        `siliconflow list models failed: ${res.status}${text ? ` ${text}` : ''}`,
-      );
+      throw new Error(`siliconflow list models failed: ${res.status}${text ? ` ${text}` : ''}`);
     }
     const data = (await res.json()) as { data?: SFModel[] };
     const rawList = Array.isArray(data.data) ? data.data : [];

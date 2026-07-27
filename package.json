@@ -1,25 +1,32 @@
 {
-  "name": "freemodelfinder",
+  "name": "@freemodelfinder/repo",
   "version": "0.1.0",
   "private": true,
-  "description": "Aggregate free LLM providers (OpenRouter/Gemini) behind a local multi-protocol API gateway, with Chat UI, CLI and macOS tray app.",
-  "packageManager": "pnpm@9.0.0",
+  "description": "Development monorepo for the FreeModelFinder local LLM gateway, web UI and CLI.",
+  "packageManager": "pnpm@11.17.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.14.0"
   },
   "scripts": {
-    "build": "pnpm -r --filter=./packages/* build",
+    "build": "pnpm --filter freemodelfinder build",
+    "build:packages": "pnpm -r --filter=./packages/* build",
     "dev:server": "pnpm --filter @freemodelfinder/server dev",
     "dev:ui": "pnpm --filter @freemodelfinder/ui dev",
-    "dev:cli": "pnpm --filter @freemodelfinder/cli dev",
+    "dev:cli": "pnpm --filter freemodelfinder dev",
     "dev": "pnpm -r --parallel --filter=./packages/{core,server,ui} dev",
+    "format:check": "prettier --check package.json pnpm-workspace.yaml README.md CHANGELOG.md SECURITY.md \"docs/**/*.md\" \".github/**/*.{json,md,yaml,yml}\" \"packages/**/*.{js,json,md,mjs,ts,tsx,yaml,yml}\" \"scripts/**/*.{js,mjs}\" --ignore-path .gitignore --ignore-path .prettierignore",
     "lint": "eslint \"packages/**/*.{ts,tsx}\" --max-warnings=0",
     "typecheck": "pnpm -r --filter=./packages/* typecheck",
     "test": "pnpm -r --filter=./packages/* run test",
-    "clean": "pnpm -r exec rm -rf dist .next .turbo node_modules/.cache"
+    "test:coverage": "pnpm --filter @freemodelfinder/core test:coverage && pnpm --filter @freemodelfinder/server test:coverage && pnpm --filter freemodelfinder test:coverage && pnpm --filter @freemodelfinder/ui test:coverage",
+    "audit:prod": "node scripts/audit-package.mjs",
+    "verify:release": "node scripts/verify-release.mjs",
+    "pack:cli": "pnpm --filter freemodelfinder prepack && npm pack ./packages/cli/dist",
+    "test:pack": "node scripts/smoke-package.mjs",
+    "clean": "node scripts/clean.mjs"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
+    "@types/node": "^22.15.0",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "eslint": "^8.57.0",

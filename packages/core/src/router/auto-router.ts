@@ -93,7 +93,11 @@ function findProfile(
 function heuristicCapabilityScore(m: ModelInfo): number {
   const id = m.id.toLowerCase();
   let score = 50;
-  if (/(70b|72b|65b|80b|405b|deepseek-r1|deepseek-v3|glm-4\.5|qwen[-_]?max|opus|gpt-5|gpt-4o|gemini-2\.5-pro|claude-3\.5)/i.test(id))
+  if (
+    /(70b|72b|65b|80b|405b|deepseek-r1|deepseek-v3|glm-4\.5|qwen[-_]?max|opus|gpt-5|gpt-4o|gemini-2\.5-pro|claude-3\.5)/i.test(
+      id,
+    )
+  )
     score = 95;
   else if (/(30b|32b|34b|40b|gpt-4|glm-4|gemini-2\.0|deepseek-v2|qwen-plus|sonnet)/i.test(id))
     score = 80;
@@ -121,7 +125,6 @@ function heuristicRpmScore(m: ModelInfo, profile?: ModelRoutingProfile): number 
     siliconflow: 70,
     modelscope: 70,
     zhipu: 70,
-    cloudflare: 65,
     github: 40,
     cohere: 55,
     huggingface: 30,

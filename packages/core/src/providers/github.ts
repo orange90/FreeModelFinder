@@ -6,6 +6,7 @@ interface GHModel {
   name?: string;
   publisher?: string;
   summary?: string;
+  supported_output_modalities?: string[];
 }
 
 export class GitHubModelsProvider extends OpenAICompatibleProvider {
@@ -25,14 +26,19 @@ export class GitHubModelsProvider extends OpenAICompatibleProvider {
     });
     if (!res.ok) throw new Error(`github models list failed: ${res.status}`);
     const data = (await res.json()) as GHModel[];
-    return data.map((m) => ({
-      id: m.id,
-      provider: this.id,
-      displayName: m.name ?? m.id,
-      free: true,
-      description:
-        m.summary ??
-        'GitHub Models free tier: 50 requests/day (premium), 150/day (low tier), works with any GitHub account.',
-    }));
+    return data
+      .filter((m) => {
+        const outputs = m.supported_output_modalities ?? [];
+        return outputs.length === 0 || outputs.includes('text');
+      })
+      .map((m) => ({
+        id: m.id,
+        provider: this.id,
+        displayName: m.name ?? m.id,
+        free: true,
+        description:
+          m.summary ??
+          'GitHub Models free tier: 50 requests/day (premium), 150/day (low tier), works with any GitHub account.',
+      }));
   }
 }

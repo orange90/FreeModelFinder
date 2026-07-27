@@ -9,13 +9,27 @@ import {
   type ChatMessage,
 } from '@freemodelfinder/core';
 
-async function pickModel(reg: ProviderRegistry): Promise<string | undefined> {
+type Prompt = <T>(questions: unknown[]) => Promise<T>;
+type ReadlineLike = {
+  question: (query: string, callback: (answer: string) => void) => void;
+  close: () => void;
+};
+
+interface ChatCommandDependencies {
+  loadRegistry: () => Promise<ProviderRegistry>;
+  loadConfig: typeof loadConfig;
+  updateConfig: typeof updateConfig;
+  prompt: Prompt;
+  createInterface: () => ReadlineLike;
+}
+
+async function pickModel(reg: ProviderRegistry, prompt: Prompt): Promise<string | undefined> {
   const { models } = await reg.listAllModels(true);
   if (!models.length) {
     console.log(chalk.yellow('No models available. Run `fmf key add` first.'));
     return undefined;
   }
-  const answer = await inquirer.prompt<{ model: string }>([
+  const answer = await prompt<{ model: string }>([
     {
       type: 'list',
       name: 'model',
@@ -30,26 +44,34 @@ async function pickModel(reg: ProviderRegistry): Promise<string | undefined> {
   return answer.model;
 }
 
-export function chatCommand(): Command {
+export function chatCommand(dependencies: Partial<ChatCommandDependencies> = {}): Command {
+  const loadRegistry = dependencies.loadRegistry ?? (() => ProviderRegistry.load());
+  const readConfig = dependencies.loadConfig ?? loadConfig;
+  const writeConfig = dependencies.updateConfig ?? updateConfig;
+  const prompt: Prompt =
+    dependencies.prompt ??
+    ((questions) => inquirer.prompt(questions as never) as Promise<unknown> as never);
+  const createInterface =
+    dependencies.createInterface ??
+    (() => readline.createInterface({ input: process.stdin, output: process.stdout }));
   return new Command('chat')
     .description('Interactive terminal chat. Type /model to switch model, /exit to quit.')
     .option('-m, --model <id>', 'model id (provider:model or bare id)')
     .action(async (opts: { model?: string }) => {
-      const reg = await ProviderRegistry.load();
-      const cfg = await loadConfig();
+      const reg = await loadRegistry();
+      const cfg = await readConfig();
       let current = opts.model ?? cfg.defaultModel;
       if (!current) {
-        current = await pickModel(reg);
+        current = await pickModel(reg, prompt);
         if (!current) return;
-        await updateConfig((c) => ({ ...c, defaultModel: current }));
+        await writeConfig((c) => ({ ...c, defaultModel: current }));
       }
       console.log(chalk.gray(`Using model: ${current}`));
       console.log(chalk.gray('Commands: /model to switch, /exit to quit'));
 
       const messages: ChatMessage[] = [];
-      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-      const ask = () =>
-        new Promise<string>((resolve) => rl.question(chalk.cyan('you> '), resolve));
+      const rl = createInterface();
+      const ask = () => new Promise<string>((resolve) => rl.question(chalk.cyan('you> '), resolve));
 
       for (;;) {
         const line = (await ask()).trim();
@@ -59,10 +81,10 @@ export function chatCommand(): Command {
           break;
         }
         if (line === '/model') {
-          const picked = await pickModel(reg);
+          const picked = await pickModel(reg, prompt);
           if (picked) {
             current = picked;
-            await updateConfig((c) => ({ ...c, defaultModel: current }));
+            await writeConfig((c) => ({ ...c, defaultModel: current }));
             console.log(chalk.gray(`Switched to ${current}`));
           }
           continue;

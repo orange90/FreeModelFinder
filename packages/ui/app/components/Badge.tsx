@@ -35,7 +35,11 @@ export function Badge({
   );
 }
 
-export function Dot({ tone = 'neutral' }: { tone?: 'neutral' | 'success' | 'warning' | 'danger' | 'primary' }) {
+export function Dot({
+  tone = 'neutral',
+}: {
+  tone?: 'neutral' | 'success' | 'warning' | 'danger' | 'primary';
+}) {
   const cls =
     tone === 'success'
       ? 'bg-success'

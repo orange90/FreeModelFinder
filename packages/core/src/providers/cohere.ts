@@ -9,15 +9,10 @@ interface CohereModel {
 }
 
 const COHERE_FREE_ALLOW_LIST = [
-  'command-a-plus',
-  'command-a-03-2025',
-  'command-a-reasoning-08-2025',
-  'command-a-translate-08-2025',
-  'command-a-vision-07-2025',
-  'command-r-plus-08-2024',
-  'command-r-08-2024',
-  'command-r7b-12-2024',
-  'north-mini-code',
+  // Unlike the Command models, North Mini Code is explicitly free with both
+  // trial and production keys. Keeping only this model prevents a production
+  // key from turning a catalog entry marked `free` into billable usage.
+  'north-mini-code-1-0',
 ] as const;
 
 const COHERE_FREE_ALLOW_MAP: ReadonlyMap<string, string> = new Map(
@@ -56,7 +51,8 @@ export class CohereProvider extends OpenAICompatibleProvider {
         displayName: canonical,
         contextWindow: m.context_length,
         free: true,
-        description: 'Cohere Trial Key: 20 RPM, share fair-use rate limit.',
+        description:
+          'Cohere North Mini Code is free with trial and production keys, subject to rate limits.',
       });
     }
     if (picked.length === 0) {

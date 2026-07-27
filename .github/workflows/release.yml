@@ -1,0 +1,90 @@
+name: Release npm package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+  actions: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Verify, publish and create release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Use an OIDC-capable npm CLI
+        run: npm install --global npm@11.18.0
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/verify-tag.mjs "$GITHUB_REF_NAME"
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:coverage
+      - run: pnpm verify:release
+      - run: pnpm test:pack
+      - run: pnpm audit:prod
+
+      - name: Prepare release artifact
+        id: release_meta
+        shell: bash
+        run: |
+          mkdir -p release
+          npm pack ./packages/cli/dist --pack-destination release
+          version="${GITHUB_REF_NAME#v}"
+          if [[ "$version" == *-* ]]; then
+            dist_tag=next
+            prerelease=true
+          else
+            dist_tag=latest
+            prerelease=false
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=$dist_tag" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          (cd release && sha256sum ./*.tgz > SHA256SUMS)
+          node scripts/create-release-notes.mjs "$version" release/RELEASE_NOTES.md
+
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: ./packages/cli/dist
+          format: cyclonedx-json
+          output-file: ./release/freemodelfinder-${{ steps.release_meta.outputs.version }}.cdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Publish to npm with Trusted Publishing
+        run: npm publish ./packages/cli/dist --access public --provenance --tag "${{ steps.release_meta.outputs.dist_tag }}"
+        env:
+          # This secret is used only for the one-time bootstrap RC. Delete it
+          # after npm Trusted Publishing is configured; OIDC then takes over.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IS_PRERELEASE: ${{ steps.release_meta.outputs.prerelease }}
+        shell: bash
+        run: |
+          args=(--title "$GITHUB_REF_NAME" --notes-file release/RELEASE_NOTES.md)
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" "${args[@]}" \
+            release/*.tgz \
+            release/SHA256SUMS \
+            release/*.cdx.json

@@ -75,10 +75,7 @@ async function dispatchWithAutoRoute(
   }
 }
 
-export function registerAnthropicRoutes(
-  app: FastifyInstance,
-  getRegistry: () => ProviderRegistry,
-) {
+export function registerAnthropicRoutes(app: FastifyInstance, getRegistry: () => ProviderRegistry) {
   app.post(
     '/v1/messages',
     async (req: FastifyRequest<{ Body: AnthropicMessagesRequest }>, reply) => {

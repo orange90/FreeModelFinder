@@ -1,7 +1,6 @@
 import { loadConfig } from './config/store.js';
 import {
   BaseProvider,
-  CloudflareProvider,
   CohereProvider,
   CustomProvider,
   GeminiProvider,
@@ -17,7 +16,13 @@ import {
 import type { ProviderContext } from './providers/base.js';
 import { QuotaTracker } from './quota.js';
 import { AutoRouter, parseRateLimitError } from './router/auto-router.js';
-import type { AppConfig, ModelInfo, ModelQuotaSnapshot, ProviderId, SwitchNotice } from './types.js';
+import type {
+  AppConfig,
+  ModelInfo,
+  ModelQuotaSnapshot,
+  ProviderId,
+  SwitchNotice,
+} from './types.js';
 
 const PROVIDER_CTORS: Record<
   Exclude<ProviderId, 'ollama'>,
@@ -29,7 +34,6 @@ const PROVIDER_CTORS: Record<
   siliconflow: SiliconFlowProvider,
   modelscope: ModelScopeProvider,
   nvidia: NvidiaProvider,
-  cloudflare: CloudflareProvider,
   github: GitHubModelsProvider,
   cohere: CohereProvider,
   huggingface: HuggingFaceProvider,
@@ -115,7 +119,8 @@ export class ProviderRegistry {
       credentials,
       onResponse: (event) => this.quotaTracker.recordResponse(event),
       onUsage: (event) => this.quotaTracker.recordUsage(event),
-      onQuotaWindows: (event) => this.quotaTracker.recordProviderWindows(event.provider, event.windows),
+      onQuotaWindows: (event) =>
+        this.quotaTracker.recordProviderWindows(event.provider, event.windows),
     });
     this.instances.set(id, instance);
     return instance;
@@ -158,9 +163,7 @@ export class ProviderRegistry {
         models.push(
           ...r.value.filter(
             (model) =>
-              model.free === true &&
-              typeof model.id === 'string' &&
-              model.id.trim().length > 0,
+              model.free === true && typeof model.id === 'string' && model.id.trim().length > 0,
           ),
         );
       } else {
@@ -285,13 +288,6 @@ export class ProviderRegistry {
         } catch {
           // fallthrough
         }
-      }
-    }
-    if (modelId.startsWith('@cf/')) {
-      try {
-        return { provider: this.getProvider('cloudflare'), modelId };
-      } catch {
-        // fallthrough
       }
     }
     if (modelId.startsWith('command-') || modelId.startsWith('c4ai-')) {

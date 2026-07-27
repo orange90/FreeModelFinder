@@ -4,15 +4,32 @@ import inquirer from 'inquirer';
 import ora from 'ora';
 import { ProviderRegistry, loadConfig, updateConfig } from '@freemodelfinder/core';
 
-export function modelCommand(): Command {
+type Prompt = <T>(questions: unknown[]) => Promise<T>;
+
+interface ModelCommandDependencies {
+  loadRegistry: () => Promise<ProviderRegistry>;
+  loadConfig: typeof loadConfig;
+  updateConfig: typeof updateConfig;
+  prompt: Prompt;
+  startSpinner: (message: string) => { stop: () => void };
+}
+
+export function modelCommand(dependencies: Partial<ModelCommandDependencies> = {}): Command {
+  const loadRegistry = dependencies.loadRegistry ?? (() => ProviderRegistry.load());
+  const readConfig = dependencies.loadConfig ?? loadConfig;
+  const writeConfig = dependencies.updateConfig ?? updateConfig;
+  const prompt: Prompt =
+    dependencies.prompt ??
+    ((questions) => inquirer.prompt(questions as never) as Promise<unknown> as never);
+  const startSpinner = dependencies.startSpinner ?? ((message: string) => ora(message).start());
   const cmd = new Command('model').description('Manage the default model');
 
   cmd
     .command('list')
     .description('List all available free models')
     .action(async () => {
-      const spin = ora('Fetching models...').start();
-      const reg = await ProviderRegistry.load();
+      const spin = startSpinner('Fetching models...');
+      const reg = await loadRegistry();
       const { models, failedProviders } = await reg.listAllModels(true);
       spin.stop();
       if (failedProviders.length) {
@@ -33,7 +50,7 @@ export function modelCommand(): Command {
     .command('current')
     .description('Show current default model')
     .action(async () => {
-      const cfg = await loadConfig();
+      const cfg = await readConfig();
       console.log(cfg.defaultModel ?? chalk.yellow('(not set)'));
     });
 
@@ -41,17 +58,17 @@ export function modelCommand(): Command {
     .command('use [modelId]')
     .description('Switch the default model (interactive if omitted)')
     .action(async (modelId?: string) => {
-      const reg = await ProviderRegistry.load();
+      const reg = await loadRegistry();
       let chosen = modelId;
       if (!chosen) {
-        const spin = ora('Loading models...').start();
+        const spin = startSpinner('Loading models...');
         const { models } = await reg.listAllModels(true);
         spin.stop();
         if (!models.length) {
           console.log(chalk.yellow('No models available. Configure providers first.'));
           return;
         }
-        const answer = await inquirer.prompt<{ model: string }>([
+        const answer = await prompt<{ model: string }>([
           {
             type: 'list',
             name: 'model',
@@ -65,7 +82,7 @@ export function modelCommand(): Command {
         ]);
         chosen = answer.model;
       }
-      await updateConfig((cfg) => ({ ...cfg, defaultModel: chosen }));
+      await writeConfig((cfg) => ({ ...cfg, defaultModel: chosen }));
       console.log(chalk.green(`✓ default model set to ${chosen}`));
     });
 

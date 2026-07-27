@@ -133,7 +133,8 @@ export function FinderView({
               只看真正能免费调用的模型
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              列表来自已配置 provider 的实时接口，并经过零价格、官方免费层白名单和文本生成能力三重筛选。
+              列表来自已配置 provider
+              的实时接口，并经过零价格、官方免费层白名单和文本生成能力三重筛选。
               试用赠金或明确收费的模型不会出现在这里。
             </p>
           </div>
@@ -283,7 +284,12 @@ export function FinderView({
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                        <span className={classNames('h-2 w-2 rounded-full', providerMark(item.provider))} />
+                        <span
+                          className={classNames(
+                            'h-2 w-2 rounded-full',
+                            providerMark(item.provider),
+                          )}
+                        />
                         {providerLabel(item.provider)}
                       </div>
                       <h2 className="mt-2 line-clamp-2 text-base font-semibold leading-6 tracking-[-0.02em] text-foreground">
@@ -296,7 +302,10 @@ export function FinderView({
                     </span>
                   </div>
 
-                  <code className="mt-2 line-clamp-1 text-[11px] text-muted-foreground" title={item.id}>
+                  <code
+                    className="mt-2 line-clamp-1 text-[11px] text-muted-foreground"
+                    title={item.id}
+                  >
                     {item.id}
                   </code>
 
@@ -348,24 +357,26 @@ export function FinderView({
 }
 
 function compactNumber(value: number): string {
-  return new Intl.NumberFormat('zh-CN', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
+  return new Intl.NumberFormat('zh-CN', { notation: 'compact', maximumFractionDigits: 1 }).format(
+    value,
+  );
 }
 
 function formatReset(resetAt?: number): string {
   if (!resetAt) return '未知';
   const date = new Date(resetAt);
   const sameDay = date.toDateString() === new Date().toDateString();
-  return date.toLocaleString('zh-CN', sameDay
-    ? { hour: '2-digit', minute: '2-digit', second: '2-digit' }
-    : { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleString(
+    'zh-CN',
+    sameDay
+      ? { hour: '2-digit', minute: '2-digit', second: '2-digit' }
+      : { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' },
+  );
 }
 
 function windowName(window: QuotaWindow): string {
-  const resource = window.resource === 'requests'
-    ? '请求'
-    : window.resource === 'tokens'
-      ? 'Token'
-      : 'Neuron';
+  const resource =
+    window.resource === 'requests' ? '请求' : window.resource === 'tokens' ? 'Token' : 'Neuron';
   const seconds = window.windowSeconds;
   if (!seconds) return `${resource}额度`;
   if (seconds === 1) return `每秒${resource}`;
@@ -394,11 +405,12 @@ function QuotaPanel({
     limited: '已限流',
     error: '检测失败',
   }[status];
-  const statusTone = status === 'available'
-    ? 'text-success'
-    : status === 'limited' || status === 'error'
-      ? 'text-destructive'
-      : 'text-muted-foreground';
+  const statusTone =
+    status === 'available'
+      ? 'text-success'
+      : status === 'limited' || status === 'error'
+        ? 'text-destructive'
+        : 'text-muted-foreground';
 
   return (
     <div className="mt-4 rounded-xl border border-border bg-surface-muted/45 p-3">
@@ -425,8 +437,13 @@ function QuotaPanel({
         <div className="flex items-center gap-1.5">
           <Gauge size={12} />
           <span>
-            本地会话已用 <b className="font-semibold text-foreground">{compactNumber(quota?.session.totalTokens ?? 0)}</b> tokens
-            {' · '}{quota?.session.requests ?? 0} 次
+            本地会话已用{' '}
+            <b className="font-semibold text-foreground">
+              {compactNumber(quota?.session.totalTokens ?? 0)}
+            </b>{' '}
+            tokens
+            {' · '}
+            {quota?.session.requests ?? 0} 次
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -443,15 +460,21 @@ function QuotaPanel({
               className="rounded-lg border border-border/70 bg-surface px-2.5 py-2"
             >
               <div className="flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
-                <span>{windowName(window)} · {window.scope === 'provider' ? '共享' : '模型'}</span>
+                <span>
+                  {windowName(window)} · {window.scope === 'provider' ? '共享' : '模型'}
+                </span>
                 <span>{window.source === 'upstream' ? '上游' : '本地估算'}</span>
               </div>
               <div className="mt-0.5 text-xs font-semibold text-foreground">
-                {window.remaining !== undefined ? `剩余 ${compactNumber(window.remaining)}` : '剩余额度未知'}
+                {window.remaining !== undefined
+                  ? `剩余 ${compactNumber(window.remaining)}`
+                  : '剩余额度未知'}
                 {window.limit !== undefined ? ` / ${compactNumber(window.limit)}` : ''}
               </div>
               {window.resetAt && (
-                <div className="mt-0.5 text-[10px] text-muted-foreground">{formatReset(window.resetAt)} 重置</div>
+                <div className="mt-0.5 text-[10px] text-muted-foreground">
+                  {formatReset(window.resetAt)} 重置
+                </div>
               )}
             </div>
           ))}
@@ -497,9 +520,7 @@ function Notice({
     <div
       className={classNames(
         'mt-5 flex flex-col justify-between gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center',
-        tone === 'error'
-          ? 'border-destructive/30 bg-destructive/5'
-          : 'border-border bg-surface',
+        tone === 'error' ? 'border-destructive/30 bg-destructive/5' : 'border-border bg-surface',
       )}
     >
       <div className="flex items-start gap-3">

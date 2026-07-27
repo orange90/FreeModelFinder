@@ -15,9 +15,7 @@ export interface OpenAIChatCompletionRequest {
   stop?: string | string[];
 }
 
-function normalizeContent(
-  c: OpenAIChatCompletionRequest['messages'][number]['content'],
-): string {
+function normalizeContent(c: OpenAIChatCompletionRequest['messages'][number]['content']): string {
   if (typeof c === 'string') return c;
   return c
     .filter((part) => part.type === 'text' || part.type === 'input_text')

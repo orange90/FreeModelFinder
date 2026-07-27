@@ -1,3 +1,16 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+
+# v0.1.0 intentionally pins the audited Next.js release below. Keep the
+# package manager's release-age gate explicit so a fresh checkout resolves the
+# same lockfile instead of depending on a global pnpm policy.
+minimumReleaseAge: 0
+
+allowBuilds:
+  esbuild: true
+  msw: false
+
+overrides:
+  postcss: 8.5.18
+  sharp: 0.35.0

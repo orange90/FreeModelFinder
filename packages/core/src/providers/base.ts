@@ -17,11 +17,7 @@ export interface ProviderContext {
     status: number;
     headers: Headers;
   }) => void;
-  onUsage?: (event: {
-    provider: ProviderId;
-    model: string;
-    usage?: ChatResponse['usage'];
-  }) => void;
+  onUsage?: (event: { provider: ProviderId; model: string; usage?: ChatResponse['usage'] }) => void;
   onQuotaWindows?: (event: { provider: ProviderId; windows: QuotaWindow[] }) => void;
 }
 

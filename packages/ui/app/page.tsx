@@ -1,14 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import {
-  KeyRound,
-  MessageSquare,
-  RefreshCw,
-  Search,
-  Wifi,
-  WifiOff,
-} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { KeyRound, MessageSquare, RefreshCw, Search, Wifi, WifiOff } from 'lucide-react';
 import { FinderView } from './components/FinderView';
 import { SettingsView } from './components/SettingsView';
 import { TesterView, type Msg } from './components/TesterView';
@@ -57,9 +50,13 @@ export default function Home() {
   const [gatewayReachable, setGatewayReachable] = useState<boolean | null>(null);
   const [failures, setFailures] = useState<ProviderFailure[]>([]);
   const [probingModels, setProbingModels] = useState<string[]>([]);
+  const streamAbortRef = useRef<AbortController | null>(null);
+  const streamReaderRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
 
   const applyModels = useCallback((payload: ModelsResponse) => {
-    const list = Array.isArray(payload.data) ? payload.data.filter((item) => item.free !== false) : [];
+    const list = Array.isArray(payload.data)
+      ? payload.data.filter((item) => item.free !== false)
+      : [];
     setModels(list);
     setFailures(payload.fmf?.failed_providers ?? []);
     setGatewayReachable(true);
@@ -133,11 +130,15 @@ export default function Home() {
   }, [applyModels]);
 
   const applyQuotas = useCallback((quotas: ModelQuotaSnapshot[]) => {
-    const byModel = new Map(quotas.map((quota) => [`${quota.provider}:${quota.model}`.toLowerCase(), quota]));
-    setModels((current) => current.map((item) => ({
-      ...item,
-      quota: byModel.get(modelValue(item).toLowerCase()) ?? item.quota,
-    })));
+    const byModel = new Map(
+      quotas.map((quota) => [`${quota.provider}:${quota.model}`.toLowerCase(), quota]),
+    );
+    setModels((current) =>
+      current.map((item) => ({
+        ...item,
+        quota: byModel.get(modelValue(item).toLowerCase()) ?? item.quota,
+      })),
+    );
   }, []);
 
   useEffect(() => {
@@ -147,7 +148,7 @@ export default function Home() {
       try {
         const response = await fetch(`${GATEWAY}/api/model-quotas`, withUiHeaders());
         if (!response.ok) return;
-        const payload = await response.json() as { data?: ModelQuotaSnapshot[] };
+        const payload = (await response.json()) as { data?: ModelQuotaSnapshot[] };
         if (!cancelled && Array.isArray(payload.data)) applyQuotas(payload.data);
       } catch {
         // Quota polling is supplemental; keep the model catalog usable while offline.
@@ -161,30 +162,33 @@ export default function Home() {
     };
   }, [applyQuotas, models.length, tab]);
 
-  const probeModel = useCallback(async (value: string) => {
-    setProbingModels((current) => current.includes(value) ? current : [...current, value]);
-    try {
-      const response = await fetch(
-        `${GATEWAY}/api/model-quotas/probe`,
-        withUiHeaders({
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ model: value }),
-        }),
-      );
-      if (!response.ok) throw new Error(`probe failed ${response.status}`);
-      const payload = await response.json() as {
-        quota?: ModelQuotaSnapshot;
-        data?: ModelQuotaSnapshot[];
-      };
-      if (Array.isArray(payload.data)) applyQuotas(payload.data);
-      else if (payload.quota) applyQuotas([payload.quota]);
-    } catch {
-      // Keep the current snapshot; the card can be retried when the gateway is reachable.
-    } finally {
-      setProbingModels((current) => current.filter((item) => item !== value));
-    }
-  }, [applyQuotas]);
+  const probeModel = useCallback(
+    async (value: string) => {
+      setProbingModels((current) => (current.includes(value) ? current : [...current, value]));
+      try {
+        const response = await fetch(
+          `${GATEWAY}/api/model-quotas/probe`,
+          withUiHeaders({
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ model: value }),
+          }),
+        );
+        if (!response.ok) throw new Error(`probe failed ${response.status}`);
+        const payload = (await response.json()) as {
+          quota?: ModelQuotaSnapshot;
+          data?: ModelQuotaSnapshot[];
+        };
+        if (Array.isArray(payload.data)) applyQuotas(payload.data);
+        else if (payload.quota) applyQuotas([payload.quota]);
+      } catch {
+        // Keep the current snapshot; the card can be retried when the gateway is reachable.
+      } finally {
+        setProbingModels((current) => current.filter((item) => item !== value));
+      }
+    },
+    [applyQuotas],
+  );
 
   const selectModel = useCallback((value: string) => {
     setModel(value);
@@ -208,6 +212,8 @@ export default function Home() {
     setMessages([...next, { role: 'assistant', content: '' }]);
     setInput('');
     setStreaming(true);
+    const controller = new AbortController();
+    streamAbortRef.current = controller;
 
     try {
       const response = await fetch(
@@ -216,6 +222,7 @@ export default function Home() {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ model, messages: next, stream: true }),
+          signal: controller.signal,
         }),
       );
       if (!response.ok || !response.body) {
@@ -224,6 +231,7 @@ export default function Home() {
       }
 
       const reader = response.body.getReader();
+      streamReaderRef.current = reader;
       const decoder = new TextDecoder();
       let buffer = '';
       let accumulated = '';
@@ -248,7 +256,9 @@ export default function Home() {
             };
             if (json.error) {
               const message =
-                typeof json.error === 'string' ? json.error : json.error.message ?? 'upstream error';
+                typeof json.error === 'string'
+                  ? json.error
+                  : (json.error.message ?? 'upstream error');
               throw new Error(message);
             }
             const delta = json.choices?.[0]?.delta?.content ?? '';
@@ -274,9 +284,16 @@ export default function Home() {
         return copy;
       });
     } finally {
+      streamReaderRef.current = null;
+      if (streamAbortRef.current === controller) streamAbortRef.current = null;
       setStreaming(false);
     }
   }
+
+  const cancelStream = useCallback(() => {
+    void streamReaderRef.current?.cancel();
+    streamAbortRef.current?.abort();
+  }, []);
 
   const currentPage = PAGE_COPY[tab];
 
@@ -293,7 +310,9 @@ export default function Home() {
               FM
             </span>
             <span>
-              <span className="block text-sm font-semibold tracking-[-0.02em]">FreeModelFinder</span>
+              <span className="block text-sm font-semibold tracking-[-0.02em]">
+                FreeModelFinder
+              </span>
               <span className="block text-[11px] text-muted-foreground">Local model gateway</span>
             </span>
           </button>
@@ -333,17 +352,11 @@ export default function Home() {
                 )}
               />
               <span className="text-xs font-medium text-foreground">
-                {gatewayReachable == null
-                  ? '正在连接'
-                  : gatewayReachable
-                    ? '网关在线'
-                    : '网关离线'}
+                {gatewayReachable == null ? '正在连接' : gatewayReachable ? '网关在线' : '网关离线'}
               </span>
             </div>
             <p className="mt-2 truncate font-mono text-[10px] text-muted-foreground">{GATEWAY}</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">
-              {models.length} 个免费模型
-            </p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{models.length} 个免费模型</p>
           </div>
         </aside>
 
@@ -415,6 +428,7 @@ export default function Home() {
                 models={models}
                 setInput={setInput}
                 send={send}
+                onCancel={cancelStream}
                 onModelChange={selectModel}
                 onClear={() => setMessages([])}
               />
@@ -433,7 +447,6 @@ export default function Home() {
           <BottomNav items={TABS} value={tab} onChange={setTab} />
         </section>
       </div>
-
     </main>
   );
 }

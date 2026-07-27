@@ -19,7 +19,13 @@ describe('quota header parsing', () => {
     const windows = parseQuotaHeaders(headers, now);
     assert.equal(windows.length, 3);
     assert.deepEqual(
-      windows.map((window) => [window.resource, window.windowSeconds, window.limit, window.used, window.remaining]),
+      windows.map((window) => [
+        window.resource,
+        window.windowSeconds,
+        window.limit,
+        window.used,
+        window.remaining,
+      ]),
       [
         ['requests', 86_400, 500, 89, 411],
         ['requests', 60, 20, 3, 17],
@@ -65,10 +71,13 @@ describe('QuotaTracker', () => {
     assert.equal(snapshot.session.requests, 1);
     assert.equal(snapshot.session.totalTokens, 6);
     assert.equal(snapshot.windows.length, 2);
-    assert.deepEqual(snapshot.windows.map((window) => [window.scope, window.remaining]), [
-      ['provider', 1_999],
-      ['model', 199],
-    ]);
+    assert.deepEqual(
+      snapshot.windows.map((window) => [window.scope, window.remaining]),
+      [
+        ['provider', 1_999],
+        ['model', 199],
+      ],
+    );
   });
 
   it('prefers upstream data over a local estimate for the same resource window', () => {
@@ -133,13 +142,15 @@ describe('QuotaTracker', () => {
 
   it('decrements an account policy once and exposes the same remainder to every sibling', () => {
     const tracker = new QuotaTracker();
-    tracker.recordProviderWindows('openrouter', [{
-      resource: 'requests',
-      windowSeconds: 86_400,
-      limit: 1_000,
-      scope: 'provider',
-      source: 'local-estimate',
-    }]);
+    tracker.recordProviderWindows('openrouter', [
+      {
+        resource: 'requests',
+        windowSeconds: 86_400,
+        limit: 1_000,
+        scope: 'provider',
+        source: 'local-estimate',
+      },
+    ]);
     tracker.recordResponse({
       provider: 'openrouter',
       model: 'model-a:free',
@@ -156,13 +167,15 @@ describe('QuotaTracker', () => {
 
   it('shares provider-window token limits across sibling models', () => {
     const tracker = new QuotaTracker();
-    tracker.recordProviderWindows('modelscope', [{
-      resource: 'tokens',
-      windowSeconds: 60,
-      limit: 30_000,
-      scope: 'provider',
-      source: 'local-estimate',
-    }]);
+    tracker.recordProviderWindows('modelscope', [
+      {
+        resource: 'tokens',
+        windowSeconds: 60,
+        limit: 30_000,
+        scope: 'provider',
+        source: 'local-estimate',
+      },
+    ]);
     const sibling = tracker.snapshot('modelscope', 'model-b');
     const minuteTokens = sibling.windows.find(
       (window) => window.resource === 'tokens' && window.windowSeconds === 60,

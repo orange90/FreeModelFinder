@@ -9,6 +9,7 @@ import {
   Eraser,
   Loader2,
   MessageSquareText,
+  Square,
   Sparkles,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -51,6 +52,7 @@ export function TesterView({
   models,
   setInput,
   send,
+  onCancel,
   onModelChange,
   onClear,
 }: {
@@ -61,6 +63,7 @@ export function TesterView({
   models: ModelItem[];
   setInput: (value: string) => void;
   send: () => void;
+  onCancel: () => void;
   onModelChange: (value: string) => void;
   onClear: () => void;
 }) {
@@ -129,7 +132,6 @@ export function TesterView({
             </button>
           </div>
         </div>
-
       </header>
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
@@ -193,9 +195,7 @@ export function TesterView({
                   key={`${message.role}-${index}`}
                   message={message}
                   isStreamingLast={
-                    streaming &&
-                    index === messages.length - 1 &&
-                    message.role === 'assistant'
+                    streaming && index === messages.length - 1 && message.role === 'assistant'
                   }
                 />
               ))}
@@ -233,13 +233,14 @@ export function TesterView({
               className="max-h-[180px] min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-foreground outline-none placeholder:text-muted-foreground/65 disabled:cursor-not-allowed"
             />
             <button
-              type="submit"
-              aria-label="发送消息"
-              disabled={streaming || !model || !input.trim()}
+              type={streaming ? 'button' : 'submit'}
+              aria-label={streaming ? '停止生成' : '发送消息'}
+              onClick={streaming ? onCancel : undefined}
+              disabled={!streaming && (!model || !input.trim())}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-foreground text-background transition hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-30"
             >
               {streaming ? (
-                <Loader2 className="animate-spin" size={16} />
+                <Square size={15} fill="currentColor" />
               ) : (
                 <ArrowUp size={17} strokeWidth={2.2} />
               )}
@@ -255,13 +256,7 @@ export function TesterView({
   );
 }
 
-function MessageRow({
-  message,
-  isStreamingLast,
-}: {
-  message: Msg;
-  isStreamingLast: boolean;
-}) {
+function MessageRow({ message, isStreamingLast }: { message: Msg; isStreamingLast: boolean }) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isError = message.content.startsWith('[error]');

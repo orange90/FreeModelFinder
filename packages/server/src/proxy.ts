@@ -1,20 +1,20 @@
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 
-function pickProxyUrl(): string | undefined {
+export function pickProxyUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
   const raw =
-    process.env.HTTPS_PROXY ||
-    process.env.https_proxy ||
-    process.env.HTTP_PROXY ||
-    process.env.http_proxy ||
-    process.env.ALL_PROXY ||
-    process.env.all_proxy;
+    env.HTTPS_PROXY ||
+    env.https_proxy ||
+    env.HTTP_PROXY ||
+    env.http_proxy ||
+    env.ALL_PROXY ||
+    env.all_proxy;
   if (!raw) return undefined;
   const trimmed = raw.trim();
   if (!trimmed) return undefined;
   return trimmed;
 }
 
-function isSupportedProxy(url: string): boolean {
+export function isSupportedProxy(url: string): boolean {
   return /^https?:\/\//i.test(url);
 }
 
@@ -61,4 +61,3 @@ installProxyFromEnv();
 export function getProxyResult(): { installed: boolean; url?: string; reason?: string } {
   return lastResult;
 }
-

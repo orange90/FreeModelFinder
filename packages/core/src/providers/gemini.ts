@@ -94,7 +94,11 @@ export class GeminiProvider extends BaseProvider {
         topP: req.top_p,
         maxOutputTokens: req.max_tokens,
         stopSequences:
-          typeof req.stop === 'string' ? [req.stop] : Array.isArray(req.stop) ? req.stop : undefined,
+          typeof req.stop === 'string'
+            ? [req.stop]
+            : Array.isArray(req.stop)
+              ? req.stop
+              : undefined,
       },
     };
   }
@@ -104,7 +108,12 @@ export class GeminiProvider extends BaseProvider {
     const res = await this.fetch(`${this.baseUrl()}/models?key=${encodeURIComponent(key)}`);
     if (!res.ok) throw new Error(`gemini list models failed: ${res.status}`);
     const data = (await res.json()) as {
-      models: Array<{ name: string; displayName?: string; inputTokenLimit?: number; supportedGenerationMethods?: string[] }>;
+      models: Array<{
+        name: string;
+        displayName?: string;
+        inputTokenLimit?: number;
+        supportedGenerationMethods?: string[];
+      }>;
     };
     const rawList = Array.isArray(data.models) ? data.models : [];
     if (rawList.length === 0) {
@@ -139,11 +148,14 @@ export class GeminiProvider extends BaseProvider {
   async chat(req: ChatRequest): Promise<ChatResponse> {
     const key = requireKey(this.ctx.credentials, this.id);
     const url = `${this.baseUrl()}/models/${encodeURIComponent(req.model)}:generateContent?key=${encodeURIComponent(key)}`;
-    const res = this.observeResponse(req.model, await this.fetch(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(this.buildBody(req)),
-    }));
+    const res = this.observeResponse(
+      req.model,
+      await this.fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(this.buildBody(req)),
+      }),
+    );
     if (!res.ok) throw new Error(`gemini chat failed ${res.status}: ${await res.text()}`);
     const data = (await res.json()) as GeminiResponse;
     const usage = data.usageMetadata
@@ -169,11 +181,14 @@ export class GeminiProvider extends BaseProvider {
   async *stream(req: ChatRequest): AsyncIterable<StreamChunk> {
     const key = requireKey(this.ctx.credentials, this.id);
     const url = `${this.baseUrl()}/models/${encodeURIComponent(req.model)}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
-    const res = this.observeResponse(req.model, await this.fetch(url, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(this.buildBody(req)),
-    }));
+    const res = this.observeResponse(
+      req.model,
+      await this.fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(this.buildBody(req)),
+      }),
+    );
     if (!res.ok || !res.body) {
       throw new Error(`gemini stream failed ${res.status}: ${await res.text()}`);
     }

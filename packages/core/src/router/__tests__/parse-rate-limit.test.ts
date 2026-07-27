@@ -41,9 +41,7 @@ describe('parseRateLimitError', () => {
   it('P7: parses ISO reset timestamp', () => {
     const iso = '2026-08-01T00:00:00Z';
     const expected = Date.parse(iso);
-    const r = parseRateLimitError(
-      new Error(`429 rate limit, reset at ${iso}`),
-    );
+    const r = parseRateLimitError(new Error(`429 rate limit, reset at ${iso}`));
     assert.equal(r.resetAt, expected);
   });
 
@@ -77,9 +75,7 @@ describe('parseRateLimitError', () => {
 
   it('P13: retry-after and ISO can coexist; ISO wins for resetAt', () => {
     const iso = '2026-08-01T00:00:00Z';
-    const r = parseRateLimitError(
-      new Error(`429 rate limit reset at ${iso} retry-after: 10`),
-    );
+    const r = parseRateLimitError(new Error(`429 rate limit reset at ${iso} retry-after: 10`));
     assert.equal(r.retryAfterSec, 10);
     assert.equal(r.resetAt, Date.parse(iso));
   });

@@ -14,8 +14,7 @@ async function main() {
   }
 
   const portEnv = process.env.PORT ? Number(process.env.PORT) : undefined;
-  const hostEnv = process.env.HOST;
-  const { listen } = await createServer({ port: portEnv, host: hostEnv });
+  const { listen } = await createServer({ port: portEnv });
   const url = await listen();
   console.log(`[freemodelfinder] server listening at ${url}`);
 }

@@ -18,7 +18,13 @@ export function StatCard({
   className?: string;
 }) {
   const dotTone =
-    tone === 'ok' ? 'success' : tone === 'warn' ? 'warning' : tone === 'danger' ? 'danger' : 'neutral';
+    tone === 'ok'
+      ? 'success'
+      : tone === 'warn'
+        ? 'warning'
+        : tone === 'danger'
+          ? 'danger'
+          : 'neutral';
   return (
     <div
       className={classNames(
@@ -33,7 +39,10 @@ export function StatCard({
         </span>
         {icon && <span className="text-muted-foreground/70">{icon}</span>}
       </div>
-      <div className="mt-1.5 truncate text-base font-semibold text-foreground" title={typeof value === 'string' ? value : undefined}>
+      <div
+        className="mt-1.5 truncate text-base font-semibold text-foreground"
+        title={typeof value === 'string' ? value : undefined}
+      >
         {value}
       </div>
       {hint && <p className="mt-0.5 truncate text-xs text-muted-foreground">{hint}</p>}

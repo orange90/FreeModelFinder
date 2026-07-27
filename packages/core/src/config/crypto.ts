@@ -37,30 +37,36 @@ function candidateV1Hosts(): string[] {
   return [...seen];
 }
 
-export function encryptString(plaintext: string): string {
-  const key = deriveKeyV2();
+export function encryptString(plaintext: string, masterKey?: Buffer): string {
+  const key = masterKey ?? deriveKeyV2();
   const iv = randomBytes(12);
   const cipher = createCipheriv(ALGO, key, iv);
   const enc = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
   const tag = cipher.getAuthTag();
-  return `v2:${iv.toString('base64')}:${tag.toString('base64')}:${enc.toString('base64')}`;
+  const version = masterKey ? 'v3' : 'v2';
+  return `${version}:${iv.toString('base64')}:${tag.toString('base64')}:${enc.toString('base64')}`;
 }
 
 function tryDecrypt(key: Buffer, ivB64: string, tagB64: string, encB64: string): string | null {
   try {
     const decipher = createDecipheriv(ALGO, key, Buffer.from(ivB64, 'base64'));
     decipher.setAuthTag(Buffer.from(tagB64, 'base64'));
-    const dec = Buffer.concat([
-      decipher.update(Buffer.from(encB64, 'base64')),
-      decipher.final(),
-    ]);
+    const dec = Buffer.concat([decipher.update(Buffer.from(encB64, 'base64')), decipher.final()]);
     return dec.toString('utf8');
   } catch {
     return null;
   }
 }
 
-export function decryptString(payload: string): string {
+export function decryptString(payload: string, masterKey?: Buffer): string {
+  if (payload.startsWith('v3:')) {
+    const [, ivB64, tagB64, encB64] = payload.split(':');
+    if (!ivB64 || !tagB64 || !encB64) throw new Error('invalid encrypted payload');
+    if (!masterKey) throw new Error('v3 master key is required');
+    const out = tryDecrypt(masterKey, ivB64, tagB64, encB64);
+    if (out === null) throw new Error('decryption failed (v3 key mismatch)');
+    return out;
+  }
   if (payload.startsWith('v2:')) {
     const [, ivB64, tagB64, encB64] = payload.split(':');
     if (!ivB64 || !tagB64 || !encB64) throw new Error('invalid encrypted payload');
@@ -84,5 +90,5 @@ export function decryptString(payload: string): string {
 // Returns true if the payload looks like an encrypted (still non-decrypted)
 // blob, so callers can avoid sending it out as a bearer token.
 export function looksEncrypted(payload: string): boolean {
-  return /^v[12]:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+$/.test(payload);
+  return /^v[123]:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+$/.test(payload);
 }

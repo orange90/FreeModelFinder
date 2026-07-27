@@ -14,9 +14,7 @@ export interface AnthropicMessagesRequest {
   stop_sequences?: string[];
 }
 
-function contentToString(
-  content: AnthropicMessagesRequest['messages'][number]['content'],
-): string {
+function contentToString(content: AnthropicMessagesRequest['messages'][number]['content']): string {
   if (typeof content === 'string') return content;
   return content
     .filter((c) => c.type === 'text')
@@ -28,9 +26,7 @@ export function anthropicToChatRequest(req: AnthropicMessagesRequest): ChatReque
   const messages: ChatMessage[] = [];
   if (req.system) {
     const sys =
-      typeof req.system === 'string'
-        ? req.system
-        : req.system.map((s) => s.text).join('\n\n');
+      typeof req.system === 'string' ? req.system : req.system.map((s) => s.text).join('\n\n');
     messages.push({ role: 'system', content: sys });
   }
   for (const m of req.messages) {

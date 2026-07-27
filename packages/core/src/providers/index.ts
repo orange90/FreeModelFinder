@@ -5,7 +5,6 @@ export { ZhipuProvider } from './zhipu.js';
 export { SiliconFlowProvider } from './siliconflow.js';
 export { ModelScopeProvider } from './modelscope.js';
 export { NvidiaProvider } from './nvidia.js';
-export { CloudflareProvider } from './cloudflare.js';
 export { GitHubModelsProvider } from './github.js';
 export { CohereProvider } from './cohere.js';
 export { HuggingFaceProvider } from './huggingface.js';

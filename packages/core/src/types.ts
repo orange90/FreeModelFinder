@@ -8,7 +8,6 @@ export const ProviderIdSchema = z.enum([
   'siliconflow',
   'modelscope',
   'nvidia',
-  'cloudflare',
   'github',
   'cohere',
   'huggingface',
@@ -175,14 +174,12 @@ export interface ProviderCooldownState {
  *   (per Copilot tier).
  * - Cohere trial key: monthly request quota shared across models.
  * - Hugging Face Inference API: monthly credits pooled across models.
- * - Cloudflare Workers AI: daily neuron budget pooled across models.
  */
 export const PROVIDER_SHARED_QUOTA: Partial<Record<ProviderId, boolean>> = {
   openrouter: true,
   github: true,
   cohere: true,
   huggingface: true,
-  cloudflare: true,
 };
 
 export function isSharedQuotaProvider(provider: ProviderId): boolean {

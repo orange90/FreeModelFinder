@@ -7,9 +7,17 @@ export function formatNumber(n: number) {
   return n.toLocaleString('en-US');
 }
 
-export const GATEWAY =
-  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_GATEWAY_URL) ||
-  'http://127.0.0.1:11435';
+function resolveGateway(): string {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_GATEWAY_URL) {
+    return process.env.NEXT_PUBLIC_GATEWAY_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.port !== '3000') {
+    return window.location.origin;
+  }
+  return 'http://127.0.0.1:11435';
+}
+
+export const GATEWAY = resolveGateway();
 
 export const UI_CLIENT_HEADERS: Record<string, string> = {
   'x-fmf-client': 'ui',

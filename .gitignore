@@ -39,4 +39,7 @@ Thumbs.db
 
 # tests
 coverage/
+*.tsbuildinfo
+*.tgz
 /.trae
+/videos

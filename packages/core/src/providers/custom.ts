@@ -59,8 +59,7 @@ export class CustomProvider extends BaseProvider {
     if (!legacyBaseUrl) return [];
     const legacyModels = Array.isArray(extra.models)
       ? ((extra.models as unknown[]).filter(
-          (m): m is CustomModelEntry =>
-            !!m && typeof (m as CustomModelEntry).id === 'string',
+          (m): m is CustomModelEntry => !!m && typeof (m as CustomModelEntry).id === 'string',
         ) as CustomModelEntry[])
       : [];
     return [
@@ -90,9 +89,7 @@ export class CustomProvider extends BaseProvider {
       if (sources.length === 1) {
         return { sourceId: sources[0]!.id, realModel: modelId };
       }
-      throw new Error(
-        `custom model id "${modelId}" must be in the form "<sourceId>:<model>"`,
-      );
+      throw new Error(`custom model id "${modelId}" must be in the form "<sourceId>:<model>"`);
     }
     return { sourceId: modelId.slice(0, sep), realModel: modelId.slice(sep + 1) };
   }
@@ -133,11 +130,14 @@ export class CustomProvider extends BaseProvider {
     const { sourceId, realModel } = this.splitModel(req.model);
     const source = this.findSource(sourceId);
     const baseUrl = source.baseUrl.replace(/\/$/, '');
-    const res = this.observeResponse(req.model, await this.fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: this.buildHeaders(source),
-      body: JSON.stringify({ ...req, model: realModel, stream: false }),
-    }));
+    const res = this.observeResponse(
+      req.model,
+      await this.fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: this.buildHeaders(source),
+        body: JSON.stringify({ ...req, model: realModel, stream: false }),
+      }),
+    );
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`custom chat failed ${res.status}: ${text}`);
@@ -165,11 +165,14 @@ export class CustomProvider extends BaseProvider {
     const { sourceId, realModel } = this.splitModel(req.model);
     const source = this.findSource(sourceId);
     const baseUrl = source.baseUrl.replace(/\/$/, '');
-    const res = this.observeResponse(req.model, await this.fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: this.buildHeaders(source),
-      body: JSON.stringify({ ...req, model: realModel, stream: true }),
-    }));
+    const res = this.observeResponse(
+      req.model,
+      await this.fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: this.buildHeaders(source),
+        body: JSON.stringify({ ...req, model: realModel, stream: true }),
+      }),
+    );
     if (!res.ok || !res.body) {
       const text = await res.text();
       throw new Error(`custom stream failed ${res.status}: ${text}`);
@@ -227,16 +230,15 @@ function normalizeSource(input: Partial<CustomSource> | undefined): CustomSource
           ? m.displayName.trim()
           : undefined,
       contextWindow:
-        typeof m?.contextWindow === 'number' && m.contextWindow > 0
-          ? m.contextWindow
-          : undefined,
+        typeof m?.contextWindow === 'number' && m.contextWindow > 0 ? m.contextWindow : undefined,
     }))
     .filter((m) => m.id);
   return {
     id,
     label: typeof input.label === 'string' && input.label.trim() ? input.label.trim() : undefined,
     baseUrl: baseUrl.replace(/\/$/, ''),
-    apiKey: typeof input.apiKey === 'string' && input.apiKey.trim() ? input.apiKey.trim() : undefined,
+    apiKey:
+      typeof input.apiKey === 'string' && input.apiKey.trim() ? input.apiKey.trim() : undefined,
     models,
   };
 }

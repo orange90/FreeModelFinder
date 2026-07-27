@@ -49,11 +49,14 @@ export abstract class OpenAICompatibleProvider extends BaseProvider {
   }
 
   async chat(req: ChatRequest): Promise<ChatResponse> {
-    const res = this.observeResponse(req.model, await this.fetch(`${this.baseUrl()}/chat/completions`, {
-      method: 'POST',
-      headers: this.buildHeaders(),
-      body: JSON.stringify({ ...req, stream: false }),
-    }));
+    const res = this.observeResponse(
+      req.model,
+      await this.fetch(`${this.baseUrl()}/chat/completions`, {
+        method: 'POST',
+        headers: this.buildHeaders(),
+        body: JSON.stringify({ ...req, stream: false }),
+      }),
+    );
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`${this.id} chat failed ${res.status}: ${text}`);
@@ -78,15 +81,18 @@ export abstract class OpenAICompatibleProvider extends BaseProvider {
   }
 
   async *stream(req: ChatRequest): AsyncIterable<StreamChunk> {
-    const res = this.observeResponse(req.model, await this.fetch(`${this.baseUrl()}/chat/completions`, {
-      method: 'POST',
-      headers: this.buildHeaders(),
-      body: JSON.stringify({
-        ...req,
-        stream: true,
-        stream_options: { include_usage: true },
+    const res = this.observeResponse(
+      req.model,
+      await this.fetch(`${this.baseUrl()}/chat/completions`, {
+        method: 'POST',
+        headers: this.buildHeaders(),
+        body: JSON.stringify({
+          ...req,
+          stream: true,
+          stream_options: { include_usage: true },
+        }),
       }),
-    }));
+    );
     if (!res.ok || !res.body) {
       const text = await res.text();
       throw new Error(`${this.id} stream failed ${res.status}: ${text}`);

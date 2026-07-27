@@ -1,9 +1,4 @@
-import type {
-  AutoRouteSettings,
-  ModelInfo,
-  ProviderId,
-  SwitchNotice,
-} from '../../types.js';
+import type { AutoRouteSettings, ModelInfo, ProviderId, SwitchNotice } from '../../types.js';
 import { AutoRouter } from '../auto-router.js';
 
 export function makeModel(
@@ -21,9 +16,7 @@ export function makeModel(
   };
 }
 
-export function makeSettings(
-  overrides: Partial<AutoRouteSettings> = {},
-): AutoRouteSettings {
+export function makeSettings(overrides: Partial<AutoRouteSettings> = {}): AutoRouteSettings {
   return {
     enabled: overrides.enabled ?? true,
     strategy: overrides.strategy ?? 'capability',
