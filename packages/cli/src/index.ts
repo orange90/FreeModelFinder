@@ -5,6 +5,7 @@ import { modelCommand } from './commands/model.js';
 import { keyCommand } from './commands/key.js';
 import { chatCommand } from './commands/chat.js';
 import { statusCommand } from './commands/status.js';
+import { doctorCommand } from './commands/doctor.js';
 import packageJson from '../package.json' with { type: 'json' };
 
 const program = new Command();
@@ -18,6 +19,7 @@ program.addCommand(modelCommand());
 program.addCommand(keyCommand());
 program.addCommand(chatCommand());
 program.addCommand(statusCommand());
+program.addCommand(doctorCommand());
 
 program.parseAsync(process.argv).catch((err) => {
   const message = err instanceof Error ? err.message : String(err);

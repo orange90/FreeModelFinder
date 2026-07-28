@@ -10,6 +10,14 @@ const uiDir = resolve(repoDir, 'packages/ui/out');
 
 await mkdir(distDir, { recursive: true });
 await cp(uiDir, resolve(distDir, 'ui'), { recursive: true, force: true });
+await cp(resolve(repoDir, 'deploy/server'), resolve(distDir, 'deploy/server'), {
+  recursive: true,
+  force: true,
+});
+await mkdir(resolve(distDir, 'docs'), { recursive: true });
+await cp(resolve(repoDir, 'docs/SERVER_MODE.md'), resolve(distDir, 'docs/SERVER_MODE.md'), {
+  force: true,
+});
 
 const license = await readFile(resolve(repoDir, 'LICENSE'), 'utf8');
 await writeFile(resolve(distDir, 'LICENSE'), license);
@@ -25,7 +33,7 @@ const publishedManifest = {
   type: sourceManifest.type,
   main: './index.js',
   bin: { fmf: './index.js' },
-  files: ['index.js', 'index.js.map', 'ui', 'README.md', 'LICENSE'],
+  files: ['index.js', 'index.js.map', 'ui', 'deploy', 'docs', 'README.md', 'LICENSE'],
   engines: sourceManifest.engines,
   repository: sourceManifest.repository,
   homepage: sourceManifest.homepage,

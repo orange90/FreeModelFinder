@@ -98,7 +98,11 @@ async function dispatchWithAutoRoute(
   }
 }
 
-export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => ProviderRegistry) {
+export function registerOpenAIRoutes(
+  app: FastifyInstance,
+  getRegistry: () => ProviderRegistry,
+  options: { includeManagement?: boolean } = {},
+) {
   app.get('/v1/models', async (_req, reply) => {
     const reg = getRegistry();
     const { models, succeededProviders, failedProviders } = await reg.listAllModels();
@@ -126,29 +130,31 @@ export function registerOpenAIRoutes(app: FastifyInstance, getRegistry: () => Pr
     });
   });
 
-  app.get('/api/model-quotas', async () => {
-    const reg = getRegistry();
-    const { models } = await reg.listAllModels();
-    return { data: reg.listModelQuotas(models) };
-  });
+  if (options.includeManagement !== false) {
+    app.get('/api/model-quotas', async () => {
+      const reg = getRegistry();
+      const { models } = await reg.listAllModels();
+      return { data: reg.listModelQuotas(models) };
+    });
 
-  app.post(
-    '/api/model-quotas/probe',
-    async (req: FastifyRequest<{ Body: { model?: string } }>, reply: FastifyReply) => {
-      const model = req.body?.model?.trim();
-      if (!model) return reply.code(400).send({ error: 'model required' });
-      try {
-        const reg = getRegistry();
-        const quota = await reg.probeModel(model);
-        const { models } = await reg.listAllModels();
-        const affected = models.filter((item) => item.provider === quota.provider);
-        return reply.send({ quota, data: reg.listModelQuotas(affected) });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        return reply.code(400).send({ error: message });
-      }
-    },
-  );
+    app.post(
+      '/api/model-quotas/probe',
+      async (req: FastifyRequest<{ Body: { model?: string } }>, reply: FastifyReply) => {
+        const model = req.body?.model?.trim();
+        if (!model) return reply.code(400).send({ error: 'model required' });
+        try {
+          const reg = getRegistry();
+          const quota = await reg.probeModel(model);
+          const { models } = await reg.listAllModels();
+          const affected = models.filter((item) => item.provider === quota.provider);
+          return reply.send({ quota, data: reg.listModelQuotas(affected) });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          return reply.code(400).send({ error: message });
+        }
+      },
+    );
+  }
 
   app.post(
     '/v1/chat/completions',

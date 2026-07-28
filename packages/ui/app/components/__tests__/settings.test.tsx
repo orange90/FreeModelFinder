@@ -55,4 +55,29 @@ describe('SettingsView', () => {
     expect(await screen.findByRole('button', { name: '隐藏 Key' })).toBeTruthy();
     expect(screen.getByText(/重新生成 Key/)).toBeTruthy();
   });
+
+  it('shows the public URL and locks authentication controls in server mode', async () => {
+    server.use(
+      http.get(`${gateway}/api/gateway`, () =>
+        HttpResponse.json({
+          mode: 'server',
+          hasKey: true,
+          apiKey: 'fmf-server-key',
+          requireAuth: true,
+          authLocked: true,
+          adminPort: 11435,
+          gatewayPort: 11436,
+          publicBaseUrl: 'https://192.0.2.10',
+        }),
+      ),
+    );
+    render(<SettingsView />);
+
+    expect((await screen.findAllByText('https://192.0.2.10')).length).toBeGreaterThan(0);
+    expect(screen.getByText(/当前管理地址仅供 Tailscale 使用/)).toBeTruthy();
+    const auth = screen.getByRole('checkbox', { name: /强制鉴权/ });
+    expect((auth as HTMLInputElement).disabled).toBe(true);
+    expect(screen.queryByRole('button', { name: '撤销' })).toBeNull();
+    expect(screen.getByText(/服务器模式已锁定/)).toBeTruthy();
+  });
 });

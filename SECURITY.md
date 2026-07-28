@@ -8,6 +8,8 @@ Only the latest published version of FreeModelFinder receives security fixes.
 
 Please do not open a public issue for a suspected vulnerability. Use GitHub's private vulnerability reporting for this repository. Include reproduction steps, affected versions and the expected impact when possible.
 
-## Local security boundary
+## Security boundaries
 
 FreeModelFinder listens only on the loopback interface. Provider credentials and the optional Gateway Key are encrypted before being written to the local configuration directory. The encryption master key is stored separately with restrictive file permissions, but this is not an operating-system keychain: other processes running as the same operating-system user remain inside the trust boundary.
+
+The default local mode serves the UI, management API, and compatible gateway from one loopback port. Explicit server mode separates a Tailscale-managed admin listener from an API-only listener. Server mode always requires a Gateway Key and never registers management routes on the public-gateway listener. The reverse proxy, TLS, firewall, and Tailscale access policy remain the operator's responsibility.

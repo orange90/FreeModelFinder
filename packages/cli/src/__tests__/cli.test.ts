@@ -7,6 +7,7 @@ import { join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { after, describe, it } from 'node:test';
 import { serveCommand } from '../commands/serve.js';
+import { doctorCommand } from '../commands/doctor.js';
 
 const packageDir = resolve(import.meta.dirname, '../..');
 const entry = resolve(packageDir, 'src/index.ts');
@@ -69,6 +70,24 @@ describe('fmf CLI', () => {
     const invalid = await runCli(['serve', '--port', '70000']);
     assert.equal(invalid.code, 1);
     assert.match(invalid.stderr, /port must be an integer between 1 and 65535/);
+
+    const missingServerOptions = await runCli(['serve', '--mode', 'server']);
+    assert.equal(missingServerOptions.code, 1);
+    assert.match(missingServerOptions.stderr, /--admin-origin is required/);
+
+    const mixedPorts = await runCli([
+      'serve',
+      '--mode',
+      'server',
+      '--port',
+      '12000',
+      '--admin-origin',
+      'https://admin.example.ts.net',
+      '--public-url',
+      'https://192.0.2.10',
+    ]);
+    assert.equal(mixedPorts.code, 1);
+    assert.match(mixedPorts.stderr, /--port is only available in local mode/);
   });
 
   it('manages status, keys and the default model in an isolated home', async () => {
@@ -189,5 +208,98 @@ describe('fmf CLI', () => {
       portFailure.parseAsync(['node', 'fmf', '--port', '12000']),
       /port 12000 is already in use/,
     );
+  });
+
+  it('starts server mode through the dual-listener runtime', async () => {
+    const calls: unknown[] = [];
+    const command = serveCommand({
+      findUiDir: () => '/fixture/ui',
+      createServerRuntime: async (options) => {
+        calls.push(options);
+        return {
+          mode: 'server',
+          adminApp: {} as never,
+          gatewayApp: {} as never,
+          registry: {} as never,
+          listen: async () => ({
+            adminUrl: 'http://127.0.0.1:12001',
+            gatewayUrl: 'http://127.0.0.1:12002',
+          }),
+          close: async () => undefined,
+        };
+      },
+    });
+    await command.parseAsync([
+      'node',
+      'fmf',
+      '--mode',
+      'server',
+      '--admin-port',
+      '12001',
+      '--gateway-port',
+      '12002',
+      '--admin-origin',
+      'https://admin.example.ts.net',
+      '--public-url',
+      'https://192.0.2.10',
+    ]);
+    assert.deepEqual(calls[0], {
+      mode: 'server',
+      adminPort: 12001,
+      gatewayPort: 12002,
+      adminOrigin: 'https://admin.example.ts.net',
+      publicUrl: 'https://192.0.2.10',
+      uiDir: '/fixture/ui',
+    });
+  });
+
+  it('runs server doctor checks without exposing the configured key', async () => {
+    const requested: string[] = [];
+    const output: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => output.push(args.join(' '));
+    try {
+      const command = doctorCommand({
+        loadConfig: async () => ({
+          version: 2,
+          port: 11435,
+          providers: {},
+          gateway: { apiKey: 'fmf-doctor-secret', requireAuth: true },
+        }),
+        inspectCertificate: async () => Date.now() + 72 * 60 * 60 * 1000,
+        fetch: async (input, init) => {
+          const url = String(input);
+          requested.push(url);
+          if (url.includes('/api/gateway')) {
+            return Response.json({
+              mode: 'server',
+              authLocked: true,
+              publicBaseUrl: 'https://192.0.2.10',
+            });
+          }
+          if (url.endsWith('/healthz')) return Response.json({ ok: true });
+          if (['/', '/api/config', '/v1/models/refresh'].some((path) => url.endsWith(path))) {
+            return new Response('', { status: 404 });
+          }
+          const authorization = new Headers(init?.headers).get('authorization');
+          if (authorization === 'Bearer fmf-doctor-secret') return Response.json({ data: [] });
+          return new Response('', { status: 401 });
+        },
+      });
+      await command.parseAsync([
+        'node',
+        'fmf',
+        'server',
+        '--admin-url',
+        'https://admin.example.ts.net',
+        '--public-url',
+        'https://192.0.2.10',
+      ]);
+    } finally {
+      console.log = originalLog;
+    }
+    assert.ok(requested.length >= 9);
+    assert.doesNotMatch(output.join('\n'), /fmf-doctor-secret/);
+    assert.match(output.join('\n'), /checks passed/);
   });
 });

@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew FreeModelFinder public IP certificate
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/certbot renew --quiet --deploy-hook "/usr/bin/systemctl reload nginx"

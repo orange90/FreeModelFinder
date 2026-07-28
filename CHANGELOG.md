@@ -4,6 +4,10 @@ All notable changes to FreeModelFinder are documented here.
 
 ## [Unreleased]
 
+- Add an opt-in server mode with separate Tailscale-admin and API-only loopback listeners.
+- Force Gateway Key authentication on the server-mode API and add `fmf doctor server` deployment checks.
+- Ship systemd, Nginx, Tailscale and short-lived IP certificate deployment templates.
+
 ## [0.1.0-rc.3] - 2026-07-27
 
 - Switch npm publication from the one-time bootstrap token to GitHub Actions OIDC Trusted Publishing.

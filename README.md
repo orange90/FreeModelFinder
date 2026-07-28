@@ -157,10 +157,32 @@ FREEMODELFINDER_HOME=/path/to/fmf-home fmf serve
 - 重置配置：先停止 `fmf serve`，再删除整个配置目录。Unix 可运行 `rm -rf ~/.freemodelfinder`；PowerShell 可运行 `Remove-Item -Recurse -Force "$HOME/.freemodelfinder"`。此操作不可恢复，会删除所有 Key 和设置。
 - 卸载 CLI：运行 `npm uninstall -g freemodelfinder`。如需同时清除数据，再手动删除配置目录。
 
+## 服务器模式
+
+默认的 `fmf serve` 仍是单端口本地模式。需要从公网调用 API、同时只通过 Tailscale 管理设置时，可以显式启动服务器模式：
+
+```bash
+fmf serve \
+  --mode server \
+  --admin-origin https://your-server.your-tailnet.ts.net \
+  --public-url https://203.0.113.10
+```
+
+服务器模式固定创建两个 loopback 监听器：管理端 `127.0.0.1:11435` 和强制 Gateway Key 的 API 端 `127.0.0.1:11436`。管理端交给 Tailscale Serve，API 端交给绑定具体公网 IP 的 Nginx；FreeModelFinder 本身不会监听公网地址。
+
+完整的 systemd、Tailscale、Nginx、Certbot 和安全自检步骤见 [服务器模式部署文档](docs/SERVER_MODE.md)。部署完成后可运行：
+
+```bash
+fmf doctor server \
+  --admin-url https://your-server.your-tailnet.ts.net \
+  --public-url https://203.0.113.10
+```
+
 ## 安全边界
 
-- HTTP 服务固定监听 loopback；v0.1 不支持远程网络部署。
+- 所有 FreeModelFinder HTTP 监听器都固定使用 loopback；服务器模式必须通过受控的 Tailscale 与 Nginx 入口接入。
 - `/api/*` 管理接口只接受来自 loopback 且带本地 UI Origin/Referer 的请求；兼容协议端点可由 Gateway Key 保护。
+- 服务器模式的管理端额外接受启动时精确配置的 Tailscale Origin；公网 Gateway 不注册 `/api/*` 或网页路由，并强制 Gateway Key。
 - Provider Key、Custom Source Key 和 Gateway Key 使用随机本地主密钥与 AES-256-GCM v3 密文保存。旧 v1/v2 密文在成功读取后会原子迁移。
 - 在支持 POSIX 权限的系统上，配置目录使用 `0700`，配置文件和主密钥使用 `0600`；Windows 仍以当前用户 ACL 为准。
 - 这只是本地文件保护，不是 macOS Keychain、Windows Credential Manager 或其他系统密钥库。同一操作系统账户下的其他进程属于信任边界，能够读取主密钥和配置文件时也能够解密凭据。
@@ -175,7 +197,7 @@ v0.1 只承诺常用文本聊天字段与流式文本增量，不是三家 SDK �
 - 流式响应中途失败后在同一次请求内无缝回退
 - 同一 Provider 的多 Key 轮询
 - Ollama fallback
-- Docker、Homebrew、自动更新器或远程部署
+- Docker、Homebrew 或自动更新器
 
 ## 从源码开发
 

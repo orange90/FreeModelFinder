@@ -79,6 +79,11 @@ type GatewayInfo = {
   apiKey: string | null;
   requireAuth: boolean;
   port?: number;
+  mode?: 'local' | 'server';
+  adminPort?: number;
+  gatewayPort?: number;
+  publicBaseUrl?: string | null;
+  authLocked?: boolean;
 };
 
 export function SettingsView({
@@ -586,7 +591,7 @@ export function SettingsView({
     }
   }
 
-  const gatewayBaseUrl = GATEWAY.replace(/\/$/, '');
+  const gatewayBaseUrl = (gateway?.publicBaseUrl || GATEWAY).replace(/\/$/, '');
   const displayKey = gateway?.apiKey ?? '';
   const curlExampleKey = displayKey || 'YOUR_API_KEY';
   const curlOpenAI = useMemo(
@@ -919,7 +924,9 @@ export function SettingsView({
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold tracking-tight text-foreground">对外接口</h2>
             <span className="text-xs text-muted-foreground">
-              让其他工具通过 OpenAI 兼容协议调用本地网关
+              {gateway?.mode === 'server'
+                ? '公网地址用于调用，当前管理地址仅供 Tailscale 使用'
+                : '让其他工具通过 OpenAI 兼容协议调用本地网关'}
             </span>
           </div>
           <ChevronDown
@@ -996,10 +1003,11 @@ export function SettingsView({
                     type="checkbox"
                     className="h-3.5 w-3.5 rounded border-input"
                     checked={!!gateway?.requireAuth}
-                    disabled={!gateway?.hasKey || gatewayBusy !== 'idle'}
+                    disabled={!!gateway?.authLocked || !gateway?.hasKey || gatewayBusy !== 'idle'}
                     onChange={(e) => void toggleRequireAuth(e.target.checked)}
                   />
                   强制鉴权
+                  {gateway?.authLocked && '（服务器模式已锁定）'}
                 </label>
               </div>
               {gateway?.hasKey && displayKey ? (
@@ -1053,7 +1061,7 @@ export function SettingsView({
                   )}
                   {gateway?.hasKey ? '重新生成 Key' : '生成 API Key'}
                 </button>
-                {gateway?.hasKey && (
+                {gateway?.hasKey && !gateway.authLocked && (
                   <button
                     type="button"
                     onClick={() => void revokeGatewayKey()}

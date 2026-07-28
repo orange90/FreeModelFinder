@@ -1,0 +1,12 @@
+{
+  "tagOwners": {
+    "tag:fmf-server": ["YOUR_TAILSCALE_LOGIN"]
+  },
+  "grants": [
+    {
+      "src": ["YOUR_TAILSCALE_LOGIN"],
+      "dst": ["tag:fmf-server"],
+      "ip": ["tcp:443"]
+    }
+  ]
+}

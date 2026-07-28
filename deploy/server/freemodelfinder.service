@@ -1,0 +1,24 @@
+[Unit]
+Description=FreeModelFinder server mode
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=FMF_USER
+Group=FMF_USER
+Environment=FREEMODELFINDER_HOME=/var/lib/freemodelfinder
+Environment=LOG_LEVEL=info
+ExecStart=/usr/bin/env fmf serve --mode server --admin-port 11435 --gateway-port 11436 --admin-origin ADMIN_ORIGIN --public-url PUBLIC_URL
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/freemodelfinder
+
+[Install]
+WantedBy=multi-user.target

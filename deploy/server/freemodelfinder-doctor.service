@@ -1,0 +1,10 @@
+[Unit]
+Description=Audit FreeModelFinder server-mode deployment
+After=freemodelfinder.service nginx.service tailscaled.service
+
+[Service]
+Type=oneshot
+User=FMF_USER
+Group=FMF_USER
+Environment=FREEMODELFINDER_HOME=/var/lib/freemodelfinder
+ExecStart=/usr/bin/env fmf doctor server --admin-url ADMIN_ORIGIN --public-url PUBLIC_URL

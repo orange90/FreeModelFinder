@@ -58,6 +58,7 @@ async function waitFor(url) {
 }
 
 let gateway;
+let serverMode;
 try {
   await runCommand(pnpmCommand, ['--filter', 'freemodelfinder', 'prepack']);
 
@@ -73,10 +74,18 @@ try {
     'packed UI index is missing',
   );
   assert.ok(
+    files.includes('docs/SERVER_MODE.md') &&
+      files.includes('deploy/server/nginx.conf') &&
+      files.includes('deploy/server/freemodelfinder.service'),
+    'packed server-mode documentation or templates are missing',
+  );
+  assert.ok(
     files.every(
       (file) =>
         ['index.js', 'index.js.map', 'README.md', 'LICENSE', 'package.json'].includes(file) ||
-        file.startsWith('ui/'),
+        file.startsWith('ui/') ||
+        file.startsWith('deploy/') ||
+        file.startsWith('docs/'),
     ),
     `unexpected packed files: ${files.join(', ')}`,
   );
@@ -157,12 +166,75 @@ try {
   assert.ok(assetPath, 'homepage does not reference a bundled static asset');
   await waitFor(`${origin}${assetPath}`);
   assert.equal(stderr, '', `gateway wrote to stderr: ${stderr}`);
+  gateway.kill('SIGTERM');
+  await once(gateway, 'exit');
+  gateway = undefined;
+
+  const adminPort = await getFreePort();
+  let gatewayPort = await getFreePort();
+  while (gatewayPort === adminPort) gatewayPort = await getFreePort();
+  const adminOrigin = 'https://admin.example.ts.net';
+  serverMode = spawn(
+    process.execPath,
+    [
+      entry,
+      'serve',
+      '--mode',
+      'server',
+      '--admin-port',
+      String(adminPort),
+      '--gateway-port',
+      String(gatewayPort),
+      '--admin-origin',
+      adminOrigin,
+      '--public-url',
+      'https://192.0.2.10',
+    ],
+    { cwd: installDir, env, stdio: ['ignore', 'pipe', 'pipe'] },
+  );
+  let serverStderr = '';
+  serverMode.stderr.setEncoding('utf8').on('data', (chunk) => {
+    serverStderr += chunk;
+  });
+  await waitFor(`http://127.0.0.1:${adminPort}/healthz`);
+  await waitFor(`http://127.0.0.1:${gatewayPort}/healthz`);
+  const gatewayInfo = await fetch(`http://127.0.0.1:${adminPort}/api/gateway`, {
+    headers: { origin: adminOrigin, 'x-fmf-client': 'ui' },
+  });
+  assert.equal(gatewayInfo.status, 200);
+  const serverConfig = await gatewayInfo.json();
+  assert.equal(serverConfig.mode, 'server');
+  assert.equal(serverConfig.authLocked, true);
+  assert.match(serverConfig.apiKey, /^fmf-/);
+  const publicModels = `http://127.0.0.1:${gatewayPort}/v1/models`;
+  assert.equal((await fetch(publicModels)).status, 401);
+  assert.equal(
+    (
+      await fetch(publicModels, {
+        headers: { authorization: `Bearer ${serverConfig.apiKey}` },
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await fetch(`http://127.0.0.1:${gatewayPort}/api/config`, {
+        headers: { origin: adminOrigin, 'x-fmf-client': 'ui' },
+      })
+    ).status,
+    404,
+  );
+  assert.equal(serverStderr, '', `server mode wrote to stderr: ${serverStderr}`);
 
   console.log(`package smoke test passed: ${packedResult.filename}`);
 } finally {
   if (gateway && gateway.exitCode === null) {
     gateway.kill('SIGTERM');
     await once(gateway, 'exit');
+  }
+  if (serverMode && serverMode.exitCode === null) {
+    serverMode.kill('SIGTERM');
+    await once(serverMode, 'exit');
   }
   await rm(scratchDir, { recursive: true, force: true });
 }
