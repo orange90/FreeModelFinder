@@ -1,0 +1,62 @@
+name: Daily provider audit
+
+on:
+  schedule:
+    # 每天 UTC 22:00 触发一次，对应 Asia/Shanghai 次日 06:00。
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Refresh provider free-model audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Provider API keys. 未在仓库 Secrets 中配置的 provider 会被脚本标记为
+      # "未接入" 而不影响其它 provider。
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+      SILICONFLOW_API_KEY: ${{ secrets.SILICONFLOW_API_KEY }}
+      MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+      GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+      COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+      HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+      SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Use a token that can push back to main.
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.14.0'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:runtime
+      - name: Run provider free-model audit
+        run: node scripts/audit-free-models.mjs
+      - name: Update README summary
+        run: node scripts/update-readme-audit.mjs
+      - name: Commit and push changes
+        run: |
+          set -euo pipefail
+          git config user.name  "freemodelfinder-bot"
+          git config user.email "freemodelfinder-bot@users.noreply.github.com"
+          git add README.md reports/
+          if git diff --cached --quiet; then
+            echo "No audit changes to commit."
+            exit 0
+          fi
+          DATE="$(TZ=Asia/Shanghai date +%Y-%m-%d)"
+          git commit -m "chore(audit): refresh provider free-model report ${DATE}"
+          git push origin HEAD:${{ github.ref_name }}

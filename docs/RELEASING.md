@@ -76,3 +76,42 @@ Verify `/healthz`, the Web UI, the real model catalog, non-streaming chat and st
 ## Recovery
 
 npm versions are immutable. If publish succeeds but GitHub Release creation fails, rerun only the release-asset step manually; do not rebuild and republish the same version. If a published version is bad, deprecate it when appropriate, fix forward with a new version, and document the incident in the changelog and release notes.
+
+## Daily provider audit
+
+The `.github/workflows/daily-audit.yml` workflow runs `pnpm audit:daily` on a schedule (22:00 UTC / 06:00 Asia/Shanghai) and on `workflow_dispatch`. Each run:
+
+1. Builds the runtime packages so the audit script can import `ProviderRegistry` from the same core-layer catalog logic that ships to users.
+2. Executes `scripts/audit-free-models.mjs`, which reads provider API keys from environment variables, calls each provider's `/models` endpoint, applies the `free === true` filter, and writes a dated report under [reports/](../reports/) plus a `reports/latest.json` snapshot. No real inference is performed — only catalog reads.
+3. Executes `scripts/update-readme-audit.mjs`, which rewrites the block between `<!-- AUDIT-SUMMARY-START -->` and `<!-- AUDIT-SUMMARY-END -->` in [README.md](../README.md) with the fresh counts, provider status and report link.
+4. Commits both files as `freemodelfinder-bot` and pushes to `main`.
+
+To enable the audit for a given provider, add its API key as a repository secret with one of these names:
+
+| Provider      | Repository secret      |
+| ------------- | ---------------------- |
+| OpenRouter    | `OPENROUTER_API_KEY`   |
+| Google Gemini | `GEMINI_API_KEY`       |
+| Zhipu AI      | `ZHIPU_API_KEY`        |
+| SiliconFlow   | `SILICONFLOW_API_KEY`  |
+| ModelScope    | `MODELSCOPE_API_KEY`   |
+| NVIDIA NIM    | `NVIDIA_API_KEY`       |
+| GitHub Models | `GH_MODELS_TOKEN`      |
+| Cohere        | `COHERE_API_KEY`       |
+| Hugging Face  | `HUGGINGFACE_API_KEY`  |
+| SenseNova     | `SENSENOVA_API_KEY`    |
+
+GitHub reserves the `GITHUB_` prefix for Actions, so the repository secret is named
+`GH_MODELS_TOKEN`. The workflow exposes it to the audit process as the
+`GITHUB_MODELS_TOKEN` environment variable expected by the script.
+
+Providers without a configured key are marked "未接入" in the README and remain in the report as skipped; they do not fail the workflow. Providers whose catalog request throws are marked "暂不可用" and the error is captured in the dated report.
+
+To run the same flow locally, set the runtime environment variables consumed by the
+audit script. Local aliases include `GOOGLE_API_KEY` for Gemini, `GITHUB_TOKEN` for
+GitHub Models, and `HF_TOKEN` for Hugging Face; `GITHUB_MODELS_TOKEN` is the preferred
+local name for a dedicated GitHub Models PAT.
+
+```bash
+pnpm audit:daily
+```
