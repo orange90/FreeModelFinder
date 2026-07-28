@@ -58,20 +58,20 @@ FreeModelFinder 只把核心层明确标记为 `free: true` 的文本聊天模�
 
 <!-- AUDIT-SUMMARY-START -->
 
-下表由 GitHub Actions 每日自动刷新（首次刷新前显示 2026-07-26 的审计基线）。完整实测记录见 [Provider 审计报告](reports/provider-free-model-audit-2026-07-26.md)。
+下表由 GitHub Actions 每日自动刷新。最近一次审计时间：**2026-07-29（Asia/Shanghai）**，共命中 **101** 个免费模型（覆盖 10/10 个 provider）。完整实测记录见 [Provider 审计报告](reports/provider-free-model-audit-2026-07-29.md)。
 
-| 内置 Provider | 实时免费模型数 | 免费判定                                                                            | 主要计费与可用性风险                                               |
-| ------------- | -------------: | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| OpenRouter    |             15 | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 | 免费账号通常共享日请求额度；上游目录和限额会变                     |
-| Google Gemini |              5 | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          | 绑定付费项目后可能适用付费层规则；地区和账号资格会影响可用性       |
-| Zhipu AI      |              2 | 只列入官方免费 Flash 清单                                                           | 免费型号也可能拥塞或限流，静态清单需要随官方政策复审               |
-| SiliconFlow   |              5 | 平台免费型号白名单与实时模型目录取交集                                              | 赠金或试用模型不视为零价；上游目录异常时会报告失败而非伪造空目录   |
-| ModelScope    |              7 | API-Inference 免费型号清单与可用目录取交集                                          | 受账号日配额、单模型配额和账号绑定状态限制                         |
-| NVIDIA NIM    |             42 | 只保留审核过的 build.nvidia.com 免费开发端点                                        | 面向学习、开发和原型，限速且不代表生产环境永久免费                 |
-| GitHub Models |             35 | 目录中的文本输出模型使用账号自带原型开发额度                                        | 若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除        |
-| Cohere        |              1 | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               | 有速率限制；其他 Command 模型不再被标记为免费                      |
-| Hugging Face  |              2 | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    | 普通 Router 模型可能消耗 credits 或按量收费，因此不会混入          |
-| SenseNova     |              3 | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         | 免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态 |
+| 内置 Provider | 实时免费模型数 | 免费判定 | 主要计费与可用性风险 |
+| --- | ---: | --- | --- |
+| OpenRouter | 14 | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 | 免费账号通常共享日请求额度；上游目录和限额会变 |
+| Google Gemini | 5 | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号 | 绑定付费项目后可能适用付费层规则；地区和账号资格会影响可用性 |
+| Zhipu AI | 2 | 只列入官方免费 Flash 清单 | 免费型号也可能拥塞或限流，静态清单需要随官方政策复审 |
+| SiliconFlow | 5 | 平台免费型号白名单与实时模型目录取交集 | 赠金或试用模型不视为零价；上游目录异常时会报告失败而非伪造空目录 |
+| ModelScope | 7 | API-Inference 免费型号清单与可用目录取交集 | 受账号日配额、单模型配额和账号绑定状态限制 |
+| NVIDIA NIM | 27 | 只保留审核过的 build.nvidia.com 免费开发端点 | 面向学习、开发和原型，限速且不代表生产环境永久免费 |
+| GitHub Models | 35 | 目录中的文本输出模型使用账号自带原型开发额度 | 若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除 |
+| Cohere | 1 | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0` | 有速率限制；其他 Command 模型不再被标记为免费 |
+| Hugging Face | 2 | 实时端点明确报告 `is_free`，或输入输出价格均为 0 | 普通 Router 模型可能消耗 credits 或按量收费，因此不会混入 |
+| SenseNova | 3 | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单 | 免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态 |
 
 <!-- AUDIT-SUMMARY-END -->
 

@@ -1,0 +1,88 @@
+{
+  "date": "2026-07-29",
+  "generatedAt": "2026-07-28T22:49:28.973Z",
+  "reportPath": "reports/provider-free-model-audit-2026-07-29.md",
+  "totalModels": 101,
+  "providers": [
+    {
+      "id": "openrouter",
+      "display": "OpenRouter",
+      "status": "ok",
+      "count": 14,
+      "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
+      "risk": "免费账号通常共享日请求额度；上游目录和限额会变"
+    },
+    {
+      "id": "gemini",
+      "display": "Google Gemini",
+      "status": "ok",
+      "count": 5,
+      "freeBasis": "账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号",
+      "risk": "绑定付费项目后可能适用付费层规则；地区和账号资格会影响可用性"
+    },
+    {
+      "id": "zhipu",
+      "display": "Zhipu AI",
+      "status": "ok",
+      "count": 2,
+      "freeBasis": "只列入官方免费 Flash 清单",
+      "risk": "免费型号也可能拥塞或限流，静态清单需要随官方政策复审"
+    },
+    {
+      "id": "siliconflow",
+      "display": "SiliconFlow",
+      "status": "ok",
+      "count": 5,
+      "freeBasis": "平台免费型号白名单与实时模型目录取交集",
+      "risk": "赠金或试用模型不视为零价；上游目录异常时会报告失败而非伪造空目录"
+    },
+    {
+      "id": "modelscope",
+      "display": "ModelScope",
+      "status": "ok",
+      "count": 7,
+      "freeBasis": "API-Inference 免费型号清单与可用目录取交集",
+      "risk": "受账号日配额、单模型配额和账号绑定状态限制"
+    },
+    {
+      "id": "nvidia",
+      "display": "NVIDIA NIM",
+      "status": "ok",
+      "count": 27,
+      "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
+      "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费"
+    },
+    {
+      "id": "github",
+      "display": "GitHub Models",
+      "status": "ok",
+      "count": 35,
+      "freeBasis": "目录中的文本输出模型使用账号自带原型开发额度",
+      "risk": "若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除"
+    },
+    {
+      "id": "cohere",
+      "display": "Cohere",
+      "status": "ok",
+      "count": 1,
+      "freeBasis": "只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`",
+      "risk": "有速率限制；其他 Command 模型不再被标记为免费"
+    },
+    {
+      "id": "huggingface",
+      "display": "Hugging Face",
+      "status": "ok",
+      "count": 2,
+      "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
+      "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入"
+    },
+    {
+      "id": "sensenova",
+      "display": "SenseNova",
+      "status": "ok",
+      "count": 3,
+      "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
+      "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态"
+    }
+  ]
+}
