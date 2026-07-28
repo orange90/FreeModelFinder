@@ -4,6 +4,10 @@ All notable changes to FreeModelFinder are documented here.
 
 ## [Unreleased]
 
+- Add a bilingual first-run wizard for OpenRouter and Gemini with automatic model discovery, deterministic model selection and a real connectivity test.
+- Allow explicit, server-side import of allowlisted provider environment variables without exposing their values to the browser.
+- Enable rate-limit-first automatic routing after a verified second provider is added through onboarding.
+
 - Add an opt-in server mode with separate Tailscale-admin and API-only loopback listeners.
 - Force Gateway Key authentication on the server-mode API and add `fmf doctor server` deployment checks.
 - Ship systemd, Nginx, Tailscale and short-lived IP certificate deployment templates.

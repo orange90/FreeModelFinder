@@ -13,6 +13,57 @@ async function openTester() {
 }
 
 describe('Home', () => {
+  it('shows onboarding instead of an empty catalog for a new configuration', async () => {
+    server.use(
+      http.get(`${gateway}/api/config`, () =>
+        HttpResponse.json({
+          version: 2,
+          port: 11435,
+          providers: {
+            openrouter: { enabled: false, hasKey: false },
+            gemini: { enabled: false, hasKey: false },
+          },
+        }),
+      ),
+    );
+    render(<Home />);
+    expect(await screen.findByText('Connect your first free model provider')).toBeTruthy();
+    expect(screen.queryByText('Fixture Model')).toBeNull();
+  });
+
+  it('keeps a persistent setup entry after onboarding is dismissed', async () => {
+    server.use(
+      http.get(`${gateway}/api/config`, () =>
+        HttpResponse.json({
+          version: 2,
+          port: 11435,
+          onboarding: { dismissedAt: 1_700_000_000_000 },
+          providers: { openrouter: { enabled: false, hasKey: false } },
+        }),
+      ),
+      http.get(`${gateway}/v1/models`, () =>
+        HttpResponse.json({ object: 'list', data: [], fmf: { failed_providers: [] } }),
+      ),
+    );
+    render(<Home />);
+    expect(await screen.findByRole('button', { name: '连接第一个 Provider' })).toBeTruthy();
+  });
+
+  it('returns to onboarding when a newly saved key is still pending verification', async () => {
+    server.use(
+      http.get(`${gateway}/api/config`, () =>
+        HttpResponse.json({
+          version: 2,
+          port: 11435,
+          onboarding: {},
+          providers: { openrouter: { enabled: true, hasKey: true } },
+        }),
+      ),
+    );
+    render(<Home />);
+    expect(await screen.findByText('Connect your first free model provider')).toBeTruthy();
+  });
+
   it('loads free models and surfaces provider failures', async () => {
     render(<Home />);
     expect(await screen.findByText('Fixture Model')).toBeTruthy();

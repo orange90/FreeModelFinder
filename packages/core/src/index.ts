@@ -5,6 +5,7 @@ export * from './config/crypto.js';
 export * from './config/snapshot.js';
 export * from './providers/index.js';
 export * from './protocols/index.js';
+export * from './onboarding.js';
 export { ProviderRegistry, type ListAllModelsResult } from './registry.js';
 export {
   AutoRouter,

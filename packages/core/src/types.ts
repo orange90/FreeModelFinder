@@ -212,6 +212,12 @@ export interface GatewaySettings {
   requireAuth?: boolean;
 }
 
+export interface OnboardingState {
+  completedAt?: number;
+  dismissedAt?: number;
+  primaryProvider?: ProviderId;
+}
+
 export interface AppConfig {
   version: number;
   port: number;
@@ -219,4 +225,5 @@ export interface AppConfig {
   providers: Partial<Record<ProviderId, ProviderSettings>>;
   gateway?: GatewaySettings;
   autoRoute?: AutoRouteSettings;
+  onboarding?: OnboardingState;
 }

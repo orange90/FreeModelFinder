@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyRound, MessageSquare, RefreshCw, Search, Wifi, WifiOff } from 'lucide-react';
 import { FinderView } from './components/FinderView';
+import { OnboardingWizard, type OnboardingResult } from './components/OnboardingWizard';
 import { SettingsView } from './components/SettingsView';
 import { TesterView, type Msg } from './components/TesterView';
 import { BottomNav, type SegmentedItem } from './components/SegmentedTabs';
@@ -17,6 +18,13 @@ import {
 import { GATEWAY, classNames, withUiHeaders } from './lib/utils';
 
 type TabKey = 'finder' | 'tester' | 'settings';
+type OnboardingMode = 'loading' | 'required' | 'dismissed' | 'complete';
+
+type ConfigPayload = {
+  defaultModel?: string;
+  onboarding?: { completedAt?: number; dismissedAt?: number; primaryProvider?: string };
+  providers?: Record<string, { enabled?: boolean; hasKey?: boolean }>;
+};
 
 const TABS: readonly SegmentedItem<TabKey>[] = [
   { key: 'finder', label: '模型', Icon: Search },
@@ -50,6 +58,7 @@ export default function Home() {
   const [gatewayReachable, setGatewayReachable] = useState<boolean | null>(null);
   const [failures, setFailures] = useState<ProviderFailure[]>([]);
   const [probingModels, setProbingModels] = useState<string[]>([]);
+  const [onboardingMode, setOnboardingMode] = useState<OnboardingMode>('loading');
   const streamAbortRef = useRef<AbortController | null>(null);
   const streamReaderRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
 
@@ -94,13 +103,26 @@ export default function Home() {
     void (async () => {
       setModelLoading(true);
       try {
-        const [modelPayload, config] = await Promise.all([
-          requestModels(),
-          fetch(`${GATEWAY}/api/config`, withUiHeaders()).then(async (response) => {
+        const config = await fetch(`${GATEWAY}/api/config`, withUiHeaders()).then(
+          async (response) => {
             if (!response.ok) throw new Error(`config error ${response.status}`);
-            return response.json() as Promise<{ defaultModel?: string }>;
-          }),
-        ]);
+            return response.json() as Promise<ConfigPayload>;
+          },
+        );
+        if (cancelled) return;
+        setGatewayReachable(true);
+        const hasConfiguredProvider = Object.values(config.providers ?? {}).some(
+          (provider) => provider.enabled && provider.hasKey,
+        );
+        const onboardingHandled =
+          !!config.onboarding?.completedAt || !!config.onboarding?.dismissedAt;
+        const onboardingPending = config.onboarding !== undefined && !onboardingHandled;
+        if (onboardingPending || (!hasConfiguredProvider && !onboardingHandled)) {
+          setOnboardingMode('required');
+          return;
+        }
+        setOnboardingMode(hasConfiguredProvider ? 'complete' : 'dismissed');
+        const modelPayload = await requestModels();
         if (cancelled) return;
         const list = applyModels(modelPayload);
         const preferred = config.defaultModel;
@@ -119,7 +141,10 @@ export default function Home() {
           );
         }
       } catch {
-        if (!cancelled) setGatewayReachable(false);
+        if (!cancelled) {
+          setGatewayReachable(false);
+          setOnboardingMode('complete');
+        }
       } finally {
         if (!cancelled) setModelLoading(false);
       }
@@ -128,6 +153,35 @@ export default function Home() {
       cancelled = true;
     };
   }, [applyModels]);
+
+  const finishOnboarding = useCallback(
+    async (_result: OnboardingResult) => {
+      setOnboardingMode('complete');
+      const [list, config] = await Promise.all([
+        refreshModels(false),
+        fetch(`${GATEWAY}/api/config`, withUiHeaders())
+          .then((response) => response.json() as Promise<ConfigPayload>)
+          .catch(() => ({}) as ConfigPayload),
+      ]);
+      const preferred = config.defaultModel;
+      if (preferred && list.some((item) => modelValue(item) === preferred)) setModel(preferred);
+      setTab('tester');
+    },
+    [refreshModels],
+  );
+
+  const dismissOnboarding = useCallback(() => {
+    setOnboardingMode('dismissed');
+    setGatewayReachable(true);
+    void refreshModels(false);
+  }, [refreshModels]);
+
+  const openAdvancedSettings = useCallback(() => {
+    setOnboardingMode('dismissed');
+    setGatewayReachable(true);
+    setTab('settings');
+    void refreshModels(false);
+  }, [refreshModels]);
 
   const applyQuotas = useCallback((quotas: ModelQuotaSnapshot[]) => {
     const byModel = new Map(
@@ -297,6 +351,29 @@ export default function Home() {
 
   const currentPage = PAGE_COPY[tab];
 
+  if (onboardingMode === 'loading') {
+    return (
+      <main className="flex min-h-[100dvh] items-center justify-center bg-background text-foreground">
+        <div className="text-center">
+          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-xs font-bold text-background">
+            FM
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">正在连接本地网关…</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (onboardingMode === 'required') {
+    return (
+      <OnboardingWizard
+        onReady={(result) => void finishOnboarding(result)}
+        onDismiss={dismissOnboarding}
+        onOpenSettings={openAdvancedSettings}
+      />
+    );
+  }
+
   return (
     <main className="h-[100dvh] min-h-0 bg-background text-foreground">
       <div className="mx-auto grid h-full min-h-0 max-w-[1600px] md:grid-cols-[220px_minmax(0,1fr)]">
@@ -414,6 +491,9 @@ export default function Home() {
                   onSelectModel={selectModel}
                   onOpenTester={() => setTab('tester')}
                   onOpenSettings={() => setTab('settings')}
+                  onStartOnboarding={
+                    onboardingMode === 'dismissed' ? () => setOnboardingMode('required') : undefined
+                  }
                   onRefresh={() => void refreshModels(true)}
                   onProbeModel={(value) => void probeModel(value)}
                   probingModels={probingModels}

@@ -56,6 +56,7 @@ export function FinderView({
   onSelectModel,
   onOpenTester,
   onOpenSettings,
+  onStartOnboarding,
   onRefresh,
   onProbeModel,
   probingModels,
@@ -68,6 +69,7 @@ export function FinderView({
   onSelectModel: (model: string) => void;
   onOpenTester: () => void;
   onOpenSettings: () => void;
+  onStartOnboarding?: () => void;
   onRefresh: () => void;
   onProbeModel: (model: string) => void;
   probingModels: string[];
@@ -165,8 +167,8 @@ export function FinderView({
           tone="neutral"
           title="还没有可用的免费模型"
           body="添加至少一个 provider key；如果已经添加，请检查下方的连接错误。"
-          action="配置来源"
-          onAction={onOpenSettings}
+          action={onStartOnboarding ? '连接第一个 Provider' : '配置来源'}
+          onAction={onStartOnboarding ?? onOpenSettings}
         />
       )}
 

@@ -14,6 +14,7 @@ import { registerOpenAIRoutes } from './routes/openai.js';
 import { registerAnthropicRoutes } from './routes/anthropic.js';
 import { registerGeminiRoutes } from './routes/gemini.js';
 import { ModelWatcher } from './watcher.js';
+import { registerOnboardingRoutes } from './onboarding.js';
 
 export interface ServerOptions {
   port?: number;
@@ -175,7 +176,22 @@ async function enforceServerGatewayAuth(
 }
 
 async function createApp(opts: AppOptions): Promise<FastifyInstance> {
-  const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } });
+  const app = Fastify({
+    logger: {
+      level: process.env.LOG_LEVEL ?? 'info',
+      redact: {
+        paths: [
+          'req.headers.authorization',
+          'req.headers.x-api-key',
+          'req.headers.x-goog-api-key',
+          'req.body.apiKey',
+          'req.body.credential.apiKey',
+          'req.body.sources[*].apiKey',
+        ],
+        censor: '[REDACTED]',
+      },
+    },
+  });
   if (opts.surface !== 'gateway') {
     await app.register(cors, {
       origin(origin, callback) {
@@ -287,6 +303,7 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
         version: cfg.version,
         port: cfg.port,
         defaultModel: cfg.defaultModel,
+        onboarding: cfg.onboarding,
         providers: Object.fromEntries(
           Object.entries(cfg.providers).map(([id, s]) => [
             id,
@@ -305,6 +322,12 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
           sources,
         },
       };
+    });
+
+    registerOnboardingRoutes(app, {
+      getRegistry,
+      updateRegistry: (config) => getRegistry().updateConfig(config),
+      refreshSnapshot: () => opts.state.watcher?.tick(true) ?? Promise.resolve(null),
     });
 
     app.post<{

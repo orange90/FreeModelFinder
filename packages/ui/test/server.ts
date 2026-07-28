@@ -28,6 +28,10 @@ export const configPayload = {
     openrouter: { enabled: false, hasKey: false },
     gemini: { enabled: false, hasKey: false },
   },
+  onboarding: {
+    completedAt: 1_700_000_000_000,
+    primaryProvider: 'openrouter',
+  },
   custom: {
     enabled: true,
     hasKey: false,
@@ -75,6 +79,8 @@ export const defaultHandlers = [
       requireAuth: true,
     }),
   ),
+  http.get(`${gateway}/api/onboarding/environment`, () => HttpResponse.json({ data: [] })),
+  http.post(`${gateway}/api/onboarding/dismiss`, () => HttpResponse.json({ ok: true })),
 ];
 
 export const server = setupServer(...defaultHandlers);

@@ -40,6 +40,10 @@ const baseConfig = (): AppConfig => ({
     },
   },
   gateway: { requireAuth: true, apiKey: 'gateway-secret' },
+  onboarding: {
+    completedAt: 1_700_000_000_000,
+    primaryProvider: 'openrouter',
+  },
 });
 
 async function resetHome(): Promise<void> {
@@ -84,6 +88,10 @@ describe('configuration encryption and migration', () => {
     }>;
     assert.equal(sources[0]?.apiKey, 'custom-source-secret');
     assert.equal(loaded.gateway?.apiKey, 'gateway-secret');
+    assert.deepEqual(loaded.onboarding, {
+      completedAt: 1_700_000_000_000,
+      primaryProvider: 'openrouter',
+    });
 
     if (process.platform !== 'win32') {
       assert.equal((await stat(testHome)).mode & 0o777, 0o700);

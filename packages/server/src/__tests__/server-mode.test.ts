@@ -81,7 +81,13 @@ describe('server-mode runtime', () => {
   it('keeps management routes off the public gateway and always requires its key', async () => {
     const value = await runtime('fmf-server-test-key');
     const gateway = value.gatewayApp as FastifyInstance;
-    for (const url of ['/', '/settings', '/api/config', '/v1/models/changes']) {
+    for (const url of [
+      '/',
+      '/settings',
+      '/api/config',
+      '/api/onboarding/environment',
+      '/v1/models/changes',
+    ]) {
       const response = await gateway.inject({ method: 'GET', url, headers: adminHeaders });
       assert.equal(response.statusCode, 404, url);
     }
