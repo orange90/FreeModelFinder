@@ -18,7 +18,9 @@
     "format:check": "prettier --check package.json pnpm-workspace.yaml README.md CHANGELOG.md SECURITY.md \"docs/**/*.md\" \".github/**/*.{json,md,yaml,yml}\" \"packages/**/*.{js,json,md,mjs,ts,tsx,yaml,yml}\" \"scripts/**/*.{js,mjs}\" --ignore-path .gitignore --ignore-path .prettierignore",
     "lint": "eslint \"packages/**/*.{ts,tsx}\" --max-warnings=0",
     "typecheck": "pnpm run build:runtime && pnpm -r --filter=./packages/* typecheck",
-    "test": "pnpm run build:runtime && pnpm -r --filter=./packages/* run test",
+    "test": "pnpm run test:docker && pnpm run build:runtime && pnpm -r --filter=./packages/* run test",
+    "test:docker": "node --test scripts/docker.test.mjs",
+    "test:docker:integration": "node --test scripts/docker.test.mjs",
     "test:coverage": "pnpm run build:runtime && pnpm --filter @freemodelfinder/core test:coverage && pnpm --filter @freemodelfinder/server test:coverage && pnpm --filter freemodelfinder test:coverage && pnpm --filter @freemodelfinder/ui test:coverage",
     "audit:prod": "node scripts/audit-package.mjs",
     "audit:free-models": "node scripts/audit-free-models.mjs",
@@ -27,7 +29,11 @@
     "verify:release": "node scripts/verify-release.mjs",
     "pack:cli": "pnpm --filter freemodelfinder prepack && npm pack ./packages/cli/dist",
     "test:pack": "node scripts/smoke-package.mjs",
-    "clean": "node scripts/clean.mjs"
+    "clean": "node scripts/clean.mjs",
+    "docker:build": "docker build -t freemodelfinder:latest .",
+    "docker:run": "docker run --rm -it -p 11435:11435 -v freemodelfinder-data:/data freemodelfinder:latest",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

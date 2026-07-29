@@ -1,0 +1,26 @@
+services:
+  freemodelfinder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: freemodelfinder:latest
+    container_name: freemodelfinder
+    restart: unless-stopped
+    ports:
+      - "11435:11435"
+    environment:
+      FREEMODELFINDER_HOME: /data
+      NODE_ENV: production
+    volumes:
+      - freemodelfinder-data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - "node -e \"fetch('http://127.0.0.1:11435/v1/models').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  freemodelfinder-data:

@@ -1,0 +1,46 @@
+# deps & build artifacts
+**/node_modules
+**/.pnpm-store
+**/dist
+**/build
+**/out
+**/.next
+**/.next-dev
+**/.turbo
+**/coverage
+**/*.tsbuildinfo
+**/*.tgz
+
+# tauri / rust
+**/target
+apps/desktop/src-tauri/target
+apps/desktop/src-tauri/gen
+
+# runtime & secrets
+.freemodelfinder
+.env
+.env.*
+!.env.example
+
+# vcs / editor / os
+.git
+.gitignore
+.github
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# docker itself
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# misc
+*.log
+npm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+/videos
+/.trae
+reports
