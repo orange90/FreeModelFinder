@@ -33,7 +33,7 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-07-29（Asia/Shanghai）更新：101 个免费模型入口，覆盖 10/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-07-30（Asia/Shanghai）更新：101 个免费模型入口，覆盖 10/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
@@ -48,42 +48,42 @@
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          3 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-07-29.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-07-30.md)
 
 ### 今日变化
 
-> 首次建立可比较基线，下一次审计开始显示新增与移除。
+与 2026-07-29 相比，成功比较的 10 个 Provider 模型清单没有变化。
 
 ### 展开完整模型列表
 
 <details>
 <summary><strong>OpenRouter · 14 个模型</strong></summary>
 
-- `openrouter:inclusionai/ling-3.0-flash:free` — Ling-3.0-flash (free)
-- `openrouter:poolside/laguna-s-2.1:free` — Poolside: Laguna S 2.1 (free)
-- `openrouter:poolside/laguna-xs-2.1:free` — Poolside: Laguna XS 2.1 (free)
 - `openrouter:cohere/north-mini-code:free` — Cohere: North Mini Code (free)
-- `openrouter:nvidia/nemotron-3-ultra-550b-a55b:free` — NVIDIA: Nemotron 3 Ultra (free)
-- `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` — NVIDIA: Nemotron 3 Nano Omni (free)
 - `openrouter:google/gemma-4-26b-a4b-it:free` — Google: Gemma 4 26B A4B (free)
 - `openrouter:google/gemma-4-31b-it:free` — Google: Gemma 4 31B (free)
-- `openrouter:nvidia/nemotron-3-super-120b-a12b:free` — NVIDIA: Nemotron 3 Super (free)
-- `openrouter:openrouter/free` — Free Models Router
+- `openrouter:inclusionai/ling-3.0-flash:free` — Ling-3.0-flash (free)
 - `openrouter:nvidia/nemotron-3-nano-30b-a3b:free` — NVIDIA: Nemotron 3 Nano 30B A3B (free)
+- `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` — NVIDIA: Nemotron 3 Nano Omni (free)
+- `openrouter:nvidia/nemotron-3-super-120b-a12b:free` — NVIDIA: Nemotron 3 Super (free)
+- `openrouter:nvidia/nemotron-3-ultra-550b-a55b:free` — NVIDIA: Nemotron 3 Ultra (free)
 - `openrouter:nvidia/nemotron-nano-12b-v2-vl:free` — NVIDIA: Nemotron Nano 12B 2 VL (free)
 - `openrouter:nvidia/nemotron-nano-9b-v2:free` — NVIDIA: Nemotron Nano 9B V2 (free)
 - `openrouter:openai/gpt-oss-20b:free` — OpenAI: gpt-oss-20b (free)
+- `openrouter:openrouter/free` — Free Models Router
+- `openrouter:poolside/laguna-s-2.1:free` — Poolside: Laguna S 2.1 (free)
+- `openrouter:poolside/laguna-xs-2.1:free` — Poolside: Laguna XS 2.1 (free)
 
 </details>
 
 <details>
 <summary><strong>Google Gemini · 5 个模型</strong></summary>
 
-- `gemini:gemma-4-26b-a4b-it` — Gemma 4 26B A4B IT
-- `gemini:gemma-4-31b-it` — Gemma 4 31B IT
 - `gemini:gemini-3.1-flash-lite` — Gemini 3.1 Flash Lite
 - `gemini:gemini-3.5-flash` — Gemini 3.5 Flash
 - `gemini:gemini-3.5-flash-lite` — Gemini 3.5 Flash Lite
+- `gemini:gemma-4-26b-a4b-it` — Gemma 4 26B A4B IT
+- `gemini:gemma-4-31b-it` — Gemma 4 31B IT
 
 </details>
 
@@ -98,11 +98,11 @@
 <details>
 <summary><strong>SiliconFlow · 5 个模型</strong></summary>
 
-- `siliconflow:tencent/Hunyuan-MT-7B`
-- `siliconflow:Qwen/Qwen3-8B`
-- `siliconflow:THUDM/GLM-Z1-9B-0414`
-- `siliconflow:THUDM/GLM-4-9B-0414`
 - `siliconflow:Qwen/Qwen2.5-7B-Instruct`
+- `siliconflow:Qwen/Qwen3-8B`
+- `siliconflow:tencent/Hunyuan-MT-7B`
+- `siliconflow:THUDM/GLM-4-9B-0414`
+- `siliconflow:THUDM/GLM-Z1-9B-0414`
 
 </details>
 
@@ -155,6 +155,26 @@
 <details>
 <summary><strong>GitHub Models · 35 个模型</strong></summary>
 
+- `github:cohere/cohere-command-a` — Cohere Command A
+- `github:deepseek/deepseek-r1` — DeepSeek-R1
+- `github:deepseek/deepseek-r1-0528` — DeepSeek-R1-0528
+- `github:deepseek/deepseek-v3-0324` — DeepSeek-V3-0324
+- `github:meta/llama-3.2-11b-vision-instruct` — Llama-3.2-11B-Vision-Instruct
+- `github:meta/llama-3.2-90b-vision-instruct` — Llama-3.2-90B-Vision-Instruct
+- `github:meta/llama-3.3-70b-instruct` — Llama-3.3-70B-Instruct
+- `github:meta/llama-4-maverick-17b-128e-instruct-fp8` — Llama 4 Maverick 17B 128E Instruct FP8
+- `github:meta/llama-4-scout-17b-16e-instruct` — Llama 4 Scout 17B 16E Instruct
+- `github:meta/meta-llama-3.1-405b-instruct` — Meta-Llama-3.1-405B-Instruct
+- `github:meta/meta-llama-3.1-8b-instruct` — Meta-Llama-3.1-8B-Instruct
+- `github:microsoft/phi-4` — Phi-4
+- `github:microsoft/phi-4-mini-instruct` — Phi-4-mini-instruct
+- `github:microsoft/phi-4-mini-reasoning` — Phi-4-mini-reasoning
+- `github:microsoft/phi-4-multimodal-instruct` — Phi-4-multimodal-instruct
+- `github:microsoft/phi-4-reasoning` — Phi-4-reasoning
+- `github:mistral-ai/codestral-2501` — Codestral 25.01
+- `github:mistral-ai/ministral-3b` — Ministral 3B
+- `github:mistral-ai/mistral-medium-2505` — Mistral Medium 3 (25.05)
+- `github:mistral-ai/mistral-small-2503` — Mistral Small 3.1
 - `github:openai/gpt-4.1` — OpenAI GPT-4.1
 - `github:openai/gpt-4.1-mini` — OpenAI GPT-4.1-mini
 - `github:openai/gpt-4.1-nano` — OpenAI GPT-4.1-nano
@@ -170,26 +190,6 @@
 - `github:openai/o3` — OpenAI o3
 - `github:openai/o3-mini` — OpenAI o3-mini
 - `github:openai/o4-mini` — OpenAI o4-mini
-- `github:cohere/cohere-command-a` — Cohere Command A
-- `github:deepseek/deepseek-r1` — DeepSeek-R1
-- `github:deepseek/deepseek-r1-0528` — DeepSeek-R1-0528
-- `github:deepseek/deepseek-v3-0324` — DeepSeek-V3-0324
-- `github:meta/llama-3.2-11b-vision-instruct` — Llama-3.2-11B-Vision-Instruct
-- `github:meta/llama-3.2-90b-vision-instruct` — Llama-3.2-90B-Vision-Instruct
-- `github:meta/llama-3.3-70b-instruct` — Llama-3.3-70B-Instruct
-- `github:meta/llama-4-maverick-17b-128e-instruct-fp8` — Llama 4 Maverick 17B 128E Instruct FP8
-- `github:meta/llama-4-scout-17b-16e-instruct` — Llama 4 Scout 17B 16E Instruct
-- `github:meta/meta-llama-3.1-405b-instruct` — Meta-Llama-3.1-405B-Instruct
-- `github:meta/meta-llama-3.1-8b-instruct` — Meta-Llama-3.1-8B-Instruct
-- `github:mistral-ai/codestral-2501` — Codestral 25.01
-- `github:mistral-ai/ministral-3b` — Ministral 3B
-- `github:mistral-ai/mistral-medium-2505` — Mistral Medium 3 (25.05)
-- `github:mistral-ai/mistral-small-2503` — Mistral Small 3.1
-- `github:microsoft/phi-4` — Phi-4
-- `github:microsoft/phi-4-mini-instruct` — Phi-4-mini-instruct
-- `github:microsoft/phi-4-mini-reasoning` — Phi-4-mini-reasoning
-- `github:microsoft/phi-4-multimodal-instruct` — Phi-4-multimodal-instruct
-- `github:microsoft/phi-4-reasoning` — Phi-4-reasoning
 
 </details>
 
@@ -203,17 +203,17 @@
 <details>
 <summary><strong>Hugging Face · 2 个模型</strong></summary>
 
-- `huggingface:prism-ml/Ternary-Bonsai-27B-gguf`
 - `huggingface:prism-ml/Ternary-Bonsai-27B-AWQ-4bit`
+- `huggingface:prism-ml/Ternary-Bonsai-27B-gguf`
 
 </details>
 
 <details>
 <summary><strong>SenseNova · 3 个模型</strong></summary>
 
-- `sensenova:sensenova-6.7-flash-lite`
 - `sensenova:deepseek-v4-flash`
 - `sensenova:glm-5.2`
+- `sensenova:sensenova-6.7-flash-lite`
 
 </details>
 

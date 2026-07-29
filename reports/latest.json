@@ -1,7 +1,8 @@
 {
-  "date": "2026-07-29",
-  "generatedAt": "2026-07-28T22:49:28.973Z",
-  "reportPath": "reports/provider-free-model-audit-2026-07-29.md",
+  "schemaVersion": 2,
+  "date": "2026-07-30",
+  "generatedAt": "2026-07-29T23:16:50.793Z",
+  "reportPath": "reports/provider-free-model-audit-2026-07-30.md",
   "totalModels": 101,
   "providers": [
     {
@@ -9,80 +10,632 @@
       "display": "OpenRouter",
       "status": "ok",
       "count": 14,
+      "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
-      "risk": "免费账号通常共享日请求额度；上游目录和限额会变"
+      "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
+      "models": [
+        {
+          "id": "cohere/north-mini-code:free",
+          "displayName": "Cohere: North Mini Code (free)",
+          "contextWindow": 256000
+        },
+        {
+          "id": "google/gemma-4-26b-a4b-it:free",
+          "displayName": "Google: Gemma 4 26B A4B  (free)",
+          "contextWindow": 262144
+        },
+        {
+          "id": "google/gemma-4-31b-it:free",
+          "displayName": "Google: Gemma 4 31B (free)",
+          "contextWindow": 262144
+        },
+        {
+          "id": "inclusionai/ling-3.0-flash:free",
+          "displayName": "Ling-3.0-flash (free)",
+          "contextWindow": 262144
+        },
+        {
+          "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+          "displayName": "NVIDIA: Nemotron 3 Nano 30B A3B (free)",
+          "contextWindow": 256000
+        },
+        {
+          "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+          "displayName": "NVIDIA: Nemotron 3 Nano Omni (free)",
+          "contextWindow": 256000
+        },
+        {
+          "id": "nvidia/nemotron-3-super-120b-a12b:free",
+          "displayName": "NVIDIA: Nemotron 3 Super (free)",
+          "contextWindow": 262144
+        },
+        {
+          "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "displayName": "NVIDIA: Nemotron 3 Ultra (free)",
+          "contextWindow": 1000000
+        },
+        {
+          "id": "nvidia/nemotron-nano-12b-v2-vl:free",
+          "displayName": "NVIDIA: Nemotron Nano 12B 2 VL (free)",
+          "contextWindow": 128000
+        },
+        {
+          "id": "nvidia/nemotron-nano-9b-v2:free",
+          "displayName": "NVIDIA: Nemotron Nano 9B V2 (free)",
+          "contextWindow": 128000
+        },
+        {
+          "id": "openai/gpt-oss-20b:free",
+          "displayName": "OpenAI: gpt-oss-20b (free)",
+          "contextWindow": 131072
+        },
+        {
+          "id": "openrouter/free",
+          "displayName": "Free Models Router",
+          "contextWindow": 200000
+        },
+        {
+          "id": "poolside/laguna-s-2.1:free",
+          "displayName": "Poolside: Laguna S 2.1 (free)",
+          "contextWindow": 262144
+        },
+        {
+          "id": "poolside/laguna-xs-2.1:free",
+          "displayName": "Poolside: Laguna XS 2.1 (free)",
+          "contextWindow": 262144
+        }
+      ]
     },
     {
       "id": "gemini",
       "display": "Google Gemini",
       "status": "ok",
       "count": 5,
+      "freeType": "账号 Free Tier",
       "freeBasis": "账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号",
-      "risk": "绑定付费项目后可能适用付费层规则；地区和账号资格会影响可用性"
+      "risk": "绑定付费项目后可能适用付费层规则；地区和账号资格会影响可用性",
+      "models": [
+        {
+          "id": "gemini-3.1-flash-lite",
+          "displayName": "Gemini 3.1 Flash Lite",
+          "contextWindow": 1048576
+        },
+        {
+          "id": "gemini-3.5-flash",
+          "displayName": "Gemini 3.5 Flash",
+          "contextWindow": 1048576
+        },
+        {
+          "id": "gemini-3.5-flash-lite",
+          "displayName": "Gemini 3.5 Flash Lite",
+          "contextWindow": 1048576
+        },
+        {
+          "id": "gemma-4-26b-a4b-it",
+          "displayName": "Gemma 4 26B A4B IT",
+          "contextWindow": 262144
+        },
+        {
+          "id": "gemma-4-31b-it",
+          "displayName": "Gemma 4 31B IT",
+          "contextWindow": 262144
+        }
+      ]
     },
     {
       "id": "zhipu",
       "display": "Zhipu AI",
       "status": "ok",
       "count": 2,
+      "freeType": "官方免费型号",
       "freeBasis": "只列入官方免费 Flash 清单",
-      "risk": "免费型号也可能拥塞或限流，静态清单需要随官方政策复审"
+      "risk": "免费型号也可能拥塞或限流，静态清单需要随官方政策复审",
+      "models": [
+        {
+          "id": "glm-4-flash",
+          "displayName": "GLM-4-Flash",
+          "contextWindow": 128000
+        },
+        {
+          "id": "glm-4.7-flash",
+          "displayName": "GLM-4.7-Flash",
+          "contextWindow": 200000
+        }
+      ]
     },
     {
       "id": "siliconflow",
       "display": "SiliconFlow",
       "status": "ok",
       "count": 5,
+      "freeType": "免费白名单",
       "freeBasis": "平台免费型号白名单与实时模型目录取交集",
-      "risk": "赠金或试用模型不视为零价；上游目录异常时会报告失败而非伪造空目录"
+      "risk": "赠金或试用模型不视为零价；上游目录异常时会报告失败而非伪造空目录",
+      "models": [
+        {
+          "id": "Qwen/Qwen2.5-7B-Instruct",
+          "displayName": "Qwen/Qwen2.5-7B-Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "Qwen/Qwen3-8B",
+          "displayName": "Qwen/Qwen3-8B",
+          "contextWindow": null
+        },
+        {
+          "id": "tencent/Hunyuan-MT-7B",
+          "displayName": "tencent/Hunyuan-MT-7B",
+          "contextWindow": null
+        },
+        {
+          "id": "THUDM/GLM-4-9B-0414",
+          "displayName": "THUDM/GLM-4-9B-0414",
+          "contextWindow": null
+        },
+        {
+          "id": "THUDM/GLM-Z1-9B-0414",
+          "displayName": "THUDM/GLM-Z1-9B-0414",
+          "contextWindow": null
+        }
+      ]
     },
     {
       "id": "modelscope",
       "display": "ModelScope",
       "status": "ok",
       "count": 7,
+      "freeType": "账号免费额度",
       "freeBasis": "API-Inference 免费型号清单与可用目录取交集",
-      "risk": "受账号日配额、单模型配额和账号绑定状态限制"
+      "risk": "受账号日配额、单模型配额和账号绑定状态限制",
+      "models": [
+        {
+          "id": "Qwen/Qwen3-235B-A22B-Instruct-2507",
+          "displayName": "Qwen3-235B-A22B-Instruct-2507",
+          "contextWindow": 262144
+        },
+        {
+          "id": "Qwen/Qwen3-235B-A22B-Thinking-2507",
+          "displayName": "Qwen3-235B-A22B-Thinking-2507",
+          "contextWindow": 262144
+        },
+        {
+          "id": "Qwen/Qwen3-32B",
+          "displayName": "Qwen3-32B",
+          "contextWindow": 131072
+        },
+        {
+          "id": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+          "displayName": "Qwen3-Coder-30B-A3B-Instruct",
+          "contextWindow": 262144
+        },
+        {
+          "id": "Qwen/Qwen3-Next-80B-A3B-Instruct",
+          "displayName": "Qwen3-Next-80B-A3B-Instruct",
+          "contextWindow": 262144
+        },
+        {
+          "id": "Qwen/Qwen3-Next-80B-A3B-Thinking",
+          "displayName": "Qwen3-Next-80B-A3B-Thinking",
+          "contextWindow": 262144
+        },
+        {
+          "id": "Qwen/Qwen3-VL-235B-A22B-Instruct",
+          "displayName": "Qwen3-VL-235B-A22B-Instruct",
+          "contextWindow": 131072
+        }
+      ]
     },
     {
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
       "count": 27,
+      "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
-      "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费"
+      "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
+      "models": [
+        {
+          "id": "deepseek-ai/deepseek-v4-flash",
+          "displayName": "deepseek-ai/deepseek-v4-flash",
+          "contextWindow": null
+        },
+        {
+          "id": "google/diffusiongemma-26b-a4b-it",
+          "displayName": "google/diffusiongemma-26b-a4b-it",
+          "contextWindow": null
+        },
+        {
+          "id": "google/gemma-4-31b-it",
+          "displayName": "google/gemma-4-31b-it",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.1-70b-instruct",
+          "displayName": "meta/llama-3.1-70b-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.1-8b-instruct",
+          "displayName": "meta/llama-3.1-8b-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.2-11b-vision-instruct",
+          "displayName": "meta/llama-3.2-11b-vision-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.2-1b-instruct",
+          "displayName": "meta/llama-3.2-1b-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.2-3b-instruct",
+          "displayName": "meta/llama-3.2-3b-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.2-90b-vision-instruct",
+          "displayName": "meta/llama-3.2-90b-vision-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "minimaxai/minimax-m3",
+          "displayName": "minimaxai/minimax-m3",
+          "contextWindow": null
+        },
+        {
+          "id": "mistralai/mistral-medium-3.5-128b",
+          "displayName": "mistralai/mistral-medium-3.5-128b",
+          "contextWindow": null
+        },
+        {
+          "id": "mistralai/mistral-nemotron",
+          "displayName": "mistralai/mistral-nemotron",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/ising-calibration-1.5-31b",
+          "displayName": "nvidia/ising-calibration-1.5-31b",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
+          "displayName": "nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/llama-3.3-nemotron-super-49b-v1",
+          "displayName": "nvidia/llama-3.3-nemotron-super-49b-v1",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+          "displayName": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nemotron-3-nano-30b-a3b",
+          "displayName": "nvidia/nemotron-3-nano-30b-a3b",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+          "displayName": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nemotron-3-super-120b-a12b",
+          "displayName": "nvidia/nemotron-3-super-120b-a12b",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nemotron-3-ultra-550b-a55b",
+          "displayName": "nvidia/nemotron-3-ultra-550b-a55b",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nemotron-mini-4b-instruct",
+          "displayName": "nvidia/nemotron-mini-4b-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nemotron-nano-12b-v2-vl",
+          "displayName": "nvidia/nemotron-nano-12b-v2-vl",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/nvidia-nemotron-nano-9b-v2",
+          "displayName": "nvidia/nvidia-nemotron-nano-9b-v2",
+          "contextWindow": null
+        },
+        {
+          "id": "nvidia/riva-translate-4b-instruct-v1.1",
+          "displayName": "nvidia/riva-translate-4b-instruct-v1.1",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-oss-120b",
+          "displayName": "openai/gpt-oss-120b",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-oss-20b",
+          "displayName": "openai/gpt-oss-20b",
+          "contextWindow": null
+        },
+        {
+          "id": "stepfun-ai/step-3.7-flash",
+          "displayName": "stepfun-ai/step-3.7-flash",
+          "contextWindow": null
+        }
+      ]
     },
     {
       "id": "github",
       "display": "GitHub Models",
       "status": "ok",
       "count": 35,
+      "freeType": "原型开发额度",
       "freeBasis": "目录中的文本输出模型使用账号自带原型开发额度",
-      "risk": "若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除"
+      "risk": "若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除",
+      "models": [
+        {
+          "id": "cohere/cohere-command-a",
+          "displayName": "Cohere Command A",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek/deepseek-r1",
+          "displayName": "DeepSeek-R1",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek/deepseek-r1-0528",
+          "displayName": "DeepSeek-R1-0528",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek/deepseek-v3-0324",
+          "displayName": "DeepSeek-V3-0324",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.2-11b-vision-instruct",
+          "displayName": "Llama-3.2-11B-Vision-Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.2-90b-vision-instruct",
+          "displayName": "Llama-3.2-90B-Vision-Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-3.3-70b-instruct",
+          "displayName": "Llama-3.3-70B-Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-4-maverick-17b-128e-instruct-fp8",
+          "displayName": "Llama 4 Maverick 17B 128E Instruct FP8",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/llama-4-scout-17b-16e-instruct",
+          "displayName": "Llama 4 Scout 17B 16E Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/meta-llama-3.1-405b-instruct",
+          "displayName": "Meta-Llama-3.1-405B-Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "meta/meta-llama-3.1-8b-instruct",
+          "displayName": "Meta-Llama-3.1-8B-Instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "microsoft/phi-4",
+          "displayName": "Phi-4",
+          "contextWindow": null
+        },
+        {
+          "id": "microsoft/phi-4-mini-instruct",
+          "displayName": "Phi-4-mini-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "microsoft/phi-4-mini-reasoning",
+          "displayName": "Phi-4-mini-reasoning",
+          "contextWindow": null
+        },
+        {
+          "id": "microsoft/phi-4-multimodal-instruct",
+          "displayName": "Phi-4-multimodal-instruct",
+          "contextWindow": null
+        },
+        {
+          "id": "microsoft/phi-4-reasoning",
+          "displayName": "Phi-4-reasoning",
+          "contextWindow": null
+        },
+        {
+          "id": "mistral-ai/codestral-2501",
+          "displayName": "Codestral 25.01",
+          "contextWindow": null
+        },
+        {
+          "id": "mistral-ai/ministral-3b",
+          "displayName": "Ministral 3B",
+          "contextWindow": null
+        },
+        {
+          "id": "mistral-ai/mistral-medium-2505",
+          "displayName": "Mistral Medium 3 (25.05)",
+          "contextWindow": null
+        },
+        {
+          "id": "mistral-ai/mistral-small-2503",
+          "displayName": "Mistral Small 3.1",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-4.1",
+          "displayName": "OpenAI GPT-4.1",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-4.1-mini",
+          "displayName": "OpenAI GPT-4.1-mini",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-4.1-nano",
+          "displayName": "OpenAI GPT-4.1-nano",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-4o",
+          "displayName": "OpenAI GPT-4o",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-4o-mini",
+          "displayName": "OpenAI GPT-4o mini",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-5",
+          "displayName": "OpenAI gpt-5",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-5-chat",
+          "displayName": "OpenAI gpt-5-chat (preview)",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-5-mini",
+          "displayName": "OpenAI gpt-5-mini",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/gpt-5-nano",
+          "displayName": "OpenAI gpt-5-nano",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/o1",
+          "displayName": "OpenAI o1",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/o1-mini",
+          "displayName": "OpenAI o1-mini",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/o1-preview",
+          "displayName": "OpenAI o1-preview",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/o3",
+          "displayName": "OpenAI o3",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/o3-mini",
+          "displayName": "OpenAI o3-mini",
+          "contextWindow": null
+        },
+        {
+          "id": "openai/o4-mini",
+          "displayName": "OpenAI o4-mini",
+          "contextWindow": null
+        }
+      ]
     },
     {
       "id": "cohere",
       "display": "Cohere",
       "status": "ok",
       "count": 1,
+      "freeType": "免费 Trial/Production",
       "freeBasis": "只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`",
-      "risk": "有速率限制；其他 Command 模型不再被标记为免费"
+      "risk": "有速率限制；其他 Command 模型不再被标记为免费",
+      "models": [
+        {
+          "id": "north-mini-code-1-0",
+          "displayName": "north-mini-code-1-0",
+          "contextWindow": 436000
+        }
+      ]
     },
     {
       "id": "huggingface",
       "display": "Hugging Face",
       "status": "ok",
       "count": 2,
+      "freeType": "实时零价端点",
       "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
-      "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入"
+      "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入",
+      "models": [
+        {
+          "id": "prism-ml/Ternary-Bonsai-27B-AWQ-4bit",
+          "displayName": "prism-ml/Ternary-Bonsai-27B-AWQ-4bit",
+          "contextWindow": 262144
+        },
+        {
+          "id": "prism-ml/Ternary-Bonsai-27B-gguf",
+          "displayName": "prism-ml/Ternary-Bonsai-27B-gguf",
+          "contextWindow": 262144
+        }
+      ]
     },
     {
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
       "count": 3,
+      "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
-      "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态"
+      "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
+      "models": [
+        {
+          "id": "deepseek-v4-flash",
+          "displayName": "deepseek-v4-flash",
+          "contextWindow": null
+        },
+        {
+          "id": "glm-5.2",
+          "displayName": "glm-5.2",
+          "contextWindow": null
+        },
+        {
+          "id": "sensenova-6.7-flash-lite",
+          "displayName": "sensenova-6.7-flash-lite",
+          "contextWindow": null
+        }
+      ]
     }
-  ]
+  ],
+  "changes": {
+    "comparedWith": "2026-07-29",
+    "added": [],
+    "removed": [],
+    "comparedProviders": [
+      "openrouter",
+      "gemini",
+      "zhipu",
+      "siliconflow",
+      "modelscope",
+      "nvidia",
+      "github",
+      "cohere",
+      "huggingface",
+      "sensenova"
+    ]
+  }
 }
