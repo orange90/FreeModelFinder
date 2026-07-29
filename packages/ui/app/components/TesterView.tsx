@@ -70,6 +70,8 @@ export function TesterView({
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const selected = models.find((item) => modelValue(item) === model);
+  const missingSelection =
+    !!model && model !== 'auto' && !models.some((item) => modelValue(item) === model);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -104,6 +106,8 @@ export function TesterView({
               className="h-11 w-full rounded-xl border border-input bg-surface px-3 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-ring focus:ring-4 focus:ring-ring/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {models.length === 0 && <option value="">暂无可用模型</option>}
+              {missingSelection && <option value={model}>不可用 · {model}</option>}
+              {models.length > 0 && <option value="auto">自动选择 · auto</option>}
               {models.map((item) => (
                 <option key={modelValue(item)} value={modelValue(item)}>
                   {item.provider} · {item.display_name ?? item.id}

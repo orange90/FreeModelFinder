@@ -15,6 +15,13 @@ import { registerAnthropicRoutes } from './routes/anthropic.js';
 import { registerGeminiRoutes } from './routes/gemini.js';
 import { ModelWatcher } from './watcher.js';
 import { registerOnboardingRoutes } from './onboarding.js';
+import {
+  createRuntimeIdentity,
+  DESKTOP_CONTROL_PROTOCOL,
+  removeRuntimeDescriptor,
+  writeRuntimeDescriptor,
+  type RuntimeDescriptor,
+} from './runtime.js';
 
 export interface ServerOptions {
   port?: number;
@@ -45,6 +52,12 @@ export interface ServerRuntime {
 interface SharedRuntimeState {
   registry: ProviderRegistry;
   watcher?: ModelWatcher;
+  runtime: Omit<RuntimeDescriptor, 'port'>;
+  revision: number;
+  catalogRevision: number;
+  desktopSignature?: string;
+  catalogSignature?: string;
+  requestShutdown?: () => Promise<void>;
 }
 
 interface AppOptions {
@@ -66,6 +79,20 @@ export const SERVER_VERSION = '0.1.0-rc.3';
 const LOOPBACK_HOSTS = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost']);
 
 const LOCAL_ORIGIN_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', 'tauri.localhost']);
+
+const PROVIDER_LABELS: Record<string, string> = {
+  openrouter: 'OpenRouter',
+  gemini: 'Google Gemini',
+  zhipu: 'Zhipu AI',
+  siliconflow: 'SiliconFlow',
+  modelscope: 'ModelScope',
+  nvidia: 'NVIDIA NIM',
+  github: 'GitHub Models',
+  cohere: 'Cohere',
+  huggingface: 'Hugging Face',
+  sensenova: 'SenseNova',
+  custom: 'Custom',
+};
 
 function isPublicGatewayRoute(method: string, url: string): boolean {
   if (method === 'GET' && url === '/v1/models') return true;
@@ -91,6 +118,11 @@ function keyMatches(provided: string | null, expected: string | undefined): bool
   const left = Buffer.from(provided);
   const right = Buffer.from(expected);
   return left.length === right.length && timingSafeEqual(left, right);
+}
+
+function hasRuntimeControlToken(req: FastifyRequest, state: SharedRuntimeState): boolean {
+  const provided = req.headers['x-fmf-control-token'];
+  return typeof provided === 'string' && keyMatches(provided, state.runtime.controlToken);
 }
 
 function isLoopbackAddress(addr: string | undefined | null): boolean {
@@ -184,6 +216,7 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
           'req.headers.authorization',
           'req.headers.x-api-key',
           'req.headers.x-goog-api-key',
+          'req.headers.x-fmf-control-token',
           'req.body.apiKey',
           'req.body.credential.apiKey',
           'req.body.sources[*].apiKey',
@@ -221,6 +254,10 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
       intervalMs: opts.watchIntervalMs ?? 60 * 60 * 1000,
       getRegistry,
       logger: app.log,
+      onCatalogChange: () => {
+        opts.state.catalogRevision += 1;
+        opts.state.revision += 1;
+      },
     });
     await watcher.init();
     watcher.start();
@@ -232,10 +269,16 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
 
   app.addHook('preHandler', async (req, reply) => {
     const url = req.url.split('?')[0] ?? req.url;
+    const desktopControlRoute =
+      url === '/api/desktop/state' ||
+      url === '/api/default-model' ||
+      url === '/api/auto-route' ||
+      url === '/api/runtime/shutdown';
     if (
       opts.surface !== 'gateway' &&
       url.startsWith('/api/') &&
-      !isTrustedUiRequest(req, opts.adminOrigin)
+      !isTrustedUiRequest(req, opts.adminOrigin) &&
+      !(desktopControlRoute && hasRuntimeControlToken(req, opts.state))
     ) {
       return reply.code(403).send({ error: 'management API is available only to the local UI' });
     }
@@ -259,10 +302,80 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
     ok: true,
     service: 'freemodelfinder',
     version: SERVER_VERSION,
+    instanceId: opts.state.runtime.instanceId,
+    desktopControlProtocol: DESKTOP_CONTROL_PROTOCOL,
+    uiAvailable: Boolean(opts.uiDir),
     ts: Date.now(),
   }));
 
   if (opts.surface !== 'gateway') {
+    app.get('/api/desktop/state', async () => {
+      const cfg = getRegistry().getConfig();
+      const { models, failedProviders } = await getRegistry().listAllModels();
+      const catalogSignature = JSON.stringify(
+        models.map((model) => [model.provider, model.id, model.displayName ?? '']),
+      );
+      if (opts.state.catalogSignature !== catalogSignature) {
+        if (opts.state.catalogSignature !== undefined) opts.state.catalogRevision += 1;
+        opts.state.catalogSignature = catalogSignature;
+      }
+      const available = new Set(models.map((model) => `${model.provider}:${model.id}`));
+      const defaultModel = cfg.defaultModel;
+      const selectionValid =
+        !defaultModel || defaultModel === 'auto' || available.has(defaultModel);
+      const desktopSignature = JSON.stringify({
+        defaultModel,
+        autoRoute: cfg.autoRoute,
+        onboarding: cfg.onboarding,
+        catalogRevision: opts.state.catalogRevision,
+      });
+      if (opts.state.desktopSignature !== desktopSignature) {
+        if (opts.state.desktopSignature !== undefined) opts.state.revision += 1;
+        opts.state.desktopSignature = desktopSignature;
+      }
+      const grouped = new Map<string, Array<{ id: string; value: string; label: string }>>();
+      for (const model of models) {
+        const entries = grouped.get(model.provider) ?? [];
+        entries.push({
+          id: model.id,
+          value: `${model.provider}:${model.id}`,
+          label: model.displayName ?? model.id,
+        });
+        grouped.set(model.provider, entries);
+      }
+      const onboardingHandled = !!cfg.onboarding?.completedAt || !!cfg.onboarding?.dismissedAt;
+      const hasConfiguredProvider = getRegistry().listEnabledProviders().length > 0;
+      return {
+        instanceId: opts.state.runtime.instanceId,
+        serviceVersion: SERVER_VERSION,
+        protocolVersion: DESKTOP_CONTROL_PROTOCOL,
+        revision: opts.state.revision,
+        catalogRevision: opts.state.catalogRevision,
+        defaultModel: defaultModel ?? null,
+        selectionValid,
+        onboardingRequired: !hasConfiguredProvider && !onboardingHandled,
+        auto: {
+          available: models.length > 0,
+          enabled: !!cfg.autoRoute?.enabled,
+          strategy: cfg.autoRoute?.strategy ?? 'capability',
+        },
+        providers: Array.from(grouped, ([id, providerModels]) => ({
+          id,
+          label: PROVIDER_LABELS[id] ?? id,
+          models: providerModels,
+        })),
+        failedProviders,
+      };
+    });
+
+    app.post('/api/runtime/shutdown', async (req, reply) => {
+      if (!hasRuntimeControlToken(req, opts.state)) {
+        return reply.code(401).send({ error: 'invalid runtime control token' });
+      }
+      await reply.send({ ok: true, instanceId: opts.state.runtime.instanceId });
+      setImmediate(() => void opts.state.requestShutdown?.());
+    });
+
     app.get('/api/config', async () => {
       const cfg = getRegistry().getConfig();
       const custom = cfg.providers.custom;
@@ -475,6 +588,8 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
           return cfg;
         });
         opts.state.registry = new ProviderRegistry(next);
+        opts.state.catalogRevision += 1;
+        opts.state.revision += 1;
         void opts.state.watcher?.tick(true);
         return { ok: true };
       } catch (err) {
@@ -490,11 +605,17 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
     });
 
     app.post<{ Body: { model: string } }>('/api/default-model', async (req, reply) => {
-      const { model } = req.body ?? {};
+      const model = req.body?.model?.trim();
       if (!model) return reply.code(400).send({ error: 'model required' });
+      if (model !== 'auto') {
+        const { models } = await getRegistry().listAllModels();
+        const available = models.some((item) => `${item.provider}:${item.id}` === model);
+        if (!available) return reply.code(400).send({ error: `model is not available: ${model}` });
+      }
       const next = await updateConfig((cfg) => ({ ...cfg, defaultModel: model }));
-      getRegistry().updateConfig(next);
-      return { ok: true, defaultModel: model };
+      getRegistry().updateConfig(next, { preserveModels: true });
+      opts.state.revision += 1;
+      return { ok: true, defaultModel: model, revision: opts.state.revision };
     });
 
     app.get('/api/auto-route', async () => {
@@ -534,7 +655,7 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
         };
         return cfg;
       });
-      getRegistry().updateConfig(next);
+      getRegistry().updateConfig(next, { preserveModels: true });
       return { ok: true, autoRoute: next.autoRoute };
     });
 
@@ -598,7 +719,7 @@ async function createApp(opts: AppOptions): Promise<FastifyInstance> {
           };
           return cfg;
         });
-        getRegistry().updateConfig(next);
+        getRegistry().updateConfig(next, { preserveModels: true });
         const gw = next.gateway ?? {};
         return {
           ok: true,
@@ -683,6 +804,9 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
 }> {
   const state: SharedRuntimeState = {
     registry: opts.registry ?? new ProviderRegistry(await loadConfig()),
+    runtime: createRuntimeIdentity(SERVER_VERSION),
+    revision: 1,
+    catalogRevision: 1,
   };
   const defaultPort = opts.port ?? state.registry.getConfig().port ?? 11435;
   const app = await createApp({
@@ -695,12 +819,21 @@ export async function createServer(opts: ServerOptions = {}): Promise<{
     gatewayPort: defaultPort,
     ownsWatcher: true,
   });
+  state.requestShutdown = async () => app.close();
+  app.addHook('onClose', async () => removeRuntimeDescriptor(state.runtime.instanceId));
   return {
     app,
     get registry() {
       return state.registry;
     },
-    listen: async (port?: number) => app.listen({ port: port ?? defaultPort, host: '127.0.0.1' }),
+    listen: async (port?: number) => {
+      const url = await app.listen({ port: port ?? defaultPort, host: '127.0.0.1' });
+      await writeRuntimeDescriptor({
+        ...state.runtime,
+        port: Number(new URL(url).port),
+      });
+      return url;
+    },
   };
 }
 
@@ -728,7 +861,12 @@ export async function createServerRuntime(opts: ServerRuntimeOptions = {}): Prom
   const publicUrl = normalizeHttpsOrigin(opts.publicUrl, 'public URL');
   const registry = opts.registry ?? new ProviderRegistry(await loadConfig());
   await enforceServerGatewayAuth(registry, !opts.registry);
-  const state: SharedRuntimeState = { registry };
+  const state: SharedRuntimeState = {
+    registry,
+    runtime: createRuntimeIdentity(SERVER_VERSION),
+    revision: 1,
+    catalogRevision: 1,
+  };
   const adminApp = await createApp({
     mode,
     surface: 'admin',

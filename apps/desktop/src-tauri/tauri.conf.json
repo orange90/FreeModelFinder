@@ -1,34 +1,35 @@
 {
-  "$schema": "https://schema.tauri.app/config/2.0.0-rc",
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "FreeModelFinder",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.3",
   "identifier": "app.freemodelfinder.desktop",
   "build": {
-    "beforeDevCommand": "pnpm --filter @freemodelfinder/ui dev",
-    "beforeBuildCommand": "pnpm run prepare-ui",
-    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
     "frontendDist": "../dist-ui"
   },
   "app": {
-    "windows": [
-      {
-        "title": "FreeModelFinder",
-        "width": 1024,
-        "height": 720,
-        "resizable": true,
-        "visible": true
-      }
-    ],
+    "windows": [],
+    "macOSPrivateApi": true,
     "security": {
       "csp": null
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["dmg", "app"],
+    "targets": ["app"],
+    "externalBin": ["binaries/freemodelfinder-server"],
+    "resources": {
+      "../dist-ui/": "dist-ui/"
+    },
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.icns"],
     "category": "DeveloperTool",
     "shortDescription": "Free LLM aggregator with local API gateway",
-    "longDescription": "FreeModelFinder aggregates free LLM providers (OpenRouter, Gemini) behind a local multi-protocol gateway."
+    "longDescription": "FreeModelFinder aggregates free LLM providers behind a local multi-protocol gateway.",
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-",
+      "hardenedRuntime": false
+    }
   }
 }

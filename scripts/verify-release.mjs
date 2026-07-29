@@ -8,6 +8,7 @@ const manifestPaths = [
   'packages/server/package.json',
   'packages/cli/package.json',
   'packages/ui/package.json',
+  'apps/desktop/package.json',
 ];
 const manifests = await Promise.all(
   manifestPaths.map(async (path) => JSON.parse(await readFile(resolve(repoDir, path), 'utf8'))),
@@ -23,7 +24,7 @@ if (manifests[0].name !== '@freemodelfinder/repo' || manifests[0].private !== tr
 if (manifests[3].name !== 'freemodelfinder' || manifests[3].private === true) {
   throw new Error('packages/cli must be the only public package');
 }
-for (const manifest of [manifests[1], manifests[2], manifests[4]]) {
+for (const manifest of [manifests[1], manifests[2], manifests[4], manifests[5]]) {
   if (manifest.private !== true) throw new Error(`${manifest.name} must remain private`);
 }
 for (const path of ['LICENSE', 'README.md', 'CHANGELOG.md', 'SECURITY.md']) {
@@ -34,6 +35,14 @@ const serverSource = await readFile(resolve(repoDir, 'packages/server/src/server
 const version = [...versions][0];
 if (!serverSource.includes(`SERVER_VERSION = '${version}'`)) {
   throw new Error('server health version does not match package version');
+}
+
+const desktopConfig = JSON.parse(
+  await readFile(resolve(repoDir, 'apps/desktop/src-tauri/tauri.conf.json'), 'utf8'),
+);
+const desktopCargo = await readFile(resolve(repoDir, 'apps/desktop/src-tauri/Cargo.toml'), 'utf8');
+if (desktopConfig.version !== version || !desktopCargo.includes(`version = "${version}"`)) {
+  throw new Error('desktop release versions do not match package version');
 }
 
 console.log(`release metadata verified for v${version}`);

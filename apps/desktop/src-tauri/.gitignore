@@ -1,8 +1,10 @@
 # Tauri build artifacts
 target/
 gen/
+binaries/
 
 # Icon placeholder — replace with real assets before shipping.
 icons/*.png
+!icons/tray-icon-template.png
 icons/*.icns
 icons/*.ico

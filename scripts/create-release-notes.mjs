@@ -28,11 +28,12 @@ ${changes}
 - Text chat only: Tool / Function Calling and multimodal input or output are not supported.
 - A stream that fails after output begins cannot fall back inside the same request.
 - Multi-key rotation, Ollama, remote deployment, Docker and Homebrew are not supported.
-- The Tauri desktop source is experimental; this release contains no native desktop application.
+- The macOS app is distributed without Developer ID signing or notarization and requires the documented Gatekeeper manual approval.
 
 ## Artifacts
 
 - npm package tarball
+- macOS DMGs for Apple Silicon and Intel
 - SHA256SUMS
 - CycloneDX JSON SBOM
 `;

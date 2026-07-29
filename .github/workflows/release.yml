@@ -15,8 +15,44 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  desktop:
+    name: Desktop (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            arch: arm64
+          - os: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.23.1'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @freemodelfinder/desktop build
+      - name: Prepare desktop artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p desktop-release
+          version="${GITHUB_REF_NAME#v}"
+          dmg="$(find apps/desktop/release -name '*.dmg' -print -quit)"
+          test -n "$dmg"
+          cp "$dmg" "desktop-release/FreeModelFinder-${version}-${{ matrix.arch }}.dmg"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.arch }}
+          path: desktop-release/*.dmg
+          if-no-files-found: error
+
   release:
     name: Verify, publish and create release
+    needs: desktop
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -58,6 +94,16 @@ jobs:
           (cd release && sha256sum ./*.tgz > SHA256SUMS)
           node scripts/create-release-notes.mjs "$version" release/RELEASE_NOTES.md
 
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-*
+          path: release
+          merge-multiple: true
+
+      - name: Refresh release checksums
+        shell: bash
+        run: (cd release && sha256sum ./*.tgz ./*.dmg > SHA256SUMS)
+
       - name: Generate CycloneDX SBOM
         uses: anchore/sbom-action@v0
         with:
@@ -82,5 +128,6 @@ jobs:
           fi
           gh release create "$GITHUB_REF_NAME" "${args[@]}" \
             release/*.tgz \
+            release/*.dmg \
             release/SHA256SUMS \
             release/*.cdx.json

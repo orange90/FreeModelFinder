@@ -54,6 +54,16 @@ export const defaultHandlers = [
   http.post(`${gateway}/v1/models/refresh`, () => HttpResponse.json({ ok: true })),
   http.get(`${gateway}/api/config`, () => HttpResponse.json(configPayload)),
   http.post(`${gateway}/api/default-model`, () => HttpResponse.json({ ok: true })),
+  http.get(`${gateway}/api/desktop/state`, () =>
+    HttpResponse.json({
+      instanceId: 'fixture-instance',
+      revision: 1,
+      catalogRevision: 1,
+      defaultModel: 'openrouter:fixture-model',
+      selectionValid: true,
+      onboardingRequired: false,
+    }),
+  ),
   http.get(`${gateway}/api/model-quotas`, () => HttpResponse.json({ data: [] })),
   http.post(`${gateway}/api/model-quotas/probe`, () => HttpResponse.json({ data: [] })),
   http.get(`${gateway}/api/auto-route`, () =>

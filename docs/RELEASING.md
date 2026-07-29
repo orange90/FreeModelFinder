@@ -1,6 +1,6 @@
 # Release runbook
 
-This repository publishes one public npm package, `freemodelfinder`. The Core, Server, UI, repository root and experimental desktop packages stay private.
+This repository publishes one public npm package, `freemodelfinder`, plus private-source macOS application binaries attached to GitHub Releases. The Core, Server, UI, repository root and desktop npm packages stay private.
 
 ## One-time repository setup
 
@@ -10,7 +10,7 @@ This repository publishes one public npm package, `freemodelfinder`. The Core, S
 4. Protect `main`. Require pull requests and the `Quality and release gates` plus all three `Package smoke` checks from `CI` before merge.
 5. Protect `v*` tags so only release maintainers can create them.
 
-The macOS/Tauri project is not part of these gates.
+The macOS/Tauri project has its own Apple Silicon build gate. Tagged releases additionally build separate Apple Silicon and Intel DMGs, ad-hoc sign their app bundles and sidecars, and attach them to the same GitHub Release. No notarization credentials are used.
 
 ## Bootstrap `0.1.0-rc.2`
 
@@ -60,7 +60,7 @@ Publish `v0.1.0-rc.3` without `NODE_AUTH_TOKEN` as the OIDC-only verification re
    ```
 
 3. Push the protected tag `v0.1.0`. The workflow checks the tag against the manifest, reruns every gate, publishes the tested staging directory to npm under `latest`, and creates a GitHub Release.
-4. Confirm that the GitHub Release contains the `.tgz`, `SHA256SUMS`, CycloneDX JSON SBOM, change notes and known limitations.
+4. Confirm that the GitHub Release contains the `.tgz`, both architecture-specific `.dmg` files, `SHA256SUMS`, CycloneDX JSON SBOM, change notes and known limitations.
 5. Reinstall from the registry rather than the local tarball and perform a real Provider acceptance test:
 
    ```bash
@@ -79,27 +79,28 @@ npm versions are immutable. If publish succeeds but GitHub Release creation fail
 
 ## Daily provider audit
 
-The `.github/workflows/daily-audit.yml` workflow runs `pnpm audit:daily` on a schedule (22:00 UTC / 06:00 Asia/Shanghai) and on `workflow_dispatch`. Each run:
+The `.github/workflows/daily-audit.yml` workflow runs the daily audit on a schedule (22:17 UTC / 06:17 Asia/Shanghai) and on `workflow_dispatch`. Each run:
 
 1. Builds the runtime packages so the audit script can import `ProviderRegistry` from the same core-layer catalog logic that ships to users.
-2. Executes `scripts/audit-free-models.mjs`, which reads provider API keys from environment variables, calls each provider's `/models` endpoint, applies the `free === true` filter, and writes a dated report under [reports/](../reports/) plus a `reports/latest.json` snapshot. No real inference is performed — only catalog reads.
-3. Executes `scripts/update-readme-audit.mjs`, which rewrites the block between `<!-- AUDIT-SUMMARY-START -->` and `<!-- AUDIT-SUMMARY-END -->` in [README.md](../README.md) with the fresh counts, provider status and report link.
-4. Commits both files as `freemodelfinder-bot` and pushes to `main`.
+2. Executes `scripts/audit-free-models.mjs`, which reads provider API keys from environment variables, calls each provider's `/models` endpoint, applies the `free === true` filter, and writes a dated report under [reports/](../reports/), a structured `reports/latest.json` snapshot, and the Shields endpoint at `reports/badge.json`. No real inference is performed — only catalog reads.
+3. Compares successful Provider catalogs with the previous successful snapshot. Temporary request failures are excluded from additions and removals so that an outage does not look like a mass model deletion.
+4. Executes `scripts/update-readme-audit.mjs`, which rewrites the block between `<!-- AUDIT-SUMMARY-START -->` and `<!-- AUDIT-SUMMARY-END -->` in [README.md](../README.md) and regenerates the stable [FREE_MODELS.md](../FREE_MODELS.md) URL with provider summaries, full Gateway model IDs and daily changes.
+5. Commits the generated catalog, README, snapshot, badge and dated report as `freemodelfinder-bot`, then pushes to `main`.
 
 To enable the audit for a given provider, add its API key as a repository secret with one of these names:
 
-| Provider      | Repository secret      |
-| ------------- | ---------------------- |
-| OpenRouter    | `OPENROUTER_API_KEY`   |
-| Google Gemini | `GEMINI_API_KEY`       |
-| Zhipu AI      | `ZHIPU_API_KEY`        |
-| SiliconFlow   | `SILICONFLOW_API_KEY`  |
-| ModelScope    | `MODELSCOPE_API_KEY`   |
-| NVIDIA NIM    | `NVIDIA_API_KEY`       |
-| GitHub Models | `GH_MODELS_TOKEN`      |
-| Cohere        | `COHERE_API_KEY`       |
-| Hugging Face  | `HUGGINGFACE_API_KEY`  |
-| SenseNova     | `SENSENOVA_API_KEY`    |
+| Provider      | Repository secret     |
+| ------------- | --------------------- |
+| OpenRouter    | `OPENROUTER_API_KEY`  |
+| Google Gemini | `GEMINI_API_KEY`      |
+| Zhipu AI      | `ZHIPU_API_KEY`       |
+| SiliconFlow   | `SILICONFLOW_API_KEY` |
+| ModelScope    | `MODELSCOPE_API_KEY`  |
+| NVIDIA NIM    | `NVIDIA_API_KEY`      |
+| GitHub Models | `GH_MODELS_TOKEN`     |
+| Cohere        | `COHERE_API_KEY`      |
+| Hugging Face  | `HUGGINGFACE_API_KEY` |
+| SenseNova     | `SENSENOVA_API_KEY`   |
 
 GitHub reserves the `GITHUB_` prefix for Actions, so the repository secret is named
 `GH_MODELS_TOKEN`. The workflow exposes it to the audit process as the

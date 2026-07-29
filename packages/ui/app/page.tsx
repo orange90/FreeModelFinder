@@ -26,6 +26,15 @@ type ConfigPayload = {
   providers?: Record<string, { enabled?: boolean; hasKey?: boolean }>;
 };
 
+type DesktopState = {
+  instanceId: string;
+  revision: number;
+  catalogRevision: number;
+  defaultModel: string | null;
+  selectionValid: boolean;
+  onboardingRequired: boolean;
+};
+
 const TABS: readonly SegmentedItem<TabKey>[] = [
   { key: 'finder', label: '模型', Icon: Search },
   { key: 'tester', label: '测试', Icon: MessageSquare },
@@ -59,8 +68,16 @@ export default function Home() {
   const [failures, setFailures] = useState<ProviderFailure[]>([]);
   const [probingModels, setProbingModels] = useState<string[]>([]);
   const [onboardingMode, setOnboardingMode] = useState<OnboardingMode>('loading');
+  const [selectionValid, setSelectionValid] = useState(true);
+  const [modelSaveError, setModelSaveError] = useState('');
   const streamAbortRef = useRef<AbortController | null>(null);
   const streamReaderRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
+  const desktopStateRef = useRef<Pick<
+    DesktopState,
+    'instanceId' | 'revision' | 'catalogRevision'
+  > | null>(null);
+  const selectionRequestRef = useRef(0);
+  const selectionPendingRef = useRef(false);
 
   const applyModels = useCallback((payload: ModelsResponse) => {
     const list = Array.isArray(payload.data)
@@ -69,10 +86,6 @@ export default function Home() {
     setModels(list);
     setFailures(payload.fmf?.failed_providers ?? []);
     setGatewayReachable(true);
-    setModel((current) => {
-      if (current && list.some((item) => modelValue(item) === current)) return current;
-      return list[0] ? modelValue(list[0]) : '';
-    });
     return list;
   }, []);
 
@@ -126,10 +139,13 @@ export default function Home() {
         if (cancelled) return;
         const list = applyModels(modelPayload);
         const preferred = config.defaultModel;
-        if (preferred && list.some((item) => modelValue(item) === preferred)) {
+        if (preferred) {
           setModel(preferred);
+          setSelectionValid(
+            preferred === 'auto' || list.some((item) => modelValue(item) === preferred),
+          );
         } else if (list[0]) {
-          const fallback = modelValue(list[0]);
+          const fallback = 'auto';
           setModel(fallback);
           void fetch(
             `${GATEWAY}/api/default-model`,
@@ -154,17 +170,53 @@ export default function Home() {
     };
   }, [applyModels]);
 
+  useEffect(() => {
+    if (onboardingMode === 'loading' || onboardingMode === 'required') return;
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const response = await fetch(`${GATEWAY}/api/desktop/state`, withUiHeaders());
+        if (!response.ok) return;
+        const state = (await response.json()) as DesktopState;
+        if (cancelled) return;
+        const previous = desktopStateRef.current;
+        const instanceChanged = previous?.instanceId !== state.instanceId;
+        const catalogChanged =
+          instanceChanged || previous?.catalogRevision !== state.catalogRevision;
+        desktopStateRef.current = state;
+        setGatewayReachable(true);
+        setSelectionValid(state.selectionValid);
+        if (!selectionPendingRef.current && state.defaultModel) {
+          setModel(state.defaultModel);
+        }
+        if (catalogChanged) {
+          void requestModels()
+            .then(applyModels)
+            .catch(() => undefined);
+        }
+      } catch {
+        if (!cancelled) setGatewayReachable(false);
+      }
+    };
+    void poll();
+    const timer = window.setInterval(() => void poll(), 2_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [applyModels, onboardingMode]);
+
   const finishOnboarding = useCallback(
     async (_result: OnboardingResult) => {
       setOnboardingMode('complete');
-      const [list, config] = await Promise.all([
+      const [, config] = await Promise.all([
         refreshModels(false),
         fetch(`${GATEWAY}/api/config`, withUiHeaders())
           .then((response) => response.json() as Promise<ConfigPayload>)
           .catch(() => ({}) as ConfigPayload),
       ]);
       const preferred = config.defaultModel;
-      if (preferred && list.some((item) => modelValue(item) === preferred)) setModel(preferred);
+      if (preferred) setModel(preferred);
       setTab('tester');
     },
     [refreshModels],
@@ -244,18 +296,36 @@ export default function Home() {
     [applyQuotas],
   );
 
-  const selectModel = useCallback((value: string) => {
-    setModel(value);
+  const selectModel = useCallback(async (value: string) => {
     if (!value) return;
-    void fetch(`${GATEWAY}/api/default-model`, {
-      ...withUiHeaders({
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ model: value }),
-      }),
-    }).catch(() => {
-      // The in-memory selection still works when persistence is temporarily unavailable.
-    });
+    const requestId = ++selectionRequestRef.current;
+    selectionPendingRef.current = true;
+    setModelSaveError('');
+    try {
+      const response = await fetch(
+        `${GATEWAY}/api/default-model`,
+        withUiHeaders({
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ model: value }),
+        }),
+      );
+      const payload = (await response.json().catch(() => ({}))) as {
+        defaultModel?: string;
+        error?: string;
+      };
+      if (!response.ok) throw new Error(payload.error || `保存失败 (${response.status})`);
+      if (requestId === selectionRequestRef.current) {
+        setModel(payload.defaultModel ?? value);
+        setSelectionValid(true);
+      }
+    } catch (error) {
+      if (requestId === selectionRequestRef.current) {
+        setModelSaveError(error instanceof Error ? error.message : String(error));
+      }
+    } finally {
+      if (requestId === selectionRequestRef.current) selectionPendingRef.current = false;
+    }
   }, []);
 
   async function send() {
@@ -478,6 +548,15 @@ export default function Home() {
               <ThemeToggle className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/10" />
             </div>
           </header>
+
+          {(modelSaveError || (!selectionValid && model)) && (
+            <div
+              role="alert"
+              className="shrink-0 border-b border-warning/30 bg-warning/5 px-5 py-2 text-xs text-warning md:px-8"
+            >
+              {modelSaveError || `当前模型不可用：${model}。请选择 auto 或其他可用模型。`}
+            </div>
+          )}
 
           <div className="min-h-0 flex-1 overflow-hidden">
             {tab === 'finder' ? (

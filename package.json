@@ -15,7 +15,7 @@
     "dev:ui": "pnpm --filter @freemodelfinder/ui dev",
     "dev:cli": "pnpm --filter freemodelfinder dev",
     "dev": "pnpm -r --parallel --filter=./packages/{core,server,ui} dev",
-    "format:check": "prettier --check package.json pnpm-workspace.yaml README.md CHANGELOG.md SECURITY.md \"docs/**/*.md\" \".github/**/*.{json,md,yaml,yml}\" \"packages/**/*.{js,json,md,mjs,ts,tsx,yaml,yml}\" \"scripts/**/*.{js,mjs}\" --ignore-path .gitignore --ignore-path .prettierignore",
+    "format:check": "prettier --check package.json pnpm-workspace.yaml README.md FREE_MODELS.md CHANGELOG.md SECURITY.md \"docs/**/*.md\" \".github/**/*.{json,md,yaml,yml}\" \"apps/desktop/**/*.{json,mjs}\" \"packages/**/*.{js,json,md,mjs,ts,tsx,yaml,yml}\" \"scripts/**/*.{js,mjs}\" --ignore-path .gitignore --ignore-path .prettierignore",
     "lint": "eslint \"packages/**/*.{ts,tsx}\" --max-warnings=0",
     "typecheck": "pnpm run build:runtime && pnpm -r --filter=./packages/* typecheck",
     "test": "pnpm run test:docker && pnpm run build:runtime && pnpm -r --filter=./packages/* run test",

@@ -178,7 +178,7 @@ export function FinderView({
             <CircleAlert className="mt-0.5 shrink-0 text-warning" size={17} />
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">
-                {failures.length} 个来源本次同步失败
+                {failures.length} 个来源本次同步失败，已保留上次结果
               </p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 {failures

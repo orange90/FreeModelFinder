@@ -10,6 +10,7 @@ export interface ModelWatcherOptions {
   intervalMs?: number;
   getRegistry: () => ProviderRegistry;
   logger?: FastifyBaseLogger;
+  onCatalogChange?: () => void;
 }
 
 export interface WatcherStatus {
@@ -78,6 +79,9 @@ export class ModelWatcher {
           succeededProviders,
         );
         this.latest = snapshot;
+        if (isInitial || diff.added.length || diff.removed.length) {
+          this.opts.onCatalogChange?.();
+        }
         this.status.lastRunAt = snapshot.updatedAt;
         this.status.lastError = failedProviders.length
           ? `providers failed: ${failedProviders.map((f) => `${f.id} (${f.error})`).join('; ')}`

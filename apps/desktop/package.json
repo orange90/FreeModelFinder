@@ -1,18 +1,22 @@
 {
   "name": "@freemodelfinder/desktop",
-  "version": "0.1.0",
+  "version": "0.1.0-rc.3",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tauri dev",
-    "build": "tauri build",
+    "dev": "pnpm run prepare-bundle && tauri dev",
+    "build": "pnpm run prepare-bundle && tauri build --bundles app && node scripts/package-dmg.mjs",
     "tauri": "tauri",
-    "prepare-ui": "pnpm --filter @freemodelfinder/ui build && rm -rf ./dist-ui && cp -r ../../packages/ui/out ./dist-ui"
+    "prepare-ui": "pnpm --filter @freemodelfinder/ui build && rm -rf ./dist-ui && cp -r ../../packages/ui/out ./dist-ui",
+    "prepare-sidecar": "node scripts/build-sidecar.mjs",
+    "prepare-bundle": "pnpm run prepare-ui && pnpm --filter @freemodelfinder/core build && pnpm --filter @freemodelfinder/server build && pnpm run prepare-sidecar"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0-rc.0"
+    "@tauri-apps/cli": "^2.11.4",
+    "esbuild": "^0.27.0",
+    "postject": "^1.0.0-alpha.6"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.0.0-rc.0"
+    "@tauri-apps/api": "^2.11.1"
   }
 }

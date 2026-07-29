@@ -71,6 +71,40 @@ describe('Home', () => {
     expect(screen.getByText(/temporary provider error/)).toBeTruthy();
   });
 
+  it('applies model changes made outside the dashboard', async () => {
+    server.use(
+      http.get(`${gateway}/api/desktop/state`, () =>
+        HttpResponse.json({
+          instanceId: 'fixture-instance',
+          revision: 2,
+          catalogRevision: 1,
+          defaultModel: 'auto',
+          selectionValid: true,
+          onboardingRequired: false,
+        }),
+      ),
+    );
+    render(<Home />);
+    await openTester();
+    await waitFor(() =>
+      expect((screen.getByLabelText('当前模型') as HTMLSelectElement).value).toBe('auto'),
+    );
+  });
+
+  it('keeps the confirmed selection when persistence fails', async () => {
+    server.use(
+      http.post(`${gateway}/api/default-model`, () =>
+        HttpResponse.json({ error: 'cannot save selection' }, { status: 500 }),
+      ),
+    );
+    render(<Home />);
+    const user = await openTester();
+    const selector = screen.getByLabelText('当前模型');
+    await user.selectOptions(selector, 'auto');
+    expect(await screen.findByText('cannot save selection')).toBeTruthy();
+    expect((selector as HTMLSelectElement).value).toBe('openrouter:fixture-model');
+  });
+
   it('keeps the catalog usable when a provider refresh fails', async () => {
     server.use(
       http.post(`${gateway}/v1/models/refresh`, () =>

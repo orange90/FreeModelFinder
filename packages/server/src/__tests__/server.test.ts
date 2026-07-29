@@ -122,6 +122,9 @@ describe('gateway surface', () => {
     assert.equal(body.ok, true);
     assert.equal(body.service, 'freemodelfinder');
     assert.equal(body.version, SERVER_VERSION);
+    assert.equal(typeof body.instanceId, 'string');
+    assert.equal(body.desktopControlProtocol, 1);
+    assert.equal(body.uiAvailable, true);
     assert.equal(typeof body.ts, 'number');
   });
 
@@ -171,6 +174,24 @@ describe('gateway surface', () => {
     const refresh = await app.inject({ method: 'POST', url: '/v1/models/refresh' });
     assert.equal(refresh.statusCode, 200);
     assert.equal(refresh.json().ok, true);
+  });
+
+  it('exposes a lightweight desktop state without credentials', async () => {
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/desktop/state',
+      headers: localUiHeaders,
+    });
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.equal(body.protocolVersion, 1);
+    assert.equal(body.auto.available, true);
+    assert.equal(body.auto.enabled, false);
+    assert.equal(body.auto.strategy, 'capability');
+    assert.equal(body.providers[0].label, 'Custom');
+    assert.equal(body.providers[0].models[0].value, 'custom:fixture-model');
+    assert.equal(typeof body.revision, 'number');
+    assert.doesNotMatch(response.body, /source-key/);
   });
 
   it('validates and persists local management changes', async () => {
@@ -260,11 +281,25 @@ describe('gateway surface', () => {
       method: 'POST',
       url: '/api/default-model',
       headers: localUiHeaders,
-      payload: { model: 'custom:model' },
+      payload: { model: 'custom:source:model' },
+    });
+    const unavailableModel = await app.inject({
+      method: 'POST',
+      url: '/api/default-model',
+      headers: localUiHeaders,
+      payload: { model: 'custom:missing' },
+    });
+    const automaticModel = await app.inject({
+      method: 'POST',
+      url: '/api/default-model',
+      headers: localUiHeaders,
+      payload: { model: 'auto' },
     });
     assert.equal(missingModel.statusCode, 400);
     assert.equal(defaultModel.statusCode, 200);
-    assert.equal(defaultModel.json().defaultModel, 'custom:model');
+    assert.equal(defaultModel.json().defaultModel, 'custom:source:model');
+    assert.equal(unavailableModel.statusCode, 400);
+    assert.equal(automaticModel.json().defaultModel, 'auto');
 
     const invalidRoute = await app.inject({
       method: 'POST',
@@ -291,6 +326,13 @@ describe('gateway surface', () => {
       headers: localUiHeaders,
     });
     assert.equal(routeState.json().strategy, 'speed');
+    const desktopRouteState = await app.inject({
+      method: 'GET',
+      url: '/api/desktop/state',
+      headers: localUiHeaders,
+    });
+    assert.equal(desktopRouteState.json().auto.enabled, true);
+    assert.equal(desktopRouteState.json().auto.strategy, 'speed');
     const cleared = await app.inject({
       method: 'POST',
       url: '/api/auto-route/clear-cooldown',

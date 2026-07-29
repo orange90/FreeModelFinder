@@ -4,6 +4,12 @@ All notable changes to FreeModelFinder are documented here.
 
 ## [Unreleased]
 
+- Add a pure macOS menu-bar app with a bundled Node SEA Gateway for Apple Silicon and Intel.
+- Keep Dashboard and menu-bar model selection synchronized through a versioned local control protocol.
+- Add safe service adoption, authenticated shutdown, crash supervision, login launch and manual update notices.
+- Publish a daily refreshed free-model catalog with a dynamic README badge, per-provider free rules and added/removed model tracking.
+- Expand the README and operator documentation with architecture-specific DMG guidance, Gatekeeper verification, API examples and troubleshooting.
+
 - Add a bilingual first-run wizard for OpenRouter and Gemini with automatic model discovery, deterministic model selection and a real connectivity test.
 - Allow explicit, server-side import of allowlisted provider environment variables without exposing their values to the browser.
 - Enable rate-limit-first automatic routing after a verified second provider is added through onboarding.

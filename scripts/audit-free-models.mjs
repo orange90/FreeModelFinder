@@ -10,7 +10,7 @@
 // the catalog endpoints, so it is safe to schedule daily on CI as long as
 // the relevant provider API keys are exposed as environment variables.
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +33,7 @@ const PROVIDER_META = [
     id: 'openrouter',
     display: 'OpenRouter',
     envKeys: ['OPENROUTER_API_KEY'],
+    freeType: '零价格模型',
     freeBasis:
       '实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型',
     risk: '免费账号通常共享日请求额度；上游目录和限额会变',
@@ -41,6 +42,7 @@ const PROVIDER_META = [
     id: 'gemini',
     display: 'Google Gemini',
     envKeys: ['GEMINI_API_KEY', 'GOOGLE_API_KEY'],
+    freeType: '账号 Free Tier',
     freeBasis: '账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号',
     risk: '绑定付费项目后可能适用付费层规则；地区和账号资格会影响可用性',
   },
@@ -48,6 +50,7 @@ const PROVIDER_META = [
     id: 'zhipu',
     display: 'Zhipu AI',
     envKeys: ['ZHIPU_API_KEY'],
+    freeType: '官方免费型号',
     freeBasis: '只列入官方免费 Flash 清单',
     risk: '免费型号也可能拥塞或限流，静态清单需要随官方政策复审',
   },
@@ -55,6 +58,7 @@ const PROVIDER_META = [
     id: 'siliconflow',
     display: 'SiliconFlow',
     envKeys: ['SILICONFLOW_API_KEY'],
+    freeType: '免费白名单',
     freeBasis: '平台免费型号白名单与实时模型目录取交集',
     risk: '赠金或试用模型不视为零价；上游目录异常时会报告失败而非伪造空目录',
   },
@@ -62,6 +66,7 @@ const PROVIDER_META = [
     id: 'modelscope',
     display: 'ModelScope',
     envKeys: ['MODELSCOPE_API_KEY'],
+    freeType: '账号免费额度',
     freeBasis: 'API-Inference 免费型号清单与可用目录取交集',
     risk: '受账号日配额、单模型配额和账号绑定状态限制',
   },
@@ -69,6 +74,7 @@ const PROVIDER_META = [
     id: 'nvidia',
     display: 'NVIDIA NIM',
     envKeys: ['NVIDIA_API_KEY'],
+    freeType: '免费开发端点',
     freeBasis: '只保留审核过的 build.nvidia.com 免费开发端点',
     risk: '面向学习、开发和原型，限速且不代表生产环境永久免费',
   },
@@ -76,6 +82,7 @@ const PROVIDER_META = [
     id: 'github',
     display: 'GitHub Models',
     envKeys: ['GITHUB_MODELS_TOKEN', 'GITHUB_TOKEN'],
+    freeType: '原型开发额度',
     freeBasis: '目录中的文本输出模型使用账号自带原型开发额度',
     risk: '若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除',
   },
@@ -83,6 +90,7 @@ const PROVIDER_META = [
     id: 'cohere',
     display: 'Cohere',
     envKeys: ['COHERE_API_KEY'],
+    freeType: '免费 Trial/Production',
     freeBasis: '只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`',
     risk: '有速率限制；其他 Command 模型不再被标记为免费',
   },
@@ -90,6 +98,7 @@ const PROVIDER_META = [
     id: 'huggingface',
     display: 'Hugging Face',
     envKeys: ['HUGGINGFACE_API_KEY', 'HF_TOKEN'],
+    freeType: '实时零价端点',
     freeBasis: '实时端点明确报告 `is_free`，或输入输出价格均为 0',
     risk: '普通 Router 模型可能消耗 credits 或按量收费，因此不会混入',
   },
@@ -97,6 +106,7 @@ const PROVIDER_META = [
     id: 'sensenova',
     display: 'SenseNova',
     envKeys: ['SENSENOVA_API_KEY'],
+    freeType: '实时零价模型',
     freeBasis: '实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单',
     risk: '免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态',
   },
@@ -142,7 +152,91 @@ function todayIsoInShanghai() {
   return fmt.format(new Date());
 }
 
+function parseModelsFromReport(markdown) {
+  const models = new Map();
+  let providerId = null;
+  for (const line of markdown.split(/\r?\n/)) {
+    const heading = line.match(/^### .+ \(([^)]+)\)$/);
+    if (heading) {
+      providerId = heading[1];
+      if (!models.has(providerId)) models.set(providerId, []);
+      continue;
+    }
+    if (!providerId) continue;
+    const item = line.match(/^- `([^`]+)`(?: — (.+))?$/);
+    if (!item) continue;
+    models.get(providerId).push({
+      id: item[1],
+      displayName: item[2] || item[1],
+      contextWindow: null,
+    });
+  }
+  return models;
+}
+
+async function readPreviousSnapshot() {
+  const latestPath = join(REPO_ROOT, 'reports', 'latest.json');
+  if (!existsSync(latestPath)) return null;
+  try {
+    const snapshot = JSON.parse(await readFile(latestPath, 'utf8'));
+    const alreadyHasModels = snapshot.providers?.some((provider) => Array.isArray(provider.models));
+    if (alreadyHasModels || !snapshot.reportPath) return snapshot;
+
+    const reportPath = join(REPO_ROOT, snapshot.reportPath);
+    if (!existsSync(reportPath)) return snapshot;
+    const byProvider = parseModelsFromReport(await readFile(reportPath, 'utf8'));
+    snapshot.providers = snapshot.providers.map((provider) => ({
+      ...provider,
+      models: byProvider.get(provider.id) ?? [],
+    }));
+    return snapshot;
+  } catch (error) {
+    console.error(`[audit] could not read previous snapshot: ${error.message ?? error}`);
+    return null;
+  }
+}
+
+function calculateChanges(previous, providers) {
+  if (!previous?.providers) {
+    return { comparedWith: null, added: [], removed: [], comparedProviders: [] };
+  }
+
+  const previousById = new Map(previous.providers.map((provider) => [provider.id, provider]));
+  const added = [];
+  const removed = [];
+  const comparedProviders = [];
+
+  for (const provider of providers) {
+    const before = previousById.get(provider.id);
+    if (
+      provider.status !== 'ok' ||
+      before?.status !== 'ok' ||
+      !Array.isArray(provider.models) ||
+      !Array.isArray(before.models)
+    ) {
+      continue;
+    }
+    comparedProviders.push(provider.id);
+    const beforeById = new Map(before.models.map((model) => [model.id, model]));
+    const currentById = new Map(provider.models.map((model) => [model.id, model]));
+    for (const model of provider.models) {
+      if (!beforeById.has(model.id)) added.push({ provider: provider.id, ...model });
+    }
+    for (const model of before.models) {
+      if (!currentById.has(model.id)) removed.push({ provider: provider.id, ...model });
+    }
+  }
+
+  return {
+    comparedWith: previous.date ?? null,
+    added,
+    removed,
+    comparedProviders,
+  };
+}
+
 async function main() {
+  const previousSnapshot = await readPreviousSnapshot();
   const { config, missing } = buildConfig();
   const registry = new ProviderRegistry(config);
 
@@ -185,11 +279,13 @@ async function main() {
         );
         entry.status = 'ok';
         entry.count = freeModels.length;
-        entry.models = freeModels.map((m) => ({
-          id: m.id,
-          displayName: m.displayName,
-          contextWindow: m.contextWindow ?? null,
-        }));
+        entry.models = freeModels
+          .map((m) => ({
+            id: m.id,
+            displayName: m.displayName,
+            contextWindow: m.contextWindow ?? null,
+          }))
+          .sort((a, b) => a.id.localeCompare(b.id));
       } else {
         // r.reason may include the provider id via r.value not being set;
         // recover via message parsing is unreliable, so mark all pending
@@ -291,28 +387,49 @@ ${perProviderSections}
   const reportPath = join(reportsDir, `provider-free-model-audit-${date}.md`);
   await writeFile(reportPath, md, 'utf8');
 
+  const providers = PROVIDER_META.map((meta) => {
+    const entry = perProvider.get(meta.id);
+    return {
+      id: meta.id,
+      display: meta.display,
+      status: entry?.status ?? 'unknown',
+      count: entry?.count ?? 0,
+      freeType: meta.freeType,
+      freeBasis: meta.freeBasis,
+      risk: meta.risk,
+      models: entry?.models ?? [],
+    };
+  });
   const summary = {
+    schemaVersion: 2,
     date,
     generatedAt: new Date().toISOString(),
     reportPath: `reports/provider-free-model-audit-${date}.md`,
     totalModels,
-    providers: PROVIDER_META.map((meta) => {
-      const entry = perProvider.get(meta.id);
-      return {
-        id: meta.id,
-        display: meta.display,
-        status: entry?.status ?? 'unknown',
-        count: entry?.count ?? 0,
-        freeBasis: meta.freeBasis,
-        risk: meta.risk,
-      };
-    }),
+    providers,
+    changes: calculateChanges(previousSnapshot, providers),
   };
   const latestPath = join(reportsDir, 'latest.json');
   await writeFile(latestPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+  const badgePath = join(reportsDir, 'badge.json');
+  await writeFile(
+    badgePath,
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        label: 'free models',
+        message: String(totalModels),
+        color: okProviders.length === PROVIDER_META.length ? 'brightgreen' : 'yellow',
+      },
+      null,
+      2,
+    )}\n`,
+    'utf8',
+  );
 
   console.error(`[audit] wrote ${reportPath}`);
   console.error(`[audit] wrote ${latestPath}`);
+  console.error(`[audit] wrote ${badgePath}`);
   console.error(`[audit] total free models across ${okProviders.length} providers: ${totalModels}`);
 }
 

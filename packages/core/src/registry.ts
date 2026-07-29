@@ -1,4 +1,5 @@
 import { loadConfig } from './config/store.js';
+import { loadSnapshot, type ModelSnapshot } from './config/snapshot.js';
 import {
   BaseProvider,
   CohereProvider,
@@ -59,7 +60,10 @@ export class ProviderRegistry {
   private quotaTracker = new QuotaTracker();
   private noticeBuffer: SwitchNotice[] = [];
 
-  constructor(private config: AppConfig) {
+  constructor(
+    private config: AppConfig,
+    private readonly loadModelSnapshot: () => Promise<ModelSnapshot> = loadSnapshot,
+  ) {
     this.autoRouter = new AutoRouter({
       getSettings: () => this.config.autoRoute,
       listAllModels: async () => (await this.listAllModels()).models,
@@ -93,10 +97,12 @@ export class ProviderRegistry {
     return [...this.noticeBuffer];
   }
 
-  updateConfig(next: AppConfig): void {
+  updateConfig(next: AppConfig, options: { preserveModels?: boolean } = {}): void {
     this.config = next;
-    this.instances.clear();
-    this.modelsCache = null;
+    if (!options.preserveModels) {
+      this.instances.clear();
+      this.modelsCache = null;
+    }
   }
 
   getProvider(id: ProviderId): BaseProvider {
@@ -172,6 +178,13 @@ export class ProviderRegistry {
           id,
           error: err instanceof Error ? err.message : String(err),
         });
+      }
+    }
+    if (failedProviders.length > 0) {
+      const failed = new Set(failedProviders.map((provider) => provider.id));
+      const snapshot = await this.loadModelSnapshot();
+      for (const model of snapshot.models) {
+        if (failed.has(model.provider)) models.push(model);
       }
     }
     const deduped = new Map<string, ModelInfo>();
