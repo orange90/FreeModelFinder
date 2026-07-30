@@ -7,9 +7,10 @@
     "dev": "pnpm run prepare-bundle && tauri dev",
     "build": "pnpm run prepare-bundle && tauri build --bundles app && node scripts/package-dmg.mjs",
     "tauri": "tauri",
+    "prepare-icons": "tauri icon src-tauri/icons/icon.svg -o src-tauri/icons/generated",
     "prepare-ui": "pnpm --filter @freemodelfinder/ui build && rm -rf ./dist-ui && cp -r ../../packages/ui/out ./dist-ui",
     "prepare-sidecar": "node scripts/build-sidecar.mjs",
-    "prepare-bundle": "pnpm run prepare-ui && pnpm --filter @freemodelfinder/core build && pnpm --filter @freemodelfinder/server build && pnpm run prepare-sidecar"
+    "prepare-bundle": "pnpm run prepare-icons && pnpm run prepare-ui && pnpm --filter @freemodelfinder/core build && pnpm --filter @freemodelfinder/server build && pnpm run prepare-sidecar"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.4",

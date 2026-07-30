@@ -8,3 +8,4 @@ icons/*.png
 !icons/tray-icon-template.png
 icons/*.icns
 icons/*.ico
+icons/generated/

@@ -22,7 +22,11 @@
     "resources": {
       "../dist-ui/": "dist-ui/"
     },
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.icns"],
+    "icon": [
+      "icons/generated/32x32.png",
+      "icons/generated/128x128.png",
+      "icons/generated/icon.icns"
+    ],
     "category": "DeveloperTool",
     "shortDescription": "Free LLM aggregator with local API gateway",
     "longDescription": "FreeModelFinder aggregates free LLM providers behind a local multi-protocol gateway.",

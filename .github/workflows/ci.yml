@@ -65,6 +65,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: cargo fmt --check --manifest-path apps/desktop/src-tauri/Cargo.toml
-      - run: pnpm --filter @freemodelfinder/desktop prepare-sidecar
+      - run: pnpm --filter @freemodelfinder/desktop prepare-bundle
       - run: cargo test --manifest-path apps/desktop/src-tauri/Cargo.toml
       - run: pnpm --filter @freemodelfinder/desktop build
