@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-08-03",
-  "generatedAt": "2026-08-02T23:14:52.521Z",
-  "reportPath": "reports/provider-free-model-audit-2026-08-03.md",
-  "totalModels": 65,
+  "date": "2026-08-04",
+  "generatedAt": "2026-08-03T23:28:43.014Z",
+  "reportPath": "reports/provider-free-model-audit-2026-08-04.md",
+  "totalModels": 64,
   "providers": [
     {
       "id": "openrouter",
@@ -183,7 +183,7 @@
       "id": "modelscope",
       "display": "ModelScope",
       "status": "ok",
-      "count": 7,
+      "count": 6,
       "freeType": "账号免费额度",
       "freeBasis": "API-Inference 免费型号清单与可用目录取交集",
       "risk": "受账号日配额、单模型配额和账号绑定状态限制",
@@ -197,11 +197,6 @@
           "id": "Qwen/Qwen3-235B-A22B-Thinking-2507",
           "displayName": "Qwen3-235B-A22B-Thinking-2507",
           "contextWindow": 262144
-        },
-        {
-          "id": "Qwen/Qwen3-32B",
-          "displayName": "Qwen3-32B",
-          "contextWindow": 131072
         },
         {
           "id": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
@@ -440,9 +435,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-08-02",
+    "comparedWith": "2026-08-03",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "modelscope",
+        "id": "Qwen/Qwen3-32B",
+        "displayName": "Qwen3-32B",
+        "contextWindow": 131072
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

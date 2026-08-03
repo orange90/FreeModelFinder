@@ -33,7 +33,7 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-08-03（Asia/Shanghai）更新：65 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-08-04（Asia/Shanghai）更新：64 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models、Cohere。
 
@@ -43,18 +43,25 @@
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            |
-| ModelScope    | 🟢 正常 |          7 | 账号免费额度          |
+| ModelScope    | 🟢 正常 |          6 | 账号免费额度          |
 | NVIDIA NIM    | 🟢 正常 |         27 | 免费开发端点          |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          |
 | Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production |
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          3 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-03.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-04.md)
 
 ### 今日变化
 
-与 2026-08-02 相比，成功比较的 8 个 Provider 模型清单没有变化。
+与 2026-08-03 相比，在成功比较的 8 个 Provider 中：**新增 0 个，移除 1 个**。
+
+<details>
+<summary>查看移除的 1 个模型</summary>
+
+- `modelscope:Qwen/Qwen3-32B`
+
+</details>
 
 ### 展开完整模型列表
 
@@ -109,11 +116,10 @@
 </details>
 
 <details>
-<summary><strong>ModelScope · 7 个模型</strong></summary>
+<summary><strong>ModelScope · 6 个模型</strong></summary>
 
 - `modelscope:Qwen/Qwen3-235B-A22B-Instruct-2507` — Qwen3-235B-A22B-Instruct-2507
 - `modelscope:Qwen/Qwen3-235B-A22B-Thinking-2507` — Qwen3-235B-A22B-Thinking-2507
-- `modelscope:Qwen/Qwen3-32B` — Qwen3-32B
 - `modelscope:Qwen/Qwen3-Coder-30B-A3B-Instruct` — Qwen3-Coder-30B-A3B-Instruct
 - `modelscope:Qwen/Qwen3-Next-80B-A3B-Instruct` — Qwen3-Next-80B-A3B-Instruct
 - `modelscope:Qwen/Qwen3-Next-80B-A3B-Thinking` — Qwen3-Next-80B-A3B-Thinking
