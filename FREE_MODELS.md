@@ -2,15 +2,19 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-07-30（Asia/Shanghai）** · **101** 个免费模型入口 · **10/10** 个 Provider 正常。
+> 最近目录审计：**2026-08-04（Asia/Shanghai）** · **64** 个免费模型入口 · **8/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-07-30.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-04.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-07-29 相比，成功比较的 10 个 Provider 模型清单没有变化。
+与 2026-08-03 相比，在成功比较的 8 个 Provider 中：**新增 0 个，移除 1 个**。
+
+### 移除
+
+- `modelscope:Qwen/Qwen3-32B`
 
 ## Provider 汇总
 
@@ -20,10 +24,10 @@
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
-| ModelScope    | 🟢 正常 |          7 | 账号免费额度          | API-Inference 免费型号清单与可用目录取交集                                          |
+| ModelScope    | 🟢 正常 |          6 | 账号免费额度          | API-Inference 免费型号清单与可用目录取交集                                          |
 | NVIDIA NIM    | 🟢 正常 |         27 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
-| GitHub Models | 🟢 正常 |         35 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
-| Cohere        | 🟢 正常 |          1 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
+| GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
+| Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
 | SenseNova     | 🟢 正常 |          3 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
 
@@ -106,7 +110,6 @@
 | ----------------------------------------------- | ----------------------------- | ---------: |
 | `modelscope:Qwen/Qwen3-235B-A22B-Instruct-2507` | Qwen3-235B-A22B-Instruct-2507 |     262.1K |
 | `modelscope:Qwen/Qwen3-235B-A22B-Thinking-2507` | Qwen3-235B-A22B-Thinking-2507 |     262.1K |
-| `modelscope:Qwen/Qwen3-32B`                     | Qwen3-32B                     |     131.1K |
 | `modelscope:Qwen/Qwen3-Coder-30B-A3B-Instruct`  | Qwen3-Coder-30B-A3B-Instruct  |     262.1K |
 | `modelscope:Qwen/Qwen3-Next-80B-A3B-Instruct`   | Qwen3-Next-80B-A3B-Instruct   |     262.1K |
 | `modelscope:Qwen/Qwen3-Next-80B-A3B-Thinking`   | Qwen3-Next-80B-A3B-Thinking   |     262.1K |
@@ -152,58 +155,20 @@
 ### GitHub Models
 
 - Provider ID：`github`
-- 状态：🟢 正常
+- 状态：🔴 失败
 - 免费依据：目录中的文本输出模型使用账号自带原型开发额度
 - 主要风险：若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除
 
-| Gateway 模型 ID                                      | 显示名称                               | 上下文窗口 |
-| ---------------------------------------------------- | -------------------------------------- | ---------: |
-| `github:cohere/cohere-command-a`                     | Cohere Command A                       |          — |
-| `github:deepseek/deepseek-r1`                        | DeepSeek-R1                            |          — |
-| `github:deepseek/deepseek-r1-0528`                   | DeepSeek-R1-0528                       |          — |
-| `github:deepseek/deepseek-v3-0324`                   | DeepSeek-V3-0324                       |          — |
-| `github:meta/llama-3.2-11b-vision-instruct`          | Llama-3.2-11B-Vision-Instruct          |          — |
-| `github:meta/llama-3.2-90b-vision-instruct`          | Llama-3.2-90B-Vision-Instruct          |          — |
-| `github:meta/llama-3.3-70b-instruct`                 | Llama-3.3-70B-Instruct                 |          — |
-| `github:meta/llama-4-maverick-17b-128e-instruct-fp8` | Llama 4 Maverick 17B 128E Instruct FP8 |          — |
-| `github:meta/llama-4-scout-17b-16e-instruct`         | Llama 4 Scout 17B 16E Instruct         |          — |
-| `github:meta/meta-llama-3.1-405b-instruct`           | Meta-Llama-3.1-405B-Instruct           |          — |
-| `github:meta/meta-llama-3.1-8b-instruct`             | Meta-Llama-3.1-8B-Instruct             |          — |
-| `github:microsoft/phi-4`                             | Phi-4                                  |          — |
-| `github:microsoft/phi-4-mini-instruct`               | Phi-4-mini-instruct                    |          — |
-| `github:microsoft/phi-4-mini-reasoning`              | Phi-4-mini-reasoning                   |          — |
-| `github:microsoft/phi-4-multimodal-instruct`         | Phi-4-multimodal-instruct              |          — |
-| `github:microsoft/phi-4-reasoning`                   | Phi-4-reasoning                        |          — |
-| `github:mistral-ai/codestral-2501`                   | Codestral 25.01                        |          — |
-| `github:mistral-ai/ministral-3b`                     | Ministral 3B                           |          — |
-| `github:mistral-ai/mistral-medium-2505`              | Mistral Medium 3 (25.05)               |          — |
-| `github:mistral-ai/mistral-small-2503`               | Mistral Small 3.1                      |          — |
-| `github:openai/gpt-4.1`                              | OpenAI GPT-4.1                         |          — |
-| `github:openai/gpt-4.1-mini`                         | OpenAI GPT-4.1-mini                    |          — |
-| `github:openai/gpt-4.1-nano`                         | OpenAI GPT-4.1-nano                    |          — |
-| `github:openai/gpt-4o`                               | OpenAI GPT-4o                          |          — |
-| `github:openai/gpt-4o-mini`                          | OpenAI GPT-4o mini                     |          — |
-| `github:openai/gpt-5`                                | OpenAI gpt-5                           |          — |
-| `github:openai/gpt-5-chat`                           | OpenAI gpt-5-chat (preview)            |          — |
-| `github:openai/gpt-5-mini`                           | OpenAI gpt-5-mini                      |          — |
-| `github:openai/gpt-5-nano`                           | OpenAI gpt-5-nano                      |          — |
-| `github:openai/o1`                                   | OpenAI o1                              |          — |
-| `github:openai/o1-mini`                              | OpenAI o1-mini                         |          — |
-| `github:openai/o1-preview`                           | OpenAI o1-preview                      |          — |
-| `github:openai/o3`                                   | OpenAI o3                              |          — |
-| `github:openai/o3-mini`                              | OpenAI o3-mini                         |          — |
-| `github:openai/o4-mini`                              | OpenAI o4-mini                         |          — |
+本次没有可展示的模型清单。
 
 ### Cohere
 
 - Provider ID：`cohere`
-- 状态：🟢 正常
+- 状态：🔴 失败
 - 免费依据：只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`
 - 主要风险：有速率限制；其他 Command 模型不再被标记为免费
 
-| Gateway 模型 ID              | 显示名称            | 上下文窗口 |
-| ---------------------------- | ------------------- | ---------: |
-| `cohere:north-mini-code-1-0` | north-mini-code-1-0 |       436K |
+本次没有可展示的模型清单。
 
 ### Hugging Face
 

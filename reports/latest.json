@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-07-30",
-  "generatedAt": "2026-07-29T23:16:50.793Z",
-  "reportPath": "reports/provider-free-model-audit-2026-07-30.md",
-  "totalModels": 101,
+  "date": "2026-08-04",
+  "generatedAt": "2026-08-03T23:28:43.014Z",
+  "reportPath": "reports/provider-free-model-audit-2026-08-04.md",
+  "totalModels": 64,
   "providers": [
     {
       "id": "openrouter",
@@ -183,7 +183,7 @@
       "id": "modelscope",
       "display": "ModelScope",
       "status": "ok",
-      "count": 7,
+      "count": 6,
       "freeType": "账号免费额度",
       "freeBasis": "API-Inference 免费型号清单与可用目录取交集",
       "risk": "受账号日配额、单模型配额和账号绑定状态限制",
@@ -197,11 +197,6 @@
           "id": "Qwen/Qwen3-235B-A22B-Thinking-2507",
           "displayName": "Qwen3-235B-A22B-Thinking-2507",
           "contextWindow": 262144
-        },
-        {
-          "id": "Qwen/Qwen3-32B",
-          "displayName": "Qwen3-32B",
-          "contextWindow": 131072
         },
         {
           "id": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
@@ -374,204 +369,22 @@
     {
       "id": "github",
       "display": "GitHub Models",
-      "status": "ok",
-      "count": 35,
+      "status": "error",
+      "count": 0,
       "freeType": "原型开发额度",
       "freeBasis": "目录中的文本输出模型使用账号自带原型开发额度",
       "risk": "若主动启用 paid usage，免费额度后可能计费；非聊天模型已排除",
-      "models": [
-        {
-          "id": "cohere/cohere-command-a",
-          "displayName": "Cohere Command A",
-          "contextWindow": null
-        },
-        {
-          "id": "deepseek/deepseek-r1",
-          "displayName": "DeepSeek-R1",
-          "contextWindow": null
-        },
-        {
-          "id": "deepseek/deepseek-r1-0528",
-          "displayName": "DeepSeek-R1-0528",
-          "contextWindow": null
-        },
-        {
-          "id": "deepseek/deepseek-v3-0324",
-          "displayName": "DeepSeek-V3-0324",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/llama-3.2-11b-vision-instruct",
-          "displayName": "Llama-3.2-11B-Vision-Instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/llama-3.2-90b-vision-instruct",
-          "displayName": "Llama-3.2-90B-Vision-Instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/llama-3.3-70b-instruct",
-          "displayName": "Llama-3.3-70B-Instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/llama-4-maverick-17b-128e-instruct-fp8",
-          "displayName": "Llama 4 Maverick 17B 128E Instruct FP8",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/llama-4-scout-17b-16e-instruct",
-          "displayName": "Llama 4 Scout 17B 16E Instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/meta-llama-3.1-405b-instruct",
-          "displayName": "Meta-Llama-3.1-405B-Instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/meta-llama-3.1-8b-instruct",
-          "displayName": "Meta-Llama-3.1-8B-Instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "microsoft/phi-4",
-          "displayName": "Phi-4",
-          "contextWindow": null
-        },
-        {
-          "id": "microsoft/phi-4-mini-instruct",
-          "displayName": "Phi-4-mini-instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "microsoft/phi-4-mini-reasoning",
-          "displayName": "Phi-4-mini-reasoning",
-          "contextWindow": null
-        },
-        {
-          "id": "microsoft/phi-4-multimodal-instruct",
-          "displayName": "Phi-4-multimodal-instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "microsoft/phi-4-reasoning",
-          "displayName": "Phi-4-reasoning",
-          "contextWindow": null
-        },
-        {
-          "id": "mistral-ai/codestral-2501",
-          "displayName": "Codestral 25.01",
-          "contextWindow": null
-        },
-        {
-          "id": "mistral-ai/ministral-3b",
-          "displayName": "Ministral 3B",
-          "contextWindow": null
-        },
-        {
-          "id": "mistral-ai/mistral-medium-2505",
-          "displayName": "Mistral Medium 3 (25.05)",
-          "contextWindow": null
-        },
-        {
-          "id": "mistral-ai/mistral-small-2503",
-          "displayName": "Mistral Small 3.1",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-4.1",
-          "displayName": "OpenAI GPT-4.1",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-4.1-mini",
-          "displayName": "OpenAI GPT-4.1-mini",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-4.1-nano",
-          "displayName": "OpenAI GPT-4.1-nano",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-4o",
-          "displayName": "OpenAI GPT-4o",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-4o-mini",
-          "displayName": "OpenAI GPT-4o mini",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-5",
-          "displayName": "OpenAI gpt-5",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-5-chat",
-          "displayName": "OpenAI gpt-5-chat (preview)",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-5-mini",
-          "displayName": "OpenAI gpt-5-mini",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/gpt-5-nano",
-          "displayName": "OpenAI gpt-5-nano",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/o1",
-          "displayName": "OpenAI o1",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/o1-mini",
-          "displayName": "OpenAI o1-mini",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/o1-preview",
-          "displayName": "OpenAI o1-preview",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/o3",
-          "displayName": "OpenAI o3",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/o3-mini",
-          "displayName": "OpenAI o3-mini",
-          "contextWindow": null
-        },
-        {
-          "id": "openai/o4-mini",
-          "displayName": "OpenAI o4-mini",
-          "contextWindow": null
-        }
-      ]
+      "models": []
     },
     {
       "id": "cohere",
       "display": "Cohere",
-      "status": "ok",
-      "count": 1,
+      "status": "error",
+      "count": 0,
       "freeType": "免费 Trial/Production",
       "freeBasis": "只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`",
       "risk": "有速率限制；其他 Command 模型不再被标记为免费",
-      "models": [
-        {
-          "id": "north-mini-code-1-0",
-          "displayName": "north-mini-code-1-0",
-          "contextWindow": 436000
-        }
-      ]
+      "models": []
     },
     {
       "id": "huggingface",
@@ -622,9 +435,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-07-29",
+    "comparedWith": "2026-08-03",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "modelscope",
+        "id": "Qwen/Qwen3-32B",
+        "displayName": "Qwen3-32B",
+        "contextWindow": 131072
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
@@ -632,8 +452,6 @@
       "siliconflow",
       "modelscope",
       "nvidia",
-      "github",
-      "cohere",
       "huggingface",
       "sensenova"
     ]

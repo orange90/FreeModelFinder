@@ -33,7 +33,9 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-07-30（Asia/Shanghai）更新：101 个免费模型入口，覆盖 10/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-08-04（Asia/Shanghai）更新：64 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+
+> 本次目录失败：GitHub Models、Cohere。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
@@ -41,18 +43,25 @@
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            |
-| ModelScope    | 🟢 正常 |          7 | 账号免费额度          |
+| ModelScope    | 🟢 正常 |          6 | 账号免费额度          |
 | NVIDIA NIM    | 🟢 正常 |         27 | 免费开发端点          |
-| GitHub Models | 🟢 正常 |         35 | 原型开发额度          |
-| Cohere        | 🟢 正常 |          1 | 免费 Trial/Production |
+| GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          |
+| Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production |
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          3 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-07-30.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-04.md)
 
 ### 今日变化
 
-与 2026-07-29 相比，成功比较的 10 个 Provider 模型清单没有变化。
+与 2026-08-03 相比，在成功比较的 8 个 Provider 中：**新增 0 个，移除 1 个**。
+
+<details>
+<summary>查看移除的 1 个模型</summary>
+
+- `modelscope:Qwen/Qwen3-32B`
+
+</details>
 
 ### 展开完整模型列表
 
@@ -107,11 +116,10 @@
 </details>
 
 <details>
-<summary><strong>ModelScope · 7 个模型</strong></summary>
+<summary><strong>ModelScope · 6 个模型</strong></summary>
 
 - `modelscope:Qwen/Qwen3-235B-A22B-Instruct-2507` — Qwen3-235B-A22B-Instruct-2507
 - `modelscope:Qwen/Qwen3-235B-A22B-Thinking-2507` — Qwen3-235B-A22B-Thinking-2507
-- `modelscope:Qwen/Qwen3-32B` — Qwen3-32B
 - `modelscope:Qwen/Qwen3-Coder-30B-A3B-Instruct` — Qwen3-Coder-30B-A3B-Instruct
 - `modelscope:Qwen/Qwen3-Next-80B-A3B-Instruct` — Qwen3-Next-80B-A3B-Instruct
 - `modelscope:Qwen/Qwen3-Next-80B-A3B-Thinking` — Qwen3-Next-80B-A3B-Thinking
@@ -149,54 +157,6 @@
 - `nvidia:openai/gpt-oss-120b`
 - `nvidia:openai/gpt-oss-20b`
 - `nvidia:stepfun-ai/step-3.7-flash`
-
-</details>
-
-<details>
-<summary><strong>GitHub Models · 35 个模型</strong></summary>
-
-- `github:cohere/cohere-command-a` — Cohere Command A
-- `github:deepseek/deepseek-r1` — DeepSeek-R1
-- `github:deepseek/deepseek-r1-0528` — DeepSeek-R1-0528
-- `github:deepseek/deepseek-v3-0324` — DeepSeek-V3-0324
-- `github:meta/llama-3.2-11b-vision-instruct` — Llama-3.2-11B-Vision-Instruct
-- `github:meta/llama-3.2-90b-vision-instruct` — Llama-3.2-90B-Vision-Instruct
-- `github:meta/llama-3.3-70b-instruct` — Llama-3.3-70B-Instruct
-- `github:meta/llama-4-maverick-17b-128e-instruct-fp8` — Llama 4 Maverick 17B 128E Instruct FP8
-- `github:meta/llama-4-scout-17b-16e-instruct` — Llama 4 Scout 17B 16E Instruct
-- `github:meta/meta-llama-3.1-405b-instruct` — Meta-Llama-3.1-405B-Instruct
-- `github:meta/meta-llama-3.1-8b-instruct` — Meta-Llama-3.1-8B-Instruct
-- `github:microsoft/phi-4` — Phi-4
-- `github:microsoft/phi-4-mini-instruct` — Phi-4-mini-instruct
-- `github:microsoft/phi-4-mini-reasoning` — Phi-4-mini-reasoning
-- `github:microsoft/phi-4-multimodal-instruct` — Phi-4-multimodal-instruct
-- `github:microsoft/phi-4-reasoning` — Phi-4-reasoning
-- `github:mistral-ai/codestral-2501` — Codestral 25.01
-- `github:mistral-ai/ministral-3b` — Ministral 3B
-- `github:mistral-ai/mistral-medium-2505` — Mistral Medium 3 (25.05)
-- `github:mistral-ai/mistral-small-2503` — Mistral Small 3.1
-- `github:openai/gpt-4.1` — OpenAI GPT-4.1
-- `github:openai/gpt-4.1-mini` — OpenAI GPT-4.1-mini
-- `github:openai/gpt-4.1-nano` — OpenAI GPT-4.1-nano
-- `github:openai/gpt-4o` — OpenAI GPT-4o
-- `github:openai/gpt-4o-mini` — OpenAI GPT-4o mini
-- `github:openai/gpt-5` — OpenAI gpt-5
-- `github:openai/gpt-5-chat` — OpenAI gpt-5-chat (preview)
-- `github:openai/gpt-5-mini` — OpenAI gpt-5-mini
-- `github:openai/gpt-5-nano` — OpenAI gpt-5-nano
-- `github:openai/o1` — OpenAI o1
-- `github:openai/o1-mini` — OpenAI o1-mini
-- `github:openai/o1-preview` — OpenAI o1-preview
-- `github:openai/o3` — OpenAI o3
-- `github:openai/o3-mini` — OpenAI o3-mini
-- `github:openai/o4-mini` — OpenAI o4-mini
-
-</details>
-
-<details>
-<summary><strong>Cohere · 1 个模型</strong></summary>
-
-- `cohere:north-mini-code-1-0`
 
 </details>
 
