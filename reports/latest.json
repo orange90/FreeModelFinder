@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-08-04",
-  "generatedAt": "2026-08-03T23:28:43.014Z",
-  "reportPath": "reports/provider-free-model-audit-2026-08-04.md",
+  "date": "2026-08-05",
+  "generatedAt": "2026-08-04T23:27:57.670Z",
+  "reportPath": "reports/provider-free-model-audit-2026-08-05.md",
   "totalModels": 64,
   "providers": [
     {
@@ -435,16 +435,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-08-03",
+    "comparedWith": "2026-08-04",
     "added": [],
-    "removed": [
-      {
-        "provider": "modelscope",
-        "id": "Qwen/Qwen3-32B",
-        "displayName": "Qwen3-32B",
-        "contextWindow": 131072
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
