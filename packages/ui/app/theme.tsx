@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useI18n } from './i18n';
 
 type Theme = 'light' | 'dark';
 
@@ -39,8 +40,9 @@ export function useTheme(): [Theme, (t: Theme) => void] {
 
 export function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useTheme();
+  const { t } = useI18n();
   const isDark = theme === 'dark';
-  const label = isDark ? '切换到亮色模式' : '切换到暗色模式';
+  const label = isDark ? t('theme.light') : t('theme.dark');
   return (
     <button
       type="button"

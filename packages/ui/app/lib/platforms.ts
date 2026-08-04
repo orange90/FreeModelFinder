@@ -70,3 +70,17 @@ export const SETTINGS_PROVIDERS = [
     hint: '所有账号都有用于原型开发的限速免费用量，付费使用需另行启用',
   },
 ] as const;
+
+export function providerLabelKey(id: string): string | undefined {
+  const map: Record<string, string> = {
+    siliconflow: 'platforms.siliconflow.label',
+    sensenova: 'platforms.sensenova.label',
+    modelscope: 'platforms.modelscope.label',
+    zhipu: 'platforms.zhipu.label',
+  };
+  return map[id];
+}
+
+export function providerHintKey(id: string): string {
+  return `platforms.${id}.hint`;
+}

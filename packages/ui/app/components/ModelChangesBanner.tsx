@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RefreshCw, Sparkles, TrendingDown, X } from 'lucide-react';
 import { GATEWAY, classNames, withUiHeaders } from '../lib/utils';
+import { useI18n } from '../i18n';
+
+type Translator = (key: string, params?: Record<string, string | number>) => string;
 
 interface ChangeItem {
   id: string;
@@ -28,16 +31,17 @@ interface ChangesResponse {
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const DISMISS_KEY = 'fmf-model-changes-dismissed-at';
 
-function formatRelative(ts: number): string {
-  if (!ts) return '尚未巡检';
+function formatRelative(ts: number, t: Translator): string {
+  if (!ts) return t('inspect.notInspected');
   const diff = Date.now() - ts;
-  if (diff < 60_000) return '刚刚';
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} 分钟前`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} 小时前`;
-  return `${Math.floor(diff / 86_400_000)} 天前`;
+  if (diff < 60_000) return t('inspect.justNow');
+  if (diff < 3_600_000) return t('inspect.minutesAgo', { n: Math.floor(diff / 60_000) });
+  if (diff < 86_400_000) return t('inspect.hoursAgo', { n: Math.floor(diff / 3_600_000) });
+  return t('inspect.daysAgo', { n: Math.floor(diff / 86_400_000) });
 }
 
 export function ModelChangesBanner() {
+  const { t } = useI18n();
   const [data, setData] = useState<ChangesResponse | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +107,7 @@ export function ModelChangesBanner() {
 
   return (
     <section
-      aria-label="模型上下架变动"
+      aria-label={t('inspect.title')}
       className="mb-4 rounded-lg border border-border bg-surface"
     >
       <header className="flex flex-wrap items-center gap-2 border-b border-border px-3.5 py-2 text-xs text-muted-foreground">
@@ -113,14 +117,20 @@ export function ModelChangesBanner() {
             error ? 'bg-destructive' : data?.watcher.lastError ? 'bg-amber-500' : 'bg-success',
           )}
         />
-        <span className="font-medium text-foreground">模型上下架巡检</span>
+        <span className="font-medium text-foreground">{t('inspect.title')}</span>
         <span className="text-muted-foreground/80">
-          · 每 {Math.round((data?.watcher.intervalMs ?? 3_600_000) / 60_000)} 分钟自动检查
+          {t('inspect.intervalMinutes', {
+            n: Math.round((data?.watcher.intervalMs ?? 3_600_000) / 60_000),
+          })}
         </span>
         <span className="text-muted-foreground/80">
-          · 最近一次：{formatRelative(data?.watcher.lastRunAt ?? 0)}
+          {t('inspect.lastRun', { when: formatRelative(data?.watcher.lastRunAt ?? 0, t) })}
         </span>
-        {data && <span className="text-muted-foreground/80">· 当前 {data.total} 个模型</span>}
+        {data && (
+          <span className="text-muted-foreground/80">
+            {t('inspect.total', { n: data.total })}
+          </span>
+        )}
         <div className="ml-auto flex items-center gap-1">
           <button
             type="button"
@@ -133,51 +143,55 @@ export function ModelChangesBanner() {
               strokeWidth={1.75}
               className={refreshing ? 'animate-spin' : undefined}
             />
-            {refreshing ? '巡检中' : '立即巡检'}
+            {refreshing ? t('inspect.running') : t('inspect.now')}
           </button>
           {hasChanges && (
             <button
               type="button"
               onClick={dismiss}
               className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-              aria-label="标记已读"
+              aria-label={t('inspect.markRead')}
             >
               <X size={12} strokeWidth={1.75} />
-              标记已读
+              {t('inspect.markRead')}
             </button>
           )}
         </div>
       </header>
 
       {error && (
-        <div className="px-3.5 py-2 text-xs text-destructive">获取模型变动失败：{error}</div>
+        <div className="px-3.5 py-2 text-xs text-destructive">
+          {t('inspect.errorLoad', { err: error })}
+        </div>
       )}
 
       {data?.watcher.lastError && !error && (
         <div className="px-3.5 py-2 text-xs text-amber-600 dark:text-amber-400">
-          上一次巡检出错：{data.watcher.lastError}
+          {t('inspect.lastRunError', { err: data.watcher.lastError })}
         </div>
       )}
 
       {!hasChanges && !error && (
         <div className="px-3.5 py-2 text-xs text-muted-foreground">
-          未发现新增或下架的免费模型。
+          {t('inspect.nothing')}
         </div>
       )}
 
       {hasChanges && (
         <div className="grid gap-3 px-3.5 py-3 md:grid-cols-2">
           <ChangeColumn
-            title="新增模型"
+            title={t('inspect.added')}
             tone="ok"
             icon={<Sparkles size={13} strokeWidth={1.75} />}
             items={visibleAdded}
+            t={t}
           />
           <ChangeColumn
-            title="下架模型"
+            title={t('inspect.removed')}
             tone="warn"
             icon={<TrendingDown size={13} strokeWidth={1.75} />}
             items={visibleRemoved}
+            t={t}
           />
         </div>
       )}
@@ -190,11 +204,13 @@ function ChangeColumn({
   tone,
   icon,
   items,
+  t,
 }: {
   title: string;
   tone: 'ok' | 'warn';
   icon: React.ReactNode;
   items: ChangeItem[];
+  t: Translator;
 }) {
   return (
     <div className="rounded-md border border-border bg-surface-muted/40 p-3">
@@ -211,7 +227,7 @@ function ChangeColumn({
         </span>
       </div>
       {items.length === 0 ? (
-        <p className="text-xs text-muted-foreground">暂无</p>
+        <p className="text-xs text-muted-foreground">{t('inspect.emptyCol')}</p>
       ) : (
         <ul className="space-y-1.5">
           {items.slice(0, 8).map((c) => (
@@ -221,7 +237,7 @@ function ChangeColumn({
                   {c.displayName || c.id}
                 </span>
                 <span className="shrink-0 text-muted-foreground">
-                  {formatRelative(c.detectedAt)}
+                  {formatRelative(c.detectedAt, t)}
                 </span>
               </div>
               <div className="flex items-baseline gap-2 text-muted-foreground">
@@ -234,7 +250,9 @@ function ChangeColumn({
             </li>
           ))}
           {items.length > 8 && (
-            <li className="text-xs text-muted-foreground">还有 {items.length - 8} 个未显示…</li>
+            <li className="text-xs text-muted-foreground">
+              {t('inspect.moreHidden', { n: items.length - 8 })}
+            </li>
           )}
         </ul>
       )}

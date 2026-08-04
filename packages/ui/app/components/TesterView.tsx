@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUp,
   Braces,
@@ -15,31 +15,34 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { formatContext, modelValue, type ModelItem } from '../lib/models';
 import { classNames } from '../lib/utils';
+import { useI18n } from '../i18n';
 
 export type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
-const EXAMPLE_PROMPTS: Array<{
-  eyebrow: string;
-  title: string;
-  prompt: string;
+type ExamplePrompt = {
+  eyebrowKey: string;
+  titleKey: string;
+  promptKey: string;
   Icon: LucideIcon;
-}> = [
+};
+
+const EXAMPLE_PROMPTS: ExamplePrompt[] = [
   {
-    eyebrow: '解释',
-    title: '把复杂概念讲清楚',
-    prompt: '用一个生活中的例子解释向量数据库，并说明它与传统关系型数据库的区别。',
+    eyebrowKey: 'tester.prompt1.eyebrow',
+    titleKey: 'tester.prompt1.title',
+    promptKey: 'tester.prompt1.prompt',
     Icon: Sparkles,
   },
   {
-    eyebrow: '代码',
-    title: '写一个可靠的工具函数',
-    prompt: '请用 TypeScript 实现一个带 cancel 方法的 debounce，并补充边界情况测试。',
+    eyebrowKey: 'tester.prompt2.eyebrow',
+    titleKey: 'tester.prompt2.title',
+    promptKey: 'tester.prompt2.prompt',
     Icon: Braces,
   },
   {
-    eyebrow: '比较',
-    title: '给出有条件的判断',
-    prompt: '比较 REST API 和 GraphQL。不要只列优缺点，请按团队规模和产品阶段给出选择建议。',
+    eyebrowKey: 'tester.prompt3.eyebrow',
+    titleKey: 'tester.prompt3.title',
+    promptKey: 'tester.prompt3.prompt',
     Icon: MessageSquareText,
   },
 ];
@@ -67,11 +70,23 @@ export function TesterView({
   onModelChange: (value: string) => void;
   onClear: () => void;
 }) {
+  const { t } = useI18n();
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const selected = models.find((item) => modelValue(item) === model);
   const missingSelection =
     !!model && model !== 'auto' && !models.some((item) => modelValue(item) === model);
+
+  const localizedPrompts = useMemo(
+    () =>
+      EXAMPLE_PROMPTS.map((example) => ({
+        Icon: example.Icon,
+        eyebrow: t(example.eyebrowKey),
+        title: t(example.titleKey),
+        prompt: t(example.promptKey),
+      })),
+    [t],
+  );
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -96,7 +111,7 @@ export function TesterView({
               htmlFor="tester-model"
               className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.13em] text-muted-foreground"
             >
-              当前模型
+              {t('tester.currentModel')}
             </label>
             <select
               id="tester-model"
@@ -105,9 +120,11 @@ export function TesterView({
               disabled={models.length === 0 || streaming}
               className="h-11 w-full rounded-xl border border-input bg-surface px-3 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-ring focus:ring-4 focus:ring-ring/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {models.length === 0 && <option value="">暂无可用模型</option>}
-              {missingSelection && <option value={model}>不可用 · {model}</option>}
-              {models.length > 0 && <option value="auto">自动选择 · auto</option>}
+              {models.length === 0 && <option value="">{t('tester.noModels')}</option>}
+              {missingSelection && (
+                <option value={model}>{t('tester.unavailable', { model })}</option>
+              )}
+              {models.length > 0 && <option value="auto">{t('tester.auto')}</option>}
               {models.map((item) => (
                 <option key={modelValue(item)} value={modelValue(item)}>
                   {item.provider} · {item.display_name ?? item.id}
@@ -120,9 +137,9 @@ export function TesterView({
             {selected && (
               <div className="hidden min-w-[130px] sm:block">
                 <p className="text-xs font-medium text-foreground">
-                  {formatContext(selected.context_window)}
+                  {formatContext(selected.context_window, t)}
                 </p>
-                <p className="mt-0.5 text-[11px] text-success">免费规则已验证</p>
+                <p className="mt-0.5 text-[11px] text-success">{t('tester.freeVerified')}</p>
               </div>
             )}
             <button
@@ -132,7 +149,7 @@ export function TesterView({
               className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-surface px-3 text-xs font-medium text-muted-foreground shadow-sm transition hover:bg-surface-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Eraser size={14} />
-              清空
+              {t('tester.clear')}
             </button>
           </div>
         </div>
@@ -145,25 +162,27 @@ export function TesterView({
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface">
                 <MessageSquareText className="text-muted-foreground" size={20} />
               </div>
-              <h2 className="mt-4 text-base font-semibold text-foreground">还没有可测试的模型</h2>
+              <h2 className="mt-4 text-base font-semibold text-foreground">
+                {t('tester.empty.title')}
+              </h2>
               <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-                在设置里添加 provider key，系统只会把符合免费规则的模型带到这里。
+                {t('tester.empty.body')}
               </p>
             </div>
           ) : messages.length === 0 ? (
             <div className="my-auto py-8">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                Quick test
+                {t('tester.quick.eyebrow')}
               </p>
               <h1 className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-foreground">
-                用同一个问题，试出模型差异
+                {t('tester.quick.title')}
               </h1>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                先选一个模板，也可以直接在下方输入。对话只会发往你当前选择的 provider。
+                {t('tester.quick.subtitle')}
               </p>
 
               <div className="mt-7 grid gap-3 md:grid-cols-3">
-                {EXAMPLE_PROMPTS.map((example) => (
+                {localizedPrompts.map((example) => (
                   <button
                     key={example.title}
                     type="button"
@@ -231,14 +250,14 @@ export function TesterView({
               }}
               placeholder={
                 models.length > 0
-                  ? '问点什么…  Enter 发送，Shift + Enter 换行'
-                  : '请先配置 provider'
+                  ? t('tester.input.placeholder')
+                  : t('tester.input.needProvider')
               }
               className="max-h-[180px] min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-foreground outline-none placeholder:text-muted-foreground/65 disabled:cursor-not-allowed"
             />
             <button
               type={streaming ? 'button' : 'submit'}
-              aria-label={streaming ? '停止生成' : '发送消息'}
+              aria-label={streaming ? t('tester.send.stopAria') : t('tester.send.sendAria')}
               onClick={streaming ? onCancel : undefined}
               disabled={!streaming && (!model || !input.trim())}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-foreground text-background transition hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-30"
@@ -251,8 +270,8 @@ export function TesterView({
             </button>
           </div>
           <div className="mt-2 flex items-center justify-between px-1 text-[11px] text-muted-foreground">
-            <span>回答可能不准确，请核对重要信息。</span>
-            {streaming && <span className="text-primary">正在生成</span>}
+            <span>{t('tester.hint.disclaimer')}</span>
+            {streaming && <span className="text-primary">{t('tester.hint.generating')}</span>}
           </div>
         </div>
       </form>
@@ -261,6 +280,7 @@ export function TesterView({
 }
 
 function MessageRow({ message, isStreamingLast }: { message: Msg; isStreamingLast: boolean }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
   const isError = message.content.startsWith('[error]');
@@ -286,7 +306,7 @@ function MessageRow({ message, isStreamingLast }: { message: Msg; isStreamingLas
             : 'border border-border bg-surface text-muted-foreground',
         )}
       >
-        {isUser ? '你' : 'FM'}
+        {isUser ? t('tester.msg.you') : 'FM'}
       </div>
       <div className={classNames('min-w-0 max-w-[86%]', isUser && 'text-right')}>
         <div
@@ -308,7 +328,7 @@ function MessageRow({ message, isStreamingLast }: { message: Msg; isStreamingLas
           ) : isStreamingLast ? (
             <span className="inline-flex items-center gap-2 text-muted-foreground">
               <Loader2 className="animate-spin" size={14} />
-              等待模型响应
+              {t('tester.msg.waiting')}
             </span>
           ) : null}
         </div>
@@ -320,7 +340,7 @@ function MessageRow({ message, isStreamingLast }: { message: Msg; isStreamingLas
               className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-muted-foreground opacity-0 transition hover:bg-surface-muted hover:text-foreground group-hover:opacity-100 focus:opacity-100"
             >
               {copied ? <Check size={12} /> : <Copy size={12} />}
-              {copied ? '已复制' : '复制'}
+              {copied ? t('tester.msg.copied') : t('tester.msg.copy')}
             </button>
           </div>
         )}

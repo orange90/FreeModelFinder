@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import './globals.css';
+import { I18nProvider } from './i18n';
 
 export const metadata = {
   title: 'FreeModelFinder',
-  description: '发现、验证并统一调用真正免费的 AI 模型',
+  description: 'Discover, verify and unify access to truly free AI models',
 };
 
 const themeInitScript = `
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        {children}
+        <I18nProvider>{children}</I18nProvider>
       </body>
     </html>
   );

@@ -1,9 +1,16 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import Home from '../page';
 import { gateway, server } from '../../test/server';
+import { I18nProvider } from '../i18n';
+
+function renderInChinese(ui: ReactNode) {
+  window.localStorage.setItem('fmf-language', 'zh');
+  return render(<I18nProvider>{ui}</I18nProvider>);
+}
 
 async function openTester() {
   const user = userEvent.setup();
@@ -26,8 +33,8 @@ describe('Home', () => {
         }),
       ),
     );
-    render(<Home />);
-    expect(await screen.findByText('Connect your first free model provider')).toBeTruthy();
+    renderInChinese(<Home />);
+    expect(await screen.findByText('先连接一个免费模型来源')).toBeTruthy();
     expect(screen.queryByText('Fixture Model')).toBeNull();
   });
 
@@ -45,7 +52,7 @@ describe('Home', () => {
         HttpResponse.json({ object: 'list', data: [], fmf: { failed_providers: [] } }),
       ),
     );
-    render(<Home />);
+    renderInChinese(<Home />);
     expect(await screen.findByRole('button', { name: '连接第一个 Provider' })).toBeTruthy();
   });
 
@@ -60,12 +67,12 @@ describe('Home', () => {
         }),
       ),
     );
-    render(<Home />);
-    expect(await screen.findByText('Connect your first free model provider')).toBeTruthy();
+    renderInChinese(<Home />);
+    expect(await screen.findByText('先连接一个免费模型来源')).toBeTruthy();
   });
 
   it('loads free models and surfaces provider failures', async () => {
-    render(<Home />);
+    renderInChinese(<Home />);
     expect(await screen.findByText('Fixture Model')).toBeTruthy();
     expect(screen.getByText(/1 个来源本次同步失败/)).toBeTruthy();
     expect(screen.getByText(/temporary provider error/)).toBeTruthy();
@@ -84,7 +91,7 @@ describe('Home', () => {
         }),
       ),
     );
-    render(<Home />);
+    renderInChinese(<Home />);
     await openTester();
     await waitFor(() =>
       expect((screen.getByLabelText('当前模型') as HTMLSelectElement).value).toBe('auto'),
@@ -97,7 +104,7 @@ describe('Home', () => {
         HttpResponse.json({ error: 'cannot save selection' }, { status: 500 }),
       ),
     );
-    render(<Home />);
+    renderInChinese(<Home />);
     const user = await openTester();
     const selector = screen.getByLabelText('当前模型');
     await user.selectOptions(selector, 'auto');
@@ -112,7 +119,7 @@ describe('Home', () => {
       ),
     );
     const user = userEvent.setup();
-    render(<Home />);
+    renderInChinese(<Home />);
     await screen.findByText('Fixture Model');
     await user.click(screen.getByRole('button', { name: '同步' }));
     expect(await screen.findByText('本地网关没有响应')).toBeTruthy();
@@ -131,7 +138,7 @@ describe('Home', () => {
           ),
       ),
     );
-    render(<Home />);
+    renderInChinese(<Home />);
     const user = await openTester();
     const input = screen.getByPlaceholderText(/问点什么/);
     await user.type(input, 'hello');
@@ -155,7 +162,7 @@ describe('Home', () => {
         );
       }),
     );
-    render(<Home />);
+    renderInChinese(<Home />);
     const user = await openTester();
     await user.type(screen.getByPlaceholderText(/问点什么/), 'cancel me');
     await user.click(screen.getByRole('button', { name: '发送消息' }));

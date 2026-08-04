@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { KeyRound, MessageSquare, RefreshCw, Search, Wifi, WifiOff } from 'lucide-react';
 import { FinderView } from './components/FinderView';
 import { OnboardingWizard, type OnboardingResult } from './components/OnboardingWizard';
@@ -8,6 +8,7 @@ import { SettingsView } from './components/SettingsView';
 import { TesterView, type Msg } from './components/TesterView';
 import { BottomNav, type SegmentedItem } from './components/SegmentedTabs';
 import { ThemeToggle } from './theme';
+import { LanguageToggle, useI18n } from './i18n';
 import {
   modelValue,
   type ModelItem,
@@ -35,16 +36,17 @@ type DesktopState = {
   onboardingRequired: boolean;
 };
 
-const TABS: readonly SegmentedItem<TabKey>[] = [
-  { key: 'finder', label: '模型', Icon: Search },
-  { key: 'tester', label: '测试', Icon: MessageSquare },
-  { key: 'settings', label: '设置', Icon: KeyRound },
-];
+const TAB_DEFS: readonly { key: TabKey; icon: SegmentedItem<TabKey>['Icon']; labelKey: string }[] =
+  [
+    { key: 'finder', icon: Search, labelKey: 'app.tab.finder' },
+    { key: 'tester', icon: MessageSquare, labelKey: 'app.tab.tester' },
+    { key: 'settings', icon: KeyRound, labelKey: 'app.tab.settings' },
+  ];
 
-const PAGE_COPY: Record<TabKey, { title: string; description: string }> = {
-  finder: { title: '免费模型', description: '实时发现与筛选' },
-  tester: { title: '对话测试', description: '直接比较模型表现' },
-  settings: { title: '本地设置', description: '来源、路由与接口' },
+const PAGE_COPY_KEYS: Record<TabKey, { title: string; description: string }> = {
+  finder: { title: 'app.page.finder.title', description: 'app.page.finder.desc' },
+  tester: { title: 'app.page.tester.title', description: 'app.page.tester.desc' },
+  settings: { title: 'app.page.settings.title', description: 'app.page.settings.desc' },
 };
 
 async function requestModels(): Promise<ModelsResponse> {
@@ -57,6 +59,7 @@ async function requestModels(): Promise<ModelsResponse> {
 }
 
 export default function Home() {
+  const { t } = useI18n();
   const [models, setModels] = useState<ModelItem[]>([]);
   const [model, setModel] = useState('');
   const [tab, setTab] = useState<TabKey>('finder');
@@ -314,7 +317,7 @@ export default function Home() {
         defaultModel?: string;
         error?: string;
       };
-      if (!response.ok) throw new Error(payload.error || `保存失败 (${response.status})`);
+      if (!response.ok) throw new Error(payload.error || `${response.status}`);
       if (requestId === selectionRequestRef.current) {
         setModel(payload.defaultModel ?? value);
         setSelectionValid(true);
@@ -419,7 +422,14 @@ export default function Home() {
     streamAbortRef.current?.abort();
   }, []);
 
-  const currentPage = PAGE_COPY[tab];
+  const TABS = useMemo<readonly SegmentedItem<TabKey>[]>(
+    () => TAB_DEFS.map((item) => ({ key: item.key, label: t(item.labelKey), Icon: item.icon })),
+    [t],
+  );
+  const currentPage = {
+    title: t(PAGE_COPY_KEYS[tab].title),
+    description: t(PAGE_COPY_KEYS[tab].description),
+  };
 
   if (onboardingMode === 'loading') {
     return (
@@ -428,7 +438,7 @@ export default function Home() {
           <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground text-xs font-bold text-background">
             FM
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">正在连接本地网关…</p>
+          <p className="mt-4 text-xs text-muted-foreground">{t('app.loading.gateway')}</p>
         </div>
       </main>
     );
@@ -460,11 +470,11 @@ export default function Home() {
               <span className="block text-sm font-semibold tracking-[-0.02em]">
                 FreeModelFinder
               </span>
-              <span className="block text-[11px] text-muted-foreground">Local model gateway</span>
+              <span className="block text-[11px] text-muted-foreground">{t('app.subtitle')}</span>
             </span>
           </button>
 
-          <nav className="mt-10 space-y-1" aria-label="主导航">
+          <nav className="mt-10 space-y-1" aria-label={t('app.nav.aria')}>
             {TABS.map((item) => {
               const active = item.key === tab;
               return (
@@ -499,11 +509,17 @@ export default function Home() {
                 )}
               />
               <span className="text-xs font-medium text-foreground">
-                {gatewayReachable == null ? '正在连接' : gatewayReachable ? '网关在线' : '网关离线'}
+                {gatewayReachable == null
+                  ? t('app.status.connecting')
+                  : gatewayReachable
+                    ? t('app.status.online')
+                    : t('app.status.offline')}
               </span>
             </div>
             <p className="mt-2 truncate font-mono text-[10px] text-muted-foreground">{GATEWAY}</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">{models.length} 个免费模型</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {t('app.status.modelsCount', { count: models.length })}
+            </p>
           </div>
         </aside>
 
@@ -533,12 +549,12 @@ export default function Home() {
                 )}
               >
                 {gatewayReachable ? <Wifi size={12} /> : <WifiOff size={12} />}
-                {gatewayReachable ? '已连接' : '未连接'}
+                {gatewayReachable ? t('app.status.connected') : t('app.status.disconnected')}
               </div>
               <button
                 type="button"
-                aria-label="同步模型"
-                title="同步模型"
+                aria-label={t('app.header.syncTitle')}
+                title={t('app.header.syncTitle')}
                 onClick={() => void refreshModels(true)}
                 disabled={modelLoading}
                 className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition hover:bg-surface-muted hover:text-foreground disabled:opacity-50"
@@ -546,6 +562,7 @@ export default function Home() {
                 <RefreshCw size={15} className={modelLoading ? 'animate-spin' : undefined} />
               </button>
               <ThemeToggle className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/10" />
+              <LanguageToggle />
             </div>
           </header>
 
@@ -554,7 +571,7 @@ export default function Home() {
               role="alert"
               className="shrink-0 border-b border-warning/30 bg-warning/5 px-5 py-2 text-xs text-warning md:px-8"
             >
-              {modelSaveError || `当前模型不可用：${model}。请选择 auto 或其他可用模型。`}
+              {modelSaveError || t('app.selection.invalid', { model })}
             </div>
           )}
 

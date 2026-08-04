@@ -3,6 +3,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { classNames } from '../lib/utils';
+import { useI18n } from '../i18n';
 
 export function Drawer({
   open,
@@ -21,6 +22,7 @@ export function Drawer({
   side?: 'right' | 'bottom';
   widthClass?: string;
 }) {
+  const { t } = useI18n();
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -51,7 +53,7 @@ export function Drawer({
           </div>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label={t('drawer.close')}
             onClick={onClose}
             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-surface-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >

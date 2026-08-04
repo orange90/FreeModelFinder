@@ -1,6 +1,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
+import { useI18n } from '../i18n';
 import { classNames } from '../lib/utils';
 
 export type SegmentedItem<Key extends string> = {
@@ -60,10 +61,11 @@ export function BottomNav<Key extends string>({
   value: Key;
   onChange: (k: Key) => void;
 }) {
+  const { t } = useI18n();
   return (
     <nav
       role="tablist"
-      aria-label="移动端导航"
+      aria-label={t('app.nav.mobileAria')}
       className="grid border-t border-border bg-surface md:hidden"
       style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
     >

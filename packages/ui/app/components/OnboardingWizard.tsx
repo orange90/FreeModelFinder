@@ -16,6 +16,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { GATEWAY, classNames, withUiHeaders } from '../lib/utils';
+import { useI18n } from '../i18n';
 
 type Provider = 'openrouter' | 'gemini';
 type Role = 'primary' | 'fallback';
@@ -106,6 +107,11 @@ const COPY = {
     gateway: '外部客户端配置',
     retry: '重试连接',
     savedButFailed: 'Key 已保存，但模型验证尚未成功：',
+    languageToggle: '切换语言',
+    progressAria: '引导进度',
+    showApiKey: '显示 API Key',
+    hideApiKey: '隐藏 API Key',
+    testFailed: '平台测试未成功。',
   },
   en: {
     eyebrow: 'Two-minute quick start',
@@ -148,6 +154,11 @@ const COPY = {
     gateway: 'External client settings',
     retry: 'Retry connection',
     savedButFailed: 'The key was saved, but model verification did not succeed:',
+    languageToggle: 'Switch language',
+    progressAria: 'Onboarding progress',
+    showApiKey: 'Show API key',
+    hideApiKey: 'Hide API key',
+    testFailed: 'The provider test did not succeed.',
   },
 } as const;
 
@@ -160,7 +171,9 @@ export function OnboardingWizard({
   onDismiss: () => void;
   onOpenSettings: () => void;
 }) {
-  const [language, setLanguage] = useState<Language>('zh');
+  const { language: globalLanguage, setLanguage: setGlobalLanguage } = useI18n();
+  const language: Language = globalLanguage === 'en' ? 'en' : 'zh';
+  const setLanguage = (next: Language) => setGlobalLanguage(next);
   const [step, setStep] = useState<Step>('provider');
   const [provider, setProvider] = useState<Provider>('openrouter');
   const [role, setRole] = useState<Role>('primary');
@@ -174,7 +187,6 @@ export function OnboardingWizard({
   const copy = COPY[language];
 
   useEffect(() => {
-    if (!navigator.language.toLowerCase().startsWith('zh')) setLanguage('en');
     fetch(`${GATEWAY}/api/onboarding/environment`, withUiHeaders())
       .then((response) => (response.ok ? response.json() : Promise.reject(new Error('failed'))))
       .then((payload: { data?: EnvironmentKeyStatus[] }) => setEnvironment(payload.data ?? []))
@@ -220,7 +232,7 @@ export function OnboardingWizard({
       if (!response.ok) throw new Error(payload.error || `request failed ${response.status}`);
       if (payload.test?.status !== 'success') {
         setResult(payload);
-        setError(payload.test?.error || 'The provider test did not succeed.');
+        setError(payload.test?.error || copy.testFailed);
         setStep('credential');
         return;
       }
@@ -272,15 +284,15 @@ export function OnboardingWizard({
           </div>
           <button
             type="button"
-            onClick={() => setLanguage((current) => (current === 'zh' ? 'en' : 'zh'))}
+            onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-            aria-label="Switch language"
+            aria-label={copy.languageToggle}
           >
             <Languages size={14} /> {language === 'zh' ? 'English' : '中文'}
           </button>
         </header>
 
-        <ol className="mt-8 grid grid-cols-4 gap-2" aria-label="Onboarding progress">
+        <ol className="mt-8 grid grid-cols-4 gap-2" aria-label={copy.progressAria}>
           {steps.map((label, index) => (
             <li key={label} className="min-w-0">
               <div
@@ -450,7 +462,7 @@ export function OnboardingWizard({
                     type="button"
                     onClick={() => setKeyVisible((current) => !current)}
                     className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground hover:bg-surface-muted hover:text-foreground"
-                    aria-label={keyVisible ? 'Hide API key' : 'Show API key'}
+                    aria-label={keyVisible ? copy.hideApiKey : copy.showApiKey}
                   >
                     {keyVisible ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>

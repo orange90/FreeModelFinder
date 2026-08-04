@@ -1,9 +1,16 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 import { OnboardingWizard } from '../OnboardingWizard';
 import { gateway, server } from '../../../test/server';
+import { I18nProvider } from '../../i18n';
+
+function renderInEnglish(ui: ReactNode) {
+  window.localStorage.setItem('fmf-language', 'en');
+  return render(<I18nProvider>{ui}</I18nProvider>);
+}
 
 function success(provider: 'openrouter' | 'gemini', autoRoute = false) {
   return {
@@ -38,7 +45,7 @@ describe('OnboardingWizard', () => {
     );
     const onReady = vi.fn();
     const user = userEvent.setup();
-    render(<OnboardingWizard onReady={onReady} onDismiss={vi.fn()} onOpenSettings={vi.fn()} />);
+    renderInEnglish(<OnboardingWizard onReady={onReady} onDismiss={vi.fn()} onOpenSettings={vi.fn()} />);
 
     const openRouter = await screen.findByText('OpenRouter');
     await user.click(
@@ -71,7 +78,7 @@ describe('OnboardingWizard', () => {
       }),
     );
     const user = userEvent.setup();
-    render(<OnboardingWizard onReady={vi.fn()} onDismiss={vi.fn()} onOpenSettings={vi.fn()} />);
+    renderInEnglish(<OnboardingWizard onReady={vi.fn()} onDismiss={vi.fn()} onOpenSettings={vi.fn()} />);
 
     const openRouter = await screen.findByText('OpenRouter');
     await user.click(
@@ -100,7 +107,7 @@ describe('OnboardingWizard', () => {
       ),
     );
     const user = userEvent.setup();
-    render(<OnboardingWizard onReady={vi.fn()} onDismiss={vi.fn()} onOpenSettings={vi.fn()} />);
+    renderInEnglish(<OnboardingWizard onReady={vi.fn()} onDismiss={vi.fn()} onOpenSettings={vi.fn()} />);
 
     const openRouter = await screen.findByText('OpenRouter');
     await user.click(

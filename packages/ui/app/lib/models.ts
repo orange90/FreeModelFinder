@@ -67,14 +67,18 @@ export function splitModelValue(value: string): { provider: string; id: string }
   };
 }
 
-export function formatContext(tokens?: number): string {
-  if (!tokens) return '上下文未知';
+export function formatContext(
+  tokens?: number,
+  t?: (key: string, params?: Record<string, string | number>) => string,
+): string {
+  const translate = t ?? ((key: string) => key);
+  if (!tokens) return translate('models.ctx.unknown');
   if (tokens >= 1_000_000) {
     const value = tokens / 1_000_000;
-    return `${Number.isInteger(value) ? value : value.toFixed(1)}M 上下文`;
+    return `${Number.isInteger(value) ? value : value.toFixed(1)}M ${translate('models.ctx.suffix')}`;
   }
   if (tokens >= 1_000) {
-    return `${Math.round(tokens / 1_000)}K 上下文`;
+    return `${Math.round(tokens / 1_000)}K ${translate('models.ctx.suffix')}`;
   }
-  return `${tokens} tokens`;
+  return `${tokens} ${translate('models.ctx.tokens')}`;
 }
