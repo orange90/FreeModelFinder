@@ -33,7 +33,7 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-08-05（Asia/Shanghai）更新：64 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-08-06（Asia/Shanghai）更新：64 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models、Cohere。
 
@@ -50,11 +50,11 @@
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          3 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-05.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-06.md)
 
 ### 今日变化
 
-与 2026-08-04 相比，成功比较的 8 个 Provider 模型清单没有变化。
+与 2026-08-05 相比，成功比较的 8 个 Provider 模型清单没有变化。
 
 ### 展开完整模型列表
 
