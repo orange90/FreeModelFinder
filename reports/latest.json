@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-08-07",
-  "generatedAt": "2026-08-07T01:34:22.845Z",
-  "reportPath": "reports/provider-free-model-audit-2026-08-07.md",
-  "totalModels": 64,
+  "date": "2026-08-08",
+  "generatedAt": "2026-08-07T22:57:13.822Z",
+  "reportPath": "reports/provider-free-model-audit-2026-08-08.md",
+  "totalModels": 62,
   "providers": [
     {
       "id": "openrouter",
@@ -224,16 +224,11 @@
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
-      "count": 27,
+      "count": 25,
       "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
       "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
       "models": [
-        {
-          "id": "deepseek-ai/deepseek-v4-flash",
-          "displayName": "deepseek-ai/deepseek-v4-flash",
-          "contextWindow": null
-        },
         {
           "id": "google/diffusiongemma-26b-a4b-it",
           "displayName": "google/diffusiongemma-26b-a4b-it",
@@ -277,11 +272,6 @@
         {
           "id": "minimaxai/minimax-m3",
           "displayName": "minimaxai/minimax-m3",
-          "contextWindow": null
-        },
-        {
-          "id": "mistralai/mistral-medium-3.5-128b",
-          "displayName": "mistralai/mistral-medium-3.5-128b",
           "contextWindow": null
         },
         {
@@ -435,21 +425,20 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-08-06",
-    "added": [
-      {
-        "provider": "openrouter",
-        "id": "inclusionai/ling-3.0-tiny:free",
-        "displayName": "inclusionAI: Ling 3.0 Tiny (free)",
-        "contextWindow": 262144
-      }
-    ],
+    "comparedWith": "2026-08-07",
+    "added": [],
     "removed": [
       {
-        "provider": "openrouter",
-        "id": "inclusionai/ling-3.0-flash:free",
-        "displayName": "Ling-3.0-flash (free)",
-        "contextWindow": 262144
+        "provider": "nvidia",
+        "id": "deepseek-ai/deepseek-v4-flash",
+        "displayName": "deepseek-ai/deepseek-v4-flash",
+        "contextWindow": null
+      },
+      {
+        "provider": "nvidia",
+        "id": "mistralai/mistral-medium-3.5-128b",
+        "displayName": "mistralai/mistral-medium-3.5-128b",
+        "contextWindow": null
       }
     ],
     "comparedProviders": [
