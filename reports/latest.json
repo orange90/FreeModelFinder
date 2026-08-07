@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-08-06",
-  "generatedAt": "2026-08-05T23:19:35.765Z",
-  "reportPath": "reports/provider-free-model-audit-2026-08-06.md",
+  "date": "2026-08-07",
+  "generatedAt": "2026-08-07T01:34:22.845Z",
+  "reportPath": "reports/provider-free-model-audit-2026-08-07.md",
   "totalModels": 64,
   "providers": [
     {
@@ -30,8 +30,8 @@
           "contextWindow": 262144
         },
         {
-          "id": "inclusionai/ling-3.0-flash:free",
-          "displayName": "Ling-3.0-flash (free)",
+          "id": "inclusionai/ling-3.0-tiny:free",
+          "displayName": "inclusionAI: Ling 3.0 Tiny (free)",
           "contextWindow": 262144
         },
         {
@@ -435,9 +435,23 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-08-05",
-    "added": [],
-    "removed": [],
+    "comparedWith": "2026-08-06",
+    "added": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.0-tiny:free",
+        "displayName": "inclusionAI: Ling 3.0 Tiny (free)",
+        "contextWindow": 262144
+      }
+    ],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.0-flash:free",
+        "displayName": "Ling-3.0-flash (free)",
+        "contextWindow": 262144
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

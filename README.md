@@ -33,7 +33,7 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-08-06（Asia/Shanghai）更新：64 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-08-07（Asia/Shanghai）更新：64 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models、Cohere。
 
@@ -50,11 +50,25 @@
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          3 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-06.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-08-07.md)
 
 ### 今日变化
 
-与 2026-08-05 相比，成功比较的 8 个 Provider 模型清单没有变化。
+与 2026-08-06 相比，在成功比较的 8 个 Provider 中：**新增 1 个，移除 1 个**。
+
+<details>
+<summary>查看新增的 1 个模型</summary>
+
+- `openrouter:inclusionai/ling-3.0-tiny:free`
+
+</details>
+
+<details>
+<summary>查看移除的 1 个模型</summary>
+
+- `openrouter:inclusionai/ling-3.0-flash:free`
+
+</details>
 
 ### 展开完整模型列表
 
@@ -64,7 +78,7 @@
 - `openrouter:cohere/north-mini-code:free` — Cohere: North Mini Code (free)
 - `openrouter:google/gemma-4-26b-a4b-it:free` — Google: Gemma 4 26B A4B (free)
 - `openrouter:google/gemma-4-31b-it:free` — Google: Gemma 4 31B (free)
-- `openrouter:inclusionai/ling-3.0-flash:free` — Ling-3.0-flash (free)
+- `openrouter:inclusionai/ling-3.0-tiny:free` — inclusionAI: Ling 3.0 Tiny (free)
 - `openrouter:nvidia/nemotron-3-nano-30b-a3b:free` — NVIDIA: Nemotron 3 Nano 30B A3B (free)
 - `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` — NVIDIA: Nemotron 3 Nano Omni (free)
 - `openrouter:nvidia/nemotron-3-super-120b-a12b:free` — NVIDIA: Nemotron 3 Super (free)
