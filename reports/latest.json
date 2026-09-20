@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-19",
-  "generatedAt": "2026-09-19T00:23:52.085Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-19.md",
+  "date": "2026-09-20",
+  "generatedAt": "2026-09-20T00:10:25.573Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-20.md",
   "totalModels": 72,
   "providers": [
     {
@@ -476,15 +476,8 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-18",
-    "added": [
-      {
-        "provider": "openrouter",
-        "id": "deepseek/deepseek-v4-flash-0731:free",
-        "displayName": "DeepSeek: DeepSeek V4 Flash 0731 (free)",
-        "contextWindow": 1048576
-      }
-    ],
+    "comparedWith": "2026-09-19",
+    "added": [],
     "removed": [],
     "comparedProviders": [
       "openrouter",
