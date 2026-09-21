@@ -33,13 +33,13 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-09-20（Asia/Shanghai）更新：72 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-09-21（Asia/Shanghai）更新：71 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
-| OpenRouter    | 🟢 正常 |         22 | 零价格模型            |
+| OpenRouter    | 🟢 正常 |         21 | 零价格模型            |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            |
@@ -50,19 +50,25 @@
 | Hugging Face  | 🟢 正常 |          4 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          6 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-09-20.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-09-21.md)
 
 ### 今日变化
 
-与 2026-09-19 相比，成功比较的 9 个 Provider 模型清单没有变化。
+与 2026-09-20 相比，在成功比较的 9 个 Provider 中：**新增 0 个，移除 1 个**。
+
+<details>
+<summary>查看移除的 1 个模型</summary>
+
+- `openrouter:deepseek/deepseek-v4-flash-0731:free`
+
+</details>
 
 ### 展开完整模型列表
 
 <details>
-<summary><strong>OpenRouter · 22 个模型</strong></summary>
+<summary><strong>OpenRouter · 21 个模型</strong></summary>
 
 - `openrouter:cohere/north-mini-code:free` — Cohere: North Mini Code (free)
-- `openrouter:deepseek/deepseek-v4-flash-0731:free` — DeepSeek: DeepSeek V4 Flash 0731 (free)
 - `openrouter:dots-studio/dots-3-note-preview:free` — Dots Studio: Dots3-Note Preview (free)
 - `openrouter:google/gemma-4-26b-a4b-it:free` — Google: Gemma 4 26B A4B (free)
 - `openrouter:google/gemma-4-31b-it:free` — Google: Gemma 4 31B (free)
