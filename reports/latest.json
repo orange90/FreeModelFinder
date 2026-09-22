@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-21",
-  "generatedAt": "2026-09-21T00:18:25.386Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-21.md",
-  "totalModels": 71,
+  "date": "2026-09-22",
+  "generatedAt": "2026-09-22T00:52:57.944Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-22.md",
+  "totalModels": 72,
   "providers": [
     {
       "id": "openrouter",
@@ -432,11 +432,16 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 6,
+      "count": 7,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
       "models": [
+        {
+          "id": "deepseek-flash",
+          "displayName": "deepseek-flash",
+          "contextWindow": null
+        },
         {
           "id": "deepseek-v4-flash",
           "displayName": "deepseek-v4-flash",
@@ -445,6 +450,11 @@
         {
           "id": "deepseek-v4-pro",
           "displayName": "deepseek-v4-pro",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek-v4.1-flash",
+          "displayName": "deepseek-v4.1-flash",
           "contextWindow": null
         },
         {
@@ -458,11 +468,6 @@
           "contextWindow": null
         },
         {
-          "id": "sensenova-6.7-flash-lite",
-          "displayName": "sensenova-6.7-flash-lite",
-          "contextWindow": null
-        },
-        {
           "id": "sensenova-6.8-flash-lite",
           "displayName": "sensenova-6.8-flash-lite",
           "contextWindow": null
@@ -471,14 +476,27 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-20",
-    "added": [],
+    "comparedWith": "2026-09-21",
+    "added": [
+      {
+        "provider": "sensenova",
+        "id": "deepseek-flash",
+        "displayName": "deepseek-flash",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "deepseek-v4.1-flash",
+        "displayName": "deepseek-v4.1-flash",
+        "contextWindow": null
+      }
+    ],
     "removed": [
       {
-        "provider": "openrouter",
-        "id": "deepseek/deepseek-v4-flash-0731:free",
-        "displayName": "DeepSeek: DeepSeek V4 Flash 0731 (free)",
-        "contextWindow": 1048576
+        "provider": "sensenova",
+        "id": "sensenova-6.7-flash-lite",
+        "displayName": "sensenova-6.7-flash-lite",
+        "contextWindow": null
       }
     ],
     "comparedProviders": [
