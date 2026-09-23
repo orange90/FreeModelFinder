@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-22",
-  "generatedAt": "2026-09-22T00:52:57.944Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-22.md",
+  "date": "2026-09-23",
+  "generatedAt": "2026-09-23T00:38:05.857Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-23.md",
   "totalModels": 72,
   "providers": [
     {
@@ -476,29 +476,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-21",
-    "added": [
-      {
-        "provider": "sensenova",
-        "id": "deepseek-flash",
-        "displayName": "deepseek-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "deepseek-v4.1-flash",
-        "displayName": "deepseek-v4.1-flash",
-        "contextWindow": null
-      }
-    ],
-    "removed": [
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.7-flash-lite",
-        "displayName": "sensenova-6.7-flash-lite",
-        "contextWindow": null
-      }
-    ],
+    "comparedWith": "2026-09-22",
+    "added": [],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
