@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-23",
-  "generatedAt": "2026-09-23T00:38:05.857Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-23.md",
-  "totalModels": 72,
+  "date": "2026-09-24",
+  "generatedAt": "2026-09-24T00:32:27.735Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-24.md",
+  "totalModels": 70,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 21,
+      "count": 20,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -42,11 +42,6 @@
         {
           "id": "inclusionai/ling-3.0-flash-sante:free",
           "displayName": "inclusionAI: Ling 3.0 Flash Sante (free)",
-          "contextWindow": 262144
-        },
-        {
-          "id": "inclusionai/ling-3.0-flash-vl:free",
-          "displayName": "inclusionAI: Ling 3.0 Flash VL (free)",
           "contextWindow": 262144
         },
         {
@@ -401,7 +396,7 @@
       "id": "huggingface",
       "display": "Hugging Face",
       "status": "ok",
-      "count": 4,
+      "count": 3,
       "freeType": "实时零价端点",
       "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
       "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入",
@@ -409,11 +404,6 @@
         {
           "id": "inclusionAI/Ling-3.0-flash-Fin",
           "displayName": "inclusionAI/Ling-3.0-flash-Fin",
-          "contextWindow": 262144
-        },
-        {
-          "id": "inclusionAI/Ling-3.0-flash-VL",
-          "displayName": "inclusionAI/Ling-3.0-flash-VL",
           "contextWindow": 262144
         },
         {
@@ -476,9 +466,22 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-22",
+    "comparedWith": "2026-09-23",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.0-flash-vl:free",
+        "displayName": "inclusionAI: Ling 3.0 Flash VL (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "huggingface",
+        "id": "inclusionAI/Ling-3.0-flash-VL",
+        "displayName": "inclusionAI/Ling-3.0-flash-VL",
+        "contextWindow": 262144
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
