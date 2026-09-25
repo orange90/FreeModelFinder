@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-24",
-  "generatedAt": "2026-09-24T00:32:27.735Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-24.md",
+  "date": "2026-09-25",
+  "generatedAt": "2026-09-25T00:35:02.588Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-25.md",
   "totalModels": 70,
   "providers": [
     {
@@ -466,22 +466,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-23",
+    "comparedWith": "2026-09-24",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "inclusionai/ling-3.0-flash-vl:free",
-        "displayName": "inclusionAI: Ling 3.0 Flash VL (free)",
-        "contextWindow": 262144
-      },
-      {
-        "provider": "huggingface",
-        "id": "inclusionAI/Ling-3.0-flash-VL",
-        "displayName": "inclusionAI/Ling-3.0-flash-VL",
-        "contextWindow": 262144
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
