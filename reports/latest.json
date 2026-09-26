@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-25",
-  "generatedAt": "2026-09-25T00:35:02.588Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-25.md",
-  "totalModels": 70,
+  "date": "2026-09-26",
+  "generatedAt": "2026-09-26T00:39:09.851Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-26.md",
+  "totalModels": 67,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 20,
+      "count": 17,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -48,16 +48,6 @@
           "id": "liquid/lfm-2.5-2.6b:free",
           "displayName": "LiquidAI: LFM2.5-2.6B (free)",
           "contextWindow": 65536
-        },
-        {
-          "id": "nex-agi/nex-n2.5-mini:free",
-          "displayName": "Nex AGI: Nex-N2.5-Mini (free)",
-          "contextWindow": 262144
-        },
-        {
-          "id": "nex-agi/nex-n2.5-pro:free",
-          "displayName": "Nex AGI: Nex-N2.5-Pro (free)",
-          "contextWindow": 262144
         },
         {
           "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
@@ -108,11 +98,6 @@
           "id": "thinkingmachines/inkling:free",
           "displayName": "Thinking Machines: Inkling (free)",
           "contextWindow": 1048576
-        },
-        {
-          "id": "z-ai/glm-5.2:free",
-          "displayName": "Z.ai: GLM 5.2 (free)",
-          "contextWindow": 32768
         }
       ]
     },
@@ -466,9 +451,28 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-24",
+    "comparedWith": "2026-09-25",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "nex-agi/nex-n2.5-mini:free",
+        "displayName": "Nex AGI: Nex-N2.5-Mini (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "openrouter",
+        "id": "nex-agi/nex-n2.5-pro:free",
+        "displayName": "Nex AGI: Nex-N2.5-Pro (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "openrouter",
+        "id": "z-ai/glm-5.2:free",
+        "displayName": "Z.ai: GLM 5.2 (free)",
+        "contextWindow": 32768
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
