@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-28",
-  "generatedAt": "2026-09-28T00:49:56.994Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-28.md",
-  "totalModels": 67,
+  "date": "2026-09-29",
+  "generatedAt": "2026-09-29T02:01:30.141Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-29.md",
+  "totalModels": 64,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 17,
+      "count": 16,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -32,11 +32,6 @@
         {
           "id": "google/gemma-4-31b-it:free",
           "displayName": "Google: Gemma 4 31B (free)",
-          "contextWindow": 262144
-        },
-        {
-          "id": "inclusionai/ling-3.0-flash-fin:free",
-          "displayName": "inclusionAI: Ling 3.0 Flash Fin (free)",
           "contextWindow": 262144
         },
         {
@@ -289,7 +284,7 @@
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
-      "count": 11,
+      "count": 10,
       "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
       "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
@@ -312,11 +307,6 @@
         {
           "id": "meta/llama-3.2-90b-vision-instruct",
           "displayName": "meta/llama-3.2-90b-vision-instruct",
-          "contextWindow": null
-        },
-        {
-          "id": "mistralai/mistral-nemotron",
-          "displayName": "mistralai/mistral-nemotron",
           "contextWindow": null
         },
         {
@@ -381,16 +371,11 @@
       "id": "huggingface",
       "display": "Hugging Face",
       "status": "ok",
-      "count": 3,
+      "count": 2,
       "freeType": "实时零价端点",
       "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
       "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入",
       "models": [
-        {
-          "id": "inclusionAI/Ling-3.0-flash-Fin",
-          "displayName": "inclusionAI/Ling-3.0-flash-Fin",
-          "contextWindow": 262144
-        },
         {
           "id": "prism-ml/Ternary-Bonsai-27B-AWQ-4bit",
           "displayName": "prism-ml/Ternary-Bonsai-27B-AWQ-4bit",
@@ -451,9 +436,28 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-27",
+    "comparedWith": "2026-09-28",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.0-flash-fin:free",
+        "displayName": "inclusionAI: Ling 3.0 Flash Fin (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "nvidia",
+        "id": "mistralai/mistral-nemotron",
+        "displayName": "mistralai/mistral-nemotron",
+        "contextWindow": null
+      },
+      {
+        "provider": "huggingface",
+        "id": "inclusionAI/Ling-3.0-flash-Fin",
+        "displayName": "inclusionAI/Ling-3.0-flash-Fin",
+        "contextWindow": 262144
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

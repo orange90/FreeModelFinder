@@ -33,39 +33,47 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-09-28（Asia/Shanghai）更新：67 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-09-29（Asia/Shanghai）更新：64 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
-| OpenRouter    | 🟢 正常 |         17 | 零价格模型            |
+| OpenRouter    | 🟢 正常 |         16 | 零价格模型            |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            |
 | ModelScope    | 🟢 正常 |         16 | 账号免费额度          |
-| NVIDIA NIM    | 🟢 正常 |         11 | 免费开发端点          |
+| NVIDIA NIM    | 🟢 正常 |         10 | 免费开发端点          |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          |
 | Cohere        | 🟢 正常 |          1 | 免费 Trial/Production |
-| Hugging Face  | 🟢 正常 |          3 | 实时零价端点          |
+| Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          7 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-09-28.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-09-29.md)
 
 ### 今日变化
 
-与 2026-09-27 相比，成功比较的 9 个 Provider 模型清单没有变化。
+与 2026-09-28 相比，在成功比较的 9 个 Provider 中：**新增 0 个，移除 3 个**。
+
+<details>
+<summary>查看移除的 3 个模型</summary>
+
+- `openrouter:inclusionai/ling-3.0-flash-fin:free`
+- `nvidia:mistralai/mistral-nemotron`
+- `huggingface:inclusionAI/Ling-3.0-flash-Fin`
+
+</details>
 
 ### 展开完整模型列表
 
 <details>
-<summary><strong>OpenRouter · 17 个模型</strong></summary>
+<summary><strong>OpenRouter · 16 个模型</strong></summary>
 
 - `openrouter:cohere/north-mini-code:free` — Cohere: North Mini Code (free)
 - `openrouter:dots-studio/dots-3-note-preview:free` — Dots Studio: Dots3-Note Preview (free)
 - `openrouter:google/gemma-4-26b-a4b-it:free` — Google: Gemma 4 26B A4B (free)
 - `openrouter:google/gemma-4-31b-it:free` — Google: Gemma 4 31B (free)
-- `openrouter:inclusionai/ling-3.0-flash-fin:free` — inclusionAI: Ling 3.0 Flash Fin (free)
 - `openrouter:inclusionai/ling-3.0-flash-sante:free` — inclusionAI: Ling 3.0 Flash Sante (free)
 - `openrouter:liquid/lfm-2.5-2.6b:free` — LiquidAI: LFM2.5-2.6B (free)
 - `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` — NVIDIA: Nemotron 3 Nano Omni (free)
@@ -134,13 +142,12 @@
 </details>
 
 <details>
-<summary><strong>NVIDIA NIM · 11 个模型</strong></summary>
+<summary><strong>NVIDIA NIM · 10 个模型</strong></summary>
 
 - `nvidia:google/diffusiongemma-26b-a4b-it`
 - `nvidia:google/gemma-4-31b-it`
 - `nvidia:meta/llama-3.2-11b-vision-instruct`
 - `nvidia:meta/llama-3.2-90b-vision-instruct`
-- `nvidia:mistralai/mistral-nemotron`
 - `nvidia:nvidia/ising-calibration-1.5-31b`
 - `nvidia:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`
 - `nvidia:nvidia/nemotron-3-super-120b-a12b`
@@ -158,9 +165,8 @@
 </details>
 
 <details>
-<summary><strong>Hugging Face · 3 个模型</strong></summary>
+<summary><strong>Hugging Face · 2 个模型</strong></summary>
 
-- `huggingface:inclusionAI/Ling-3.0-flash-Fin`
 - `huggingface:prism-ml/Ternary-Bonsai-27B-AWQ-4bit`
 - `huggingface:prism-ml/Ternary-Bonsai-27B-gguf`
 
