@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-09-29",
-  "generatedAt": "2026-09-29T02:01:30.141Z",
-  "reportPath": "reports/provider-free-model-audit-2026-09-29.md",
+  "date": "2026-09-30",
+  "generatedAt": "2026-09-30T01:19:33.631Z",
+  "reportPath": "reports/provider-free-model-audit-2026-09-30.md",
   "totalModels": 64,
   "providers": [
     {
@@ -436,28 +436,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-09-28",
+    "comparedWith": "2026-09-29",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "inclusionai/ling-3.0-flash-fin:free",
-        "displayName": "inclusionAI: Ling 3.0 Flash Fin (free)",
-        "contextWindow": 262144
-      },
-      {
-        "provider": "nvidia",
-        "id": "mistralai/mistral-nemotron",
-        "displayName": "mistralai/mistral-nemotron",
-        "contextWindow": null
-      },
-      {
-        "provider": "huggingface",
-        "id": "inclusionAI/Ling-3.0-flash-Fin",
-        "displayName": "inclusionAI/Ling-3.0-flash-Fin",
-        "contextWindow": 262144
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
