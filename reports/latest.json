@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-02",
-  "generatedAt": "2026-10-02T01:42:50.607Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-02.md",
-  "totalModels": 61,
+  "date": "2026-10-03",
+  "generatedAt": "2026-10-03T01:13:30.245Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-03.md",
+  "totalModels": 65,
   "providers": [
     {
       "id": "openrouter",
@@ -397,46 +397,52 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 3,
+      "count": 7,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
       "models": [
         {
+          "id": "deepseek-flash",
+          "displayName": "deepseek-flash",
+          "contextWindow": null
+        },
+        {
           "id": "deepseek-v4-flash",
-          "displayName": "DeepSeek V4 Flash (SenseNova)",
+          "displayName": "deepseek-v4-flash",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek-v4-pro",
+          "displayName": "deepseek-v4-pro",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek-v4.1-flash",
+          "displayName": "deepseek-v4.1-flash",
           "contextWindow": null
         },
         {
           "id": "glm-5.2",
-          "displayName": "GLM-5.2 (SenseNova)",
+          "displayName": "glm-5.2",
           "contextWindow": null
         },
         {
-          "id": "sensenova-6.7-flash-lite",
-          "displayName": "SenseNova 6.7 Flash-Lite",
+          "id": "kimi-k3",
+          "displayName": "kimi-k3",
+          "contextWindow": null
+        },
+        {
+          "id": "sensenova-6.8-flash-lite",
+          "displayName": "sensenova-6.8-flash-lite",
           "contextWindow": null
         }
       ]
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-01",
+    "comparedWith": "2026-10-02",
     "added": [
-      {
-        "provider": "openrouter",
-        "id": "apodex/apodex-1.1-mini:free",
-        "displayName": "Apodex: Apodex 1.1 Mini (free)",
-        "contextWindow": 262144
-      },
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.7-flash-lite",
-        "displayName": "SenseNova 6.7 Flash-Lite",
-        "contextWindow": null
-      }
-    ],
-    "removed": [
       {
         "provider": "sensenova",
         "id": "deepseek-flash",
@@ -465,6 +471,14 @@
         "provider": "sensenova",
         "id": "sensenova-6.8-flash-lite",
         "displayName": "sensenova-6.8-flash-lite",
+        "contextWindow": null
+      }
+    ],
+    "removed": [
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.7-flash-lite",
+        "displayName": "SenseNova 6.7 Flash-Lite",
         "contextWindow": null
       }
     ],
