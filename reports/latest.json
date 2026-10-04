@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-03",
-  "generatedAt": "2026-10-03T01:13:30.245Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-03.md",
+  "date": "2026-10-04",
+  "generatedAt": "2026-10-04T00:41:51.667Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-04.md",
   "totalModels": 65,
   "providers": [
     {
@@ -441,47 +441,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-02",
-    "added": [
-      {
-        "provider": "sensenova",
-        "id": "deepseek-flash",
-        "displayName": "deepseek-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "deepseek-v4-pro",
-        "displayName": "deepseek-v4-pro",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "deepseek-v4.1-flash",
-        "displayName": "deepseek-v4.1-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "kimi-k3",
-        "displayName": "kimi-k3",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.8-flash-lite",
-        "displayName": "sensenova-6.8-flash-lite",
-        "contextWindow": null
-      }
-    ],
-    "removed": [
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.7-flash-lite",
-        "displayName": "SenseNova 6.7 Flash-Lite",
-        "contextWindow": null
-      }
-    ],
+    "comparedWith": "2026-10-03",
+    "added": [],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
