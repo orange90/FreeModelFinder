@@ -2,26 +2,31 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-10-05（Asia/Shanghai）** · **65** 个免费模型入口 · **9/10** 个 Provider 正常。
+> 最近目录审计：**2026-10-06（Asia/Shanghai）** · **63** 个免费模型入口 · **9/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-05.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-06.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-10-04 相比，成功比较的 9 个 Provider 模型清单没有变化。
+与 2026-10-05 相比，在成功比较的 9 个 Provider 中：**新增 0 个，移除 2 个**。
+
+### 移除
+
+- `openrouter:qwen/qwen3.8-27b:free`
+- `nvidia:nvidia/riva-translate-4b-instruct-v1.1`
 
 ## Provider 汇总
 
 | Provider      | 状态    | 免费模型数 | 免费类型              | 免费依据                                                                            |
 | ------------- | ------- | ---------: | --------------------- | ----------------------------------------------------------------------------------- |
-| OpenRouter    | 🟢 正常 |         17 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
+| OpenRouter    | 🟢 正常 |         16 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
 | ModelScope    | 🟢 正常 |         16 | 账号免费额度          | API-Inference 免费型号清单与可用目录取交集                                          |
-| NVIDIA NIM    | 🟢 正常 |         10 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
+| NVIDIA NIM    | 🟢 正常 |          9 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
 | Cohere        | 🟢 正常 |          1 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
@@ -52,7 +57,6 @@
 | `openrouter:openrouter/free`                                    | Free Models Router                       |       200K |
 | `openrouter:poolside/laguna-s-2.1:free`                         | Poolside: Laguna S 2.1 (free)            |     262.1K |
 | `openrouter:poolside/laguna-xs-2.1:free`                        | Poolside: Laguna XS 2.1 (free)           |     262.1K |
-| `openrouter:qwen/qwen3.8-27b:free`                              | Qwen: Qwen3.8 27B (free)                 |     262.1K |
 | `openrouter:thinkingmachines/inkling-small:free`                | Thinking Machines: Inkling Small (free)  |         1M |
 | `openrouter:thinkingmachines/inkling:free`                      | Thinking Machines: Inkling (free)        |         1M |
 
@@ -141,7 +145,6 @@
 | `nvidia:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning` | nvidia/nemotron-3-nano-omni-30b-a3b-reasoning |          — |
 | `nvidia:nvidia/nemotron-3-super-120b-a12b`             | nvidia/nemotron-3-super-120b-a12b             |          — |
 | `nvidia:nvidia/nemotron-3-ultra-550b-a55b`             | nvidia/nemotron-3-ultra-550b-a55b             |          — |
-| `nvidia:nvidia/riva-translate-4b-instruct-v1.1`        | nvidia/riva-translate-4b-instruct-v1.1        |          — |
 | `nvidia:openai/gpt-oss-20b`                            | openai/gpt-oss-20b                            |          — |
 
 ### GitHub Models

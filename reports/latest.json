@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-05",
-  "generatedAt": "2026-10-05T00:59:31.974Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-05.md",
-  "totalModels": 65,
+  "date": "2026-10-06",
+  "generatedAt": "2026-10-06T02:20:14.086Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-06.md",
+  "totalModels": 63,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 17,
+      "count": 16,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -82,11 +82,6 @@
         {
           "id": "poolside/laguna-xs-2.1:free",
           "displayName": "Poolside: Laguna XS 2.1 (free)",
-          "contextWindow": 262144
-        },
-        {
-          "id": "qwen/qwen3.8-27b:free",
-          "displayName": "Qwen: Qwen3.8 27B (free)",
           "contextWindow": 262144
         },
         {
@@ -289,7 +284,7 @@
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
-      "count": 10,
+      "count": 9,
       "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
       "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
@@ -332,11 +327,6 @@
         {
           "id": "nvidia/nemotron-3-ultra-550b-a55b",
           "displayName": "nvidia/nemotron-3-ultra-550b-a55b",
-          "contextWindow": null
-        },
-        {
-          "id": "nvidia/riva-translate-4b-instruct-v1.1",
-          "displayName": "nvidia/riva-translate-4b-instruct-v1.1",
           "contextWindow": null
         },
         {
@@ -441,9 +431,22 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-04",
+    "comparedWith": "2026-10-05",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "qwen/qwen3.8-27b:free",
+        "displayName": "Qwen: Qwen3.8 27B (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "nvidia",
+        "id": "nvidia/riva-translate-4b-instruct-v1.1",
+        "displayName": "nvidia/riva-translate-4b-instruct-v1.1",
+        "contextWindow": null
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
