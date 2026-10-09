@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-08",
-  "generatedAt": "2026-10-08T01:59:40.932Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-08.md",
-  "totalModels": 63,
+  "date": "2026-10-09",
+  "generatedAt": "2026-10-09T02:13:43.881Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-09.md",
+  "totalModels": 61,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 16,
+      "count": 15,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -37,11 +37,6 @@
         {
           "id": "google/gemma-4-31b-it:free",
           "displayName": "Google: Gemma 4 31B (free)",
-          "contextWindow": 262144
-        },
-        {
-          "id": "inclusionai/ling-3.0-flash-sante:free",
-          "displayName": "inclusionAI: Ling 3.0 Flash Sante (free)",
           "contextWindow": 262144
         },
         {
@@ -387,7 +382,7 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 7,
+      "count": 6,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
@@ -400,11 +395,6 @@
         {
           "id": "deepseek-v4-flash",
           "displayName": "deepseek-v4-flash",
-          "contextWindow": null
-        },
-        {
-          "id": "deepseek-v4-pro",
-          "displayName": "deepseek-v4-pro",
           "contextWindow": null
         },
         {
@@ -431,9 +421,22 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-07",
+    "comparedWith": "2026-10-08",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.0-flash-sante:free",
+        "displayName": "inclusionAI: Ling 3.0 Flash Sante (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "sensenova",
+        "id": "deepseek-v4-pro",
+        "displayName": "deepseek-v4-pro",
+        "contextWindow": null
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

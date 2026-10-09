@@ -33,13 +33,13 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-10-08（Asia/Shanghai）更新：63 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-10-09（Asia/Shanghai）更新：61 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
-| OpenRouter    | 🟢 正常 |         16 | 零价格模型            |
+| OpenRouter    | 🟢 正常 |         15 | 零价格模型            |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            |
@@ -48,25 +48,32 @@
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          |
 | Cohere        | 🟢 正常 |          1 | 免费 Trial/Production |
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
-| SenseNova     | 🟢 正常 |          7 | 实时零价模型          |
+| SenseNova     | 🟢 正常 |          6 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-08.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-09.md)
 
 ### 今日变化
 
-与 2026-10-07 相比，成功比较的 9 个 Provider 模型清单没有变化。
+与 2026-10-08 相比，在成功比较的 9 个 Provider 中：**新增 0 个，移除 2 个**。
+
+<details>
+<summary>查看移除的 2 个模型</summary>
+
+- `openrouter:inclusionai/ling-3.0-flash-sante:free`
+- `sensenova:deepseek-v4-pro`
+
+</details>
 
 ### 展开完整模型列表
 
 <details>
-<summary><strong>OpenRouter · 16 个模型</strong></summary>
+<summary><strong>OpenRouter · 15 个模型</strong></summary>
 
 - `openrouter:apodex/apodex-1.1-mini:free` — Apodex: Apodex 1.1 Mini (free)
 - `openrouter:cohere/north-mini-code:free` — Cohere: North Mini Code (free)
 - `openrouter:dots-studio/dots-3-note-preview:free` — Dots Studio: Dots3-Note Preview (free)
 - `openrouter:google/gemma-4-26b-a4b-it:free` — Google: Gemma 4 26B A4B (free)
 - `openrouter:google/gemma-4-31b-it:free` — Google: Gemma 4 31B (free)
-- `openrouter:inclusionai/ling-3.0-flash-sante:free` — inclusionAI: Ling 3.0 Flash Sante (free)
 - `openrouter:liquid/lfm-2.5-2.6b:free` — LiquidAI: LFM2.5-2.6B (free)
 - `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` — NVIDIA: Nemotron 3 Nano Omni (free)
 - `openrouter:nvidia/nemotron-3-super-120b-a12b:free` — NVIDIA: Nemotron 3 Super (free)
@@ -163,11 +170,10 @@
 </details>
 
 <details>
-<summary><strong>SenseNova · 7 个模型</strong></summary>
+<summary><strong>SenseNova · 6 个模型</strong></summary>
 
 - `sensenova:deepseek-flash`
 - `sensenova:deepseek-v4-flash`
-- `sensenova:deepseek-v4-pro`
 - `sensenova:deepseek-v4.1-flash`
 - `sensenova:glm-5.2`
 - `sensenova:kimi-k3`
