@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-09",
-  "generatedAt": "2026-10-09T02:13:43.881Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-09.md",
+  "date": "2026-10-10",
+  "generatedAt": "2026-10-10T01:46:19.253Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-10.md",
   "totalModels": 61,
   "providers": [
     {
@@ -421,22 +421,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-08",
+    "comparedWith": "2026-10-09",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "inclusionai/ling-3.0-flash-sante:free",
-        "displayName": "inclusionAI: Ling 3.0 Flash Sante (free)",
-        "contextWindow": 262144
-      },
-      {
-        "provider": "sensenova",
-        "id": "deepseek-v4-pro",
-        "displayName": "deepseek-v4-pro",
-        "contextWindow": null
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
