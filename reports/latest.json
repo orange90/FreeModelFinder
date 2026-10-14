@@ -1,24 +1,19 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-13",
-  "generatedAt": "2026-10-13T03:04:14.926Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-13.md",
-  "totalModels": 61,
+  "date": "2026-10-14",
+  "generatedAt": "2026-10-14T01:15:36.989Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-14.md",
+  "totalModels": 60,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 15,
+      "count": 14,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
       "models": [
-        {
-          "id": "apodex/apodex-1.1-mini:free",
-          "displayName": "Apodex: Apodex 1.1 Mini (free)",
-          "contextWindow": 262144
-        },
         {
           "id": "cohere/north-mini-code:free",
           "displayName": "Cohere: North Mini Code (free)",
@@ -421,9 +416,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-12",
+    "comparedWith": "2026-10-13",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "apodex/apodex-1.1-mini:free",
+        "displayName": "Apodex: Apodex 1.1 Mini (free)",
+        "contextWindow": 262144
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
