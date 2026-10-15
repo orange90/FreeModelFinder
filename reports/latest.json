@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-14",
-  "generatedAt": "2026-10-14T01:15:36.989Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-14.md",
+  "date": "2026-10-15",
+  "generatedAt": "2026-10-15T00:33:54.337Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-15.md",
   "totalModels": 60,
   "providers": [
     {
@@ -416,16 +416,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-13",
+    "comparedWith": "2026-10-14",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "apodex/apodex-1.1-mini:free",
-        "displayName": "Apodex: Apodex 1.1 Mini (free)",
-        "contextWindow": 262144
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
