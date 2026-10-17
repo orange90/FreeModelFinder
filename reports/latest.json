@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-16",
-  "generatedAt": "2026-10-16T00:26:55.779Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-16.md",
-  "totalModels": 61,
+  "date": "2026-10-17",
+  "generatedAt": "2026-10-17T00:31:48.865Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-17.md",
+  "totalModels": 62,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 15,
+      "count": 16,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -88,6 +88,11 @@
           "id": "thinkingmachines/inkling:free",
           "displayName": "Thinking Machines: Inkling (free)",
           "contextWindow": 1048576
+        },
+        {
+          "id": "xingchen-agi/xing4.0-29b-a4b:free",
+          "displayName": "XingChen: Xing4.0 29B A4B (free)",
+          "contextWindow": 262144
         }
       ]
     },
@@ -421,13 +426,13 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-15",
+    "comparedWith": "2026-10-16",
     "added": [
       {
         "provider": "openrouter",
-        "id": "nvidia/nemotron-3.5-super-vl:free",
-        "displayName": "NVIDIA: Nemotron 3.5 Super VL (free)",
-        "contextWindow": 1000000
+        "id": "xingchen-agi/xing4.0-29b-a4b:free",
+        "displayName": "XingChen: Xing4.0 29B A4B (free)",
+        "contextWindow": 262144
       }
     ],
     "removed": [],

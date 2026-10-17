@@ -2,25 +2,25 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-10-16（Asia/Shanghai）** · **61** 个免费模型入口 · **9/10** 个 Provider 正常。
+> 最近目录审计：**2026-10-17（Asia/Shanghai）** · **62** 个免费模型入口 · **9/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-16.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-17.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-10-15 相比，在成功比较的 9 个 Provider 中：**新增 1 个，移除 0 个**。
+与 2026-10-16 相比，在成功比较的 9 个 Provider 中：**新增 1 个，移除 0 个**。
 
 ### 新增
 
-- `openrouter:nvidia/nemotron-3.5-super-vl:free`
+- `openrouter:xingchen-agi/xing4.0-29b-a4b:free`
 
 ## Provider 汇总
 
 | Provider      | 状态    | 免费模型数 | 免费类型              | 免费依据                                                                            |
 | ------------- | ------- | ---------: | --------------------- | ----------------------------------------------------------------------------------- |
-| OpenRouter    | 🟢 正常 |         15 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
+| OpenRouter    | 🟢 正常 |         16 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
@@ -57,6 +57,7 @@
 | `openrouter:poolside/laguna-xs-2.1:free`                        | Poolside: Laguna XS 2.1 (free)          |     262.1K |
 | `openrouter:thinkingmachines/inkling-small:free`                | Thinking Machines: Inkling Small (free) |         1M |
 | `openrouter:thinkingmachines/inkling:free`                      | Thinking Machines: Inkling (free)       |         1M |
+| `openrouter:xingchen-agi/xing4.0-29b-a4b:free`                  | XingChen: Xing4.0 29B A4B (free)        |     262.1K |
 
 ### Google Gemini
 
