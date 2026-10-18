@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-17",
-  "generatedAt": "2026-10-17T00:31:48.865Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-17.md",
+  "date": "2026-10-18",
+  "generatedAt": "2026-10-18T00:04:54.930Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-18.md",
   "totalModels": 62,
   "providers": [
     {
@@ -426,15 +426,8 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-16",
-    "added": [
-      {
-        "provider": "openrouter",
-        "id": "xingchen-agi/xing4.0-29b-a4b:free",
-        "displayName": "XingChen: Xing4.0 29B A4B (free)",
-        "contextWindow": 262144
-      }
-    ],
+    "comparedWith": "2026-10-17",
+    "added": [],
     "removed": [],
     "comparedProviders": [
       "openrouter",
