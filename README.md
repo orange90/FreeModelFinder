@@ -33,7 +33,7 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-10-20（Asia/Shanghai）更新：63 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-10-21（Asia/Shanghai）更新：63 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
 > 本次目录失败：GitHub Models。
 
@@ -50,18 +50,11 @@
 | Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          6 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-20.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-21.md)
 
 ### 今日变化
 
-与 2026-10-19 相比，在成功比较的 9 个 Provider 中：**新增 1 个，移除 0 个**。
-
-<details>
-<summary>查看新增的 1 个模型</summary>
-
-- `openrouter:minimax/minimax-m3.1-flash:free`
-
-</details>
+与 2026-10-20 相比，成功比较的 9 个 Provider 模型清单没有变化。
 
 ### 展开完整模型列表
 

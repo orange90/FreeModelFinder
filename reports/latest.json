@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-20",
-  "generatedAt": "2026-10-20T01:06:36.203Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-20.md",
+  "date": "2026-10-21",
+  "generatedAt": "2026-10-21T00:39:39.948Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-21.md",
   "totalModels": 63,
   "providers": [
     {
@@ -431,15 +431,8 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-19",
-    "added": [
-      {
-        "provider": "openrouter",
-        "id": "minimax/minimax-m3.1-flash:free",
-        "displayName": "MiniMax: MiniMax M3.1 Flash (free)",
-        "contextWindow": 1000000
-      }
-    ],
+    "comparedWith": "2026-10-20",
+    "added": [],
     "removed": [],
     "comparedProviders": [
       "openrouter",
