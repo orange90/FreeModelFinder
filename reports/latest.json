@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-21",
-  "generatedAt": "2026-10-21T00:39:39.948Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-21.md",
-  "totalModels": 63,
+  "date": "2026-10-22",
+  "generatedAt": "2026-10-22T00:42:36.126Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-22.md",
+  "totalModels": 62,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 17,
+      "count": 18,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -82,6 +82,11 @@
         {
           "id": "poolside/laguna-xs-2.1:free",
           "displayName": "Poolside: Laguna XS 2.1 (free)",
+          "contextWindow": 262144
+        },
+        {
+          "id": "recursive/flint-v1.0:free",
+          "displayName": "Recursive: Flint (free)",
           "contextWindow": 262144
         },
         {
@@ -370,23 +375,12 @@
     {
       "id": "huggingface",
       "display": "Hugging Face",
-      "status": "ok",
-      "count": 2,
+      "status": "error",
+      "count": 0,
       "freeType": "实时零价端点",
       "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
       "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入",
-      "models": [
-        {
-          "id": "prism-ml/Ternary-Bonsai-27B-AWQ-4bit",
-          "displayName": "prism-ml/Ternary-Bonsai-27B-AWQ-4bit",
-          "contextWindow": 262144
-        },
-        {
-          "id": "prism-ml/Ternary-Bonsai-27B-gguf",
-          "displayName": "prism-ml/Ternary-Bonsai-27B-gguf",
-          "contextWindow": 262144
-        }
-      ]
+      "models": []
     },
     {
       "id": "sensenova",
@@ -431,8 +425,15 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-20",
-    "added": [],
+    "comparedWith": "2026-10-21",
+    "added": [
+      {
+        "provider": "openrouter",
+        "id": "recursive/flint-v1.0:free",
+        "displayName": "Recursive: Flint (free)",
+        "contextWindow": 262144
+      }
+    ],
     "removed": [],
     "comparedProviders": [
       "openrouter",
@@ -442,7 +443,6 @@
       "modelscope",
       "nvidia",
       "cohere",
-      "huggingface",
       "sensenova"
     ]
   }

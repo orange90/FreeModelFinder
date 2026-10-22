@@ -2,21 +2,25 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-10-21（Asia/Shanghai）** · **63** 个免费模型入口 · **9/10** 个 Provider 正常。
+> 最近目录审计：**2026-10-22（Asia/Shanghai）** · **62** 个免费模型入口 · **8/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-21.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-22.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-10-20 相比，成功比较的 9 个 Provider 模型清单没有变化。
+与 2026-10-21 相比，在成功比较的 8 个 Provider 中：**新增 1 个，移除 0 个**。
+
+### 新增
+
+- `openrouter:recursive/flint-v1.0:free`
 
 ## Provider 汇总
 
 | Provider      | 状态    | 免费模型数 | 免费类型              | 免费依据                                                                            |
 | ------------- | ------- | ---------: | --------------------- | ----------------------------------------------------------------------------------- |
-| OpenRouter    | 🟢 正常 |         17 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
+| OpenRouter    | 🟢 正常 |         18 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
@@ -24,7 +28,7 @@
 | NVIDIA NIM    | 🟢 正常 |          9 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
 | Cohere        | 🟢 正常 |          1 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
-| Hugging Face  | 🟢 正常 |          2 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
+| Hugging Face  | 🔴 失败 |   暂不可用 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
 | SenseNova     | 🟢 正常 |          6 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
 
 ## 完整列表
@@ -52,6 +56,7 @@
 | `openrouter:openrouter/free`                                    | Free Models Router                      |       200K |
 | `openrouter:poolside/laguna-s-2.1:free`                         | Poolside: Laguna S 2.1 (free)           |     262.1K |
 | `openrouter:poolside/laguna-xs-2.1:free`                        | Poolside: Laguna XS 2.1 (free)          |     262.1K |
+| `openrouter:recursive/flint-v1.0:free`                          | Recursive: Flint (free)                 |     262.1K |
 | `openrouter:thinkingmachines/inkling-small:free`                | Thinking Machines: Inkling Small (free) |         1M |
 | `openrouter:thinkingmachines/inkling:free`                      | Thinking Machines: Inkling (free)       |         1M |
 | `openrouter:xingchen-agi/xing4.0-29b-a4b:free`                  | XingChen: Xing4.0 29B A4B (free)        |     262.1K |
@@ -166,14 +171,11 @@
 ### Hugging Face
 
 - Provider ID：`huggingface`
-- 状态：🟢 正常
+- 状态：🔴 失败
 - 免费依据：实时端点明确报告 `is_free`，或输入输出价格均为 0
 - 主要风险：普通 Router 模型可能消耗 credits 或按量收费，因此不会混入
 
-| Gateway 模型 ID                                    | 显示名称                             | 上下文窗口 |
-| -------------------------------------------------- | ------------------------------------ | ---------: |
-| `huggingface:prism-ml/Ternary-Bonsai-27B-AWQ-4bit` | prism-ml/Ternary-Bonsai-27B-AWQ-4bit |     262.1K |
-| `huggingface:prism-ml/Ternary-Bonsai-27B-gguf`     | prism-ml/Ternary-Bonsai-27B-gguf     |     262.1K |
+本次没有可展示的模型清单。
 
 ### SenseNova
 

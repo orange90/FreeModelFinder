@@ -33,13 +33,13 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-10-21（Asia/Shanghai）更新：63 个免费模型入口，覆盖 9/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-10-22（Asia/Shanghai）更新：62 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
-> 本次目录失败：GitHub Models。
+> 本次目录失败：GitHub Models、Hugging Face。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
-| OpenRouter    | 🟢 正常 |         17 | 零价格模型            |
+| OpenRouter    | 🟢 正常 |         18 | 零价格模型            |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            |
@@ -47,19 +47,26 @@
 | NVIDIA NIM    | 🟢 正常 |          9 | 免费开发端点          |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          |
 | Cohere        | 🟢 正常 |          1 | 免费 Trial/Production |
-| Hugging Face  | 🟢 正常 |          2 | 实时零价端点          |
+| Hugging Face  | 🔴 失败 |   暂不可用 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          6 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-21.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-22.md)
 
 ### 今日变化
 
-与 2026-10-20 相比，成功比较的 9 个 Provider 模型清单没有变化。
+与 2026-10-21 相比，在成功比较的 8 个 Provider 中：**新增 1 个，移除 0 个**。
+
+<details>
+<summary>查看新增的 1 个模型</summary>
+
+- `openrouter:recursive/flint-v1.0:free`
+
+</details>
 
 ### 展开完整模型列表
 
 <details>
-<summary><strong>OpenRouter · 17 个模型</strong></summary>
+<summary><strong>OpenRouter · 18 个模型</strong></summary>
 
 - `openrouter:cohere/north-mini-code:free` — Cohere: North Mini Code (free)
 - `openrouter:dots-studio/dots-3-note-preview:free` — Dots Studio: Dots3-Note Preview (free)
@@ -75,6 +82,7 @@
 - `openrouter:openrouter/free` — Free Models Router
 - `openrouter:poolside/laguna-s-2.1:free` — Poolside: Laguna S 2.1 (free)
 - `openrouter:poolside/laguna-xs-2.1:free` — Poolside: Laguna XS 2.1 (free)
+- `openrouter:recursive/flint-v1.0:free` — Recursive: Flint (free)
 - `openrouter:thinkingmachines/inkling-small:free` — Thinking Machines: Inkling Small (free)
 - `openrouter:thinkingmachines/inkling:free` — Thinking Machines: Inkling (free)
 - `openrouter:xingchen-agi/xing4.0-29b-a4b:free` — XingChen: Xing4.0 29B A4B (free)
@@ -152,14 +160,6 @@
 <summary><strong>Cohere · 1 个模型</strong></summary>
 
 - `cohere:north-mini-code-1-0`
-
-</details>
-
-<details>
-<summary><strong>Hugging Face · 2 个模型</strong></summary>
-
-- `huggingface:prism-ml/Ternary-Bonsai-27B-AWQ-4bit`
-- `huggingface:prism-ml/Ternary-Bonsai-27B-gguf`
 
 </details>
 
