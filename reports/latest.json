@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-22",
-  "generatedAt": "2026-10-22T00:42:36.126Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-22.md",
-  "totalModels": 62,
+  "date": "2026-10-23",
+  "generatedAt": "2026-10-23T00:42:35.245Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-23.md",
+  "totalModels": 61,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 18,
+      "count": 17,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -38,11 +38,6 @@
           "id": "liquid/lfm-2.5-2.6b:free",
           "displayName": "LiquidAI: LFM2.5-2.6B (free)",
           "contextWindow": 65536
-        },
-        {
-          "id": "minimax/minimax-m3.1-flash:free",
-          "displayName": "MiniMax: MiniMax M3.1 Flash (free)",
-          "contextWindow": 1000000
         },
         {
           "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
@@ -425,16 +420,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-21",
-    "added": [
+    "comparedWith": "2026-10-22",
+    "added": [],
+    "removed": [
       {
         "provider": "openrouter",
-        "id": "recursive/flint-v1.0:free",
-        "displayName": "Recursive: Flint (free)",
-        "contextWindow": 262144
+        "id": "minimax/minimax-m3.1-flash:free",
+        "displayName": "MiniMax: MiniMax M3.1 Flash (free)",
+        "contextWindow": 1000000
       }
     ],
-    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
