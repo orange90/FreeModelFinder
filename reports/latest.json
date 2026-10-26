@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-25",
-  "generatedAt": "2026-10-25T00:21:31.637Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-25.md",
-  "totalModels": 61,
+  "date": "2026-10-26",
+  "generatedAt": "2026-10-26T00:25:31.112Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-26.md",
+  "totalModels": 58,
   "providers": [
     {
       "id": "openrouter",
@@ -381,48 +381,65 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 6,
+      "count": 3,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
       "models": [
         {
-          "id": "deepseek-flash",
-          "displayName": "deepseek-flash",
-          "contextWindow": null
-        },
-        {
           "id": "deepseek-v4-flash",
-          "displayName": "deepseek-v4-flash",
-          "contextWindow": null
-        },
-        {
-          "id": "deepseek-v4.1-flash",
-          "displayName": "deepseek-v4.1-flash",
+          "displayName": "DeepSeek V4 Flash (SenseNova)",
           "contextWindow": null
         },
         {
           "id": "glm-5.2",
-          "displayName": "glm-5.2",
+          "displayName": "GLM-5.2 (SenseNova)",
           "contextWindow": null
         },
         {
-          "id": "kimi-k3",
-          "displayName": "kimi-k3",
-          "contextWindow": null
-        },
-        {
-          "id": "sensenova-6.8-flash-lite",
-          "displayName": "sensenova-6.8-flash-lite",
+          "id": "sensenova-6.7-flash-lite",
+          "displayName": "SenseNova 6.7 Flash-Lite",
           "contextWindow": null
         }
       ]
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-24",
-    "added": [],
-    "removed": [],
+    "comparedWith": "2026-10-25",
+    "added": [
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.7-flash-lite",
+        "displayName": "SenseNova 6.7 Flash-Lite",
+        "contextWindow": null
+      }
+    ],
+    "removed": [
+      {
+        "provider": "sensenova",
+        "id": "deepseek-flash",
+        "displayName": "deepseek-flash",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "deepseek-v4.1-flash",
+        "displayName": "deepseek-v4.1-flash",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "kimi-k3",
+        "displayName": "kimi-k3",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.8-flash-lite",
+        "displayName": "sensenova-6.8-flash-lite",
+        "contextWindow": null
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

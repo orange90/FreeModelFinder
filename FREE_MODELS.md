@@ -2,15 +2,26 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-10-25（Asia/Shanghai）** · **61** 个免费模型入口 · **8/10** 个 Provider 正常。
+> 最近目录审计：**2026-10-26（Asia/Shanghai）** · **58** 个免费模型入口 · **8/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-25.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-10-26.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-10-24 相比，成功比较的 8 个 Provider 模型清单没有变化。
+与 2026-10-25 相比，在成功比较的 8 个 Provider 中：**新增 1 个，移除 4 个**。
+
+### 新增
+
+- `sensenova:sensenova-6.7-flash-lite`
+
+### 移除
+
+- `sensenova:deepseek-flash`
+- `sensenova:deepseek-v4.1-flash`
+- `sensenova:kimi-k3`
+- `sensenova:sensenova-6.8-flash-lite`
 
 ## Provider 汇总
 
@@ -25,7 +36,7 @@
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
 | Cohere        | 🟢 正常 |          1 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
 | Hugging Face  | 🔴 失败 |   暂不可用 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
-| SenseNova     | 🟢 正常 |          6 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
+| SenseNova     | 🟢 正常 |          3 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
 
 ## 完整列表
 
@@ -179,11 +190,8 @@
 - 免费依据：实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单
 - 主要风险：免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态
 
-| Gateway 模型 ID                      | 显示名称                 | 上下文窗口 |
-| ------------------------------------ | ------------------------ | ---------: |
-| `sensenova:deepseek-flash`           | deepseek-flash           |          — |
-| `sensenova:deepseek-v4-flash`        | deepseek-v4-flash        |          — |
-| `sensenova:deepseek-v4.1-flash`      | deepseek-v4.1-flash      |          — |
-| `sensenova:glm-5.2`                  | glm-5.2                  |          — |
-| `sensenova:kimi-k3`                  | kimi-k3                  |          — |
-| `sensenova:sensenova-6.8-flash-lite` | sensenova-6.8-flash-lite |          — |
+| Gateway 模型 ID                      | 显示名称                      | 上下文窗口 |
+| ------------------------------------ | ----------------------------- | ---------: |
+| `sensenova:deepseek-v4-flash`        | DeepSeek V4 Flash (SenseNova) |          — |
+| `sensenova:glm-5.2`                  | GLM-5.2 (SenseNova)           |          — |
+| `sensenova:sensenova-6.7-flash-lite` | SenseNova 6.7 Flash-Lite      |          — |
