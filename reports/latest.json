@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-26",
-  "generatedAt": "2026-10-26T00:25:31.112Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-26.md",
-  "totalModels": 58,
+  "date": "2026-10-27",
+  "generatedAt": "2026-10-27T01:30:09.525Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-27.md",
+  "totalModels": 61,
   "providers": [
     {
       "id": "openrouter",
@@ -381,40 +381,47 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 3,
+      "count": 6,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
       "models": [
         {
+          "id": "deepseek-flash",
+          "displayName": "deepseek-flash",
+          "contextWindow": null
+        },
+        {
           "id": "deepseek-v4-flash",
-          "displayName": "DeepSeek V4 Flash (SenseNova)",
+          "displayName": "deepseek-v4-flash",
+          "contextWindow": null
+        },
+        {
+          "id": "deepseek-v4.1-flash",
+          "displayName": "deepseek-v4.1-flash",
           "contextWindow": null
         },
         {
           "id": "glm-5.2",
-          "displayName": "GLM-5.2 (SenseNova)",
+          "displayName": "glm-5.2",
           "contextWindow": null
         },
         {
-          "id": "sensenova-6.7-flash-lite",
-          "displayName": "SenseNova 6.7 Flash-Lite",
+          "id": "kimi-k3",
+          "displayName": "kimi-k3",
+          "contextWindow": null
+        },
+        {
+          "id": "sensenova-6.8-flash-lite",
+          "displayName": "sensenova-6.8-flash-lite",
           "contextWindow": null
         }
       ]
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-25",
+    "comparedWith": "2026-10-26",
     "added": [
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.7-flash-lite",
-        "displayName": "SenseNova 6.7 Flash-Lite",
-        "contextWindow": null
-      }
-    ],
-    "removed": [
       {
         "provider": "sensenova",
         "id": "deepseek-flash",
@@ -437,6 +444,14 @@
         "provider": "sensenova",
         "id": "sensenova-6.8-flash-lite",
         "displayName": "sensenova-6.8-flash-lite",
+        "contextWindow": null
+      }
+    ],
+    "removed": [
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.7-flash-lite",
+        "displayName": "SenseNova 6.7 Flash-Lite",
         "contextWindow": null
       }
     ],
