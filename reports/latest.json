@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-27",
-  "generatedAt": "2026-10-27T01:30:09.525Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-27.md",
-  "totalModels": 61,
+  "date": "2026-10-28",
+  "generatedAt": "2026-10-28T01:25:57.999Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-28.md",
+  "totalModels": 59,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 17,
+      "count": 16,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -43,11 +43,6 @@
           "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
           "displayName": "NVIDIA: Nemotron 3 Nano Omni (free)",
           "contextWindow": 256000
-        },
-        {
-          "id": "nvidia/nemotron-3-super-120b-a12b:free",
-          "displayName": "NVIDIA: Nemotron 3 Super (free)",
-          "contextWindow": 262144
         },
         {
           "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
@@ -354,18 +349,12 @@
     {
       "id": "cohere",
       "display": "Cohere",
-      "status": "ok",
-      "count": 1,
+      "status": "error",
+      "count": 0,
       "freeType": "免费 Trial/Production",
       "freeBasis": "只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`",
       "risk": "有速率限制；其他 Command 模型不再被标记为免费",
-      "models": [
-        {
-          "id": "north-mini-code-1-0",
-          "displayName": "north-mini-code-1-0",
-          "contextWindow": 436000
-        }
-      ]
+      "models": []
     },
     {
       "id": "huggingface",
@@ -420,39 +409,14 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-26",
-    "added": [
-      {
-        "provider": "sensenova",
-        "id": "deepseek-flash",
-        "displayName": "deepseek-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "deepseek-v4.1-flash",
-        "displayName": "deepseek-v4.1-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "kimi-k3",
-        "displayName": "kimi-k3",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.8-flash-lite",
-        "displayName": "sensenova-6.8-flash-lite",
-        "contextWindow": null
-      }
-    ],
+    "comparedWith": "2026-10-27",
+    "added": [],
     "removed": [
       {
-        "provider": "sensenova",
-        "id": "sensenova-6.7-flash-lite",
-        "displayName": "SenseNova 6.7 Flash-Lite",
-        "contextWindow": null
+        "provider": "openrouter",
+        "id": "nvidia/nemotron-3-super-120b-a12b:free",
+        "displayName": "NVIDIA: Nemotron 3 Super (free)",
+        "contextWindow": 262144
       }
     ],
     "comparedProviders": [
@@ -462,7 +426,6 @@
       "siliconflow",
       "modelscope",
       "nvidia",
-      "cohere",
       "sensenova"
     ]
   }
