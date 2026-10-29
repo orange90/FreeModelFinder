@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-28",
-  "generatedAt": "2026-10-28T01:25:57.999Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-28.md",
+  "date": "2026-10-29",
+  "generatedAt": "2026-10-29T01:51:03.288Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-29.md",
   "totalModels": 59,
   "providers": [
     {
@@ -409,16 +409,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-27",
+    "comparedWith": "2026-10-28",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "nvidia/nemotron-3-super-120b-a12b:free",
-        "displayName": "NVIDIA: Nemotron 3 Super (free)",
-        "contextWindow": 262144
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
