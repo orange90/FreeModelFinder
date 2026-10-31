@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-30",
-  "generatedAt": "2026-10-30T01:59:15.712Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-30.md",
+  "date": "2026-10-31",
+  "generatedAt": "2026-10-31T01:37:30.037Z",
+  "reportPath": "reports/provider-free-model-audit-2026-10-31.md",
   "totalModels": 59,
   "providers": [
     {
@@ -409,7 +409,7 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-29",
+    "comparedWith": "2026-10-30",
     "added": [],
     "removed": [],
     "comparedProviders": [
