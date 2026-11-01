@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-10-31",
-  "generatedAt": "2026-10-31T01:37:30.037Z",
-  "reportPath": "reports/provider-free-model-audit-2026-10-31.md",
-  "totalModels": 59,
+  "date": "2026-11-01",
+  "generatedAt": "2026-11-01T01:15:28.165Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-01.md",
+  "totalModels": 57,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 16,
+      "count": 14,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -63,16 +63,6 @@
           "id": "openrouter/free",
           "displayName": "Free Models Router",
           "contextWindow": 200000
-        },
-        {
-          "id": "poolside/laguna-s-2.1:free",
-          "displayName": "Poolside: Laguna S 2.1 (free)",
-          "contextWindow": 262144
-        },
-        {
-          "id": "poolside/laguna-xs-2.1:free",
-          "displayName": "Poolside: Laguna XS 2.1 (free)",
-          "contextWindow": 262144
         },
         {
           "id": "recursive/flint-v1.0:free",
@@ -409,9 +399,22 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-30",
+    "comparedWith": "2026-10-31",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "poolside/laguna-s-2.1:free",
+        "displayName": "Poolside: Laguna S 2.1 (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "openrouter",
+        "id": "poolside/laguna-xs-2.1:free",
+        "displayName": "Poolside: Laguna XS 2.1 (free)",
+        "contextWindow": 262144
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
