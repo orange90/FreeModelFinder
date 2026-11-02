@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-01",
-  "generatedAt": "2026-11-01T01:15:28.165Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-01.md",
+  "date": "2026-11-02",
+  "generatedAt": "2026-11-02T01:32:11.737Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-02.md",
   "totalModels": 57,
   "providers": [
     {
@@ -399,22 +399,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-10-31",
+    "comparedWith": "2026-11-01",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "poolside/laguna-s-2.1:free",
-        "displayName": "Poolside: Laguna S 2.1 (free)",
-        "contextWindow": 262144
-      },
-      {
-        "provider": "openrouter",
-        "id": "poolside/laguna-xs-2.1:free",
-        "displayName": "Poolside: Laguna XS 2.1 (free)",
-        "contextWindow": 262144
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
