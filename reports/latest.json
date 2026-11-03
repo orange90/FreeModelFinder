@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-02",
-  "generatedAt": "2026-11-02T01:32:11.737Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-02.md",
-  "totalModels": 57,
+  "date": "2026-11-03",
+  "generatedAt": "2026-11-03T03:29:11.932Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-03.md",
+  "totalModels": 58,
   "providers": [
     {
       "id": "openrouter",
@@ -360,7 +360,7 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 6,
+      "count": 7,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
@@ -391,6 +391,11 @@
           "contextWindow": null
         },
         {
+          "id": "sensenova-6.8-flash",
+          "displayName": "sensenova-6.8-flash",
+          "contextWindow": null
+        },
+        {
           "id": "sensenova-6.8-flash-lite",
           "displayName": "sensenova-6.8-flash-lite",
           "contextWindow": null
@@ -399,8 +404,15 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-01",
-    "added": [],
+    "comparedWith": "2026-11-02",
+    "added": [
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.8-flash",
+        "displayName": "sensenova-6.8-flash",
+        "contextWindow": null
+      }
+    ],
     "removed": [],
     "comparedProviders": [
       "openrouter",
