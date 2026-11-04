@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-03",
-  "generatedAt": "2026-11-03T03:29:11.932Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-03.md",
+  "date": "2026-11-04",
+  "generatedAt": "2026-11-04T02:22:56.931Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-04.md",
   "totalModels": 58,
   "providers": [
     {
@@ -404,15 +404,8 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-02",
-    "added": [
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.8-flash",
-        "displayName": "sensenova-6.8-flash",
-        "contextWindow": null
-      }
-    ],
+    "comparedWith": "2026-11-03",
+    "added": [],
     "removed": [],
     "comparedProviders": [
       "openrouter",
