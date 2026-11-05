@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-04",
-  "generatedAt": "2026-11-04T02:22:56.931Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-04.md",
-  "totalModels": 58,
+  "date": "2026-11-05",
+  "generatedAt": "2026-11-05T02:30:25.718Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-05.md",
+  "totalModels": 57,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 14,
+      "count": 12,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -68,16 +68,6 @@
           "id": "recursive/flint-v1.0:free",
           "displayName": "Recursive: Flint (free)",
           "contextWindow": 262144
-        },
-        {
-          "id": "thinkingmachines/inkling-small:free",
-          "displayName": "Thinking Machines: Inkling Small (free)",
-          "contextWindow": 1048576
-        },
-        {
-          "id": "thinkingmachines/inkling:free",
-          "displayName": "Thinking Machines: Inkling (free)",
-          "contextWindow": 1048576
         },
         {
           "id": "xingchen-agi/xing4.0-29b-a4b:free",
@@ -360,7 +350,7 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 7,
+      "count": 8,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
@@ -386,6 +376,11 @@
           "contextWindow": null
         },
         {
+          "id": "glm-5.3",
+          "displayName": "glm-5.3",
+          "contextWindow": null
+        },
+        {
           "id": "kimi-k3",
           "displayName": "kimi-k3",
           "contextWindow": null
@@ -404,9 +399,29 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-03",
-    "added": [],
-    "removed": [],
+    "comparedWith": "2026-11-04",
+    "added": [
+      {
+        "provider": "sensenova",
+        "id": "glm-5.3",
+        "displayName": "glm-5.3",
+        "contextWindow": null
+      }
+    ],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "thinkingmachines/inkling-small:free",
+        "displayName": "Thinking Machines: Inkling Small (free)",
+        "contextWindow": 1048576
+      },
+      {
+        "provider": "openrouter",
+        "id": "thinkingmachines/inkling:free",
+        "displayName": "Thinking Machines: Inkling (free)",
+        "contextWindow": 1048576
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
