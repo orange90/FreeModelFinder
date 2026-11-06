@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-05",
-  "generatedAt": "2026-11-05T02:30:25.718Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-05.md",
-  "totalModels": 57,
+  "date": "2026-11-06",
+  "generatedAt": "2026-11-06T02:31:10.632Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-06.md",
+  "totalModels": 55,
   "providers": [
     {
       "id": "openrouter",
@@ -264,7 +264,7 @@
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
-      "count": 9,
+      "count": 8,
       "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
       "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
@@ -277,11 +277,6 @@
         {
           "id": "google/gemma-4-31b-it",
           "displayName": "google/gemma-4-31b-it",
-          "contextWindow": null
-        },
-        {
-          "id": "meta/llama-3.2-11b-vision-instruct",
-          "displayName": "meta/llama-3.2-11b-vision-instruct",
           "contextWindow": null
         },
         {
@@ -350,7 +345,7 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 8,
+      "count": 7,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
@@ -363,11 +358,6 @@
         {
           "id": "deepseek-v4-flash",
           "displayName": "deepseek-v4-flash",
-          "contextWindow": null
-        },
-        {
-          "id": "deepseek-v4.1-flash",
-          "displayName": "deepseek-v4.1-flash",
           "contextWindow": null
         },
         {
@@ -399,27 +389,20 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-04",
-    "added": [
-      {
-        "provider": "sensenova",
-        "id": "glm-5.3",
-        "displayName": "glm-5.3",
-        "contextWindow": null
-      }
-    ],
+    "comparedWith": "2026-11-05",
+    "added": [],
     "removed": [
       {
-        "provider": "openrouter",
-        "id": "thinkingmachines/inkling-small:free",
-        "displayName": "Thinking Machines: Inkling Small (free)",
-        "contextWindow": 1048576
+        "provider": "nvidia",
+        "id": "meta/llama-3.2-11b-vision-instruct",
+        "displayName": "meta/llama-3.2-11b-vision-instruct",
+        "contextWindow": null
       },
       {
-        "provider": "openrouter",
-        "id": "thinkingmachines/inkling:free",
-        "displayName": "Thinking Machines: Inkling (free)",
-        "contextWindow": 1048576
+        "provider": "sensenova",
+        "id": "deepseek-v4.1-flash",
+        "displayName": "deepseek-v4.1-flash",
+        "contextWindow": null
       }
     ],
     "comparedProviders": [
