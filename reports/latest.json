@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-06",
-  "generatedAt": "2026-11-06T02:31:10.632Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-06.md",
-  "totalModels": 55,
+  "date": "2026-11-07",
+  "generatedAt": "2026-11-07T01:58:16.379Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-07.md",
+  "totalModels": 56,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 12,
+      "count": 13,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -38,6 +38,11 @@
           "id": "liquid/lfm-2.5-2.6b:free",
           "displayName": "LiquidAI: LFM2.5-2.6B (free)",
           "contextWindow": 65536
+        },
+        {
+          "id": "liquid/lfm-3-1.7b:free",
+          "displayName": "LiquidAI: LFM3-1.7B (free)",
+          "contextWindow": 262144
         },
         {
           "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
@@ -389,22 +394,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-05",
-    "added": [],
-    "removed": [
+    "comparedWith": "2026-11-06",
+    "added": [
       {
-        "provider": "nvidia",
-        "id": "meta/llama-3.2-11b-vision-instruct",
-        "displayName": "meta/llama-3.2-11b-vision-instruct",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "deepseek-v4.1-flash",
-        "displayName": "deepseek-v4.1-flash",
-        "contextWindow": null
+        "provider": "openrouter",
+        "id": "liquid/lfm-3-1.7b:free",
+        "displayName": "LiquidAI: LFM3-1.7B (free)",
+        "contextWindow": 262144
       }
     ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",

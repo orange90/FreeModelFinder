@@ -2,26 +2,25 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-11-06（Asia/Shanghai）** · **55** 个免费模型入口 · **7/10** 个 Provider 正常。
+> 最近目录审计：**2026-11-07（Asia/Shanghai）** · **56** 个免费模型入口 · **7/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-06.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-07.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-11-05 相比，在成功比较的 7 个 Provider 中：**新增 0 个，移除 2 个**。
+与 2026-11-06 相比，在成功比较的 7 个 Provider 中：**新增 1 个，移除 0 个**。
 
-### 移除
+### 新增
 
-- `nvidia:meta/llama-3.2-11b-vision-instruct`
-- `sensenova:deepseek-v4.1-flash`
+- `openrouter:liquid/lfm-3-1.7b:free`
 
 ## Provider 汇总
 
 | Provider      | 状态    | 免费模型数 | 免费类型              | 免费依据                                                                            |
 | ------------- | ------- | ---------: | --------------------- | ----------------------------------------------------------------------------------- |
-| OpenRouter    | 🟢 正常 |         12 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
+| OpenRouter    | 🟢 正常 |         13 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
@@ -48,6 +47,7 @@
 | `openrouter:google/gemma-4-26b-a4b-it:free`                     | Google: Gemma 4 26B A4B (free)         |     262.1K |
 | `openrouter:google/gemma-4-31b-it:free`                         | Google: Gemma 4 31B (free)             |     262.1K |
 | `openrouter:liquid/lfm-2.5-2.6b:free`                           | LiquidAI: LFM2.5-2.6B (free)           |      65.5K |
+| `openrouter:liquid/lfm-3-1.7b:free`                             | LiquidAI: LFM3-1.7B (free)             |     262.1K |
 | `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | NVIDIA: Nemotron 3 Nano Omni (free)    |       256K |
 | `openrouter:nvidia/nemotron-3-ultra-550b-a55b:free`             | NVIDIA: Nemotron 3 Ultra (free)        |         1M |
 | `openrouter:nvidia/nemotron-3.5-lightning:free`                 | NVIDIA: Nemotron 3.5 Lightning (free)  |         1M |
