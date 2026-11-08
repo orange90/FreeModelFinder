@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-07",
-  "generatedAt": "2026-11-07T01:58:16.379Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-07.md",
+  "date": "2026-11-08",
+  "generatedAt": "2026-11-08T01:28:22.763Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-08.md",
   "totalModels": 56,
   "providers": [
     {
@@ -394,15 +394,8 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-06",
-    "added": [
-      {
-        "provider": "openrouter",
-        "id": "liquid/lfm-3-1.7b:free",
-        "displayName": "LiquidAI: LFM3-1.7B (free)",
-        "contextWindow": 262144
-      }
-    ],
+    "comparedWith": "2026-11-07",
+    "added": [],
     "removed": [],
     "comparedProviders": [
       "openrouter",
