@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-09",
-  "generatedAt": "2026-11-09T01:45:18.492Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-09.md",
-  "totalModels": 56,
+  "date": "2026-11-10",
+  "generatedAt": "2026-11-10T04:09:42.390Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-10.md",
+  "totalModels": 57,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 13,
+      "count": 14,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -73,6 +73,11 @@
           "id": "recursive/flint-v1.0:free",
           "displayName": "Recursive: Flint (free)",
           "contextWindow": 262144
+        },
+        {
+          "id": "thinkingmachines/inkling-2-small:free",
+          "displayName": "Thinking Machines: Inkling 2 Small (free)",
+          "contextWindow": 1048576
         },
         {
           "id": "xingchen-agi/xing4.0-29b-a4b:free",
@@ -394,8 +399,15 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-08",
-    "added": [],
+    "comparedWith": "2026-11-09",
+    "added": [
+      {
+        "provider": "openrouter",
+        "id": "thinkingmachines/inkling-2-small:free",
+        "displayName": "Thinking Machines: Inkling 2 Small (free)",
+        "contextWindow": 1048576
+      }
+    ],
     "removed": [],
     "comparedProviders": [
       "openrouter",
