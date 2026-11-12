@@ -1,19 +1,24 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-11",
-  "generatedAt": "2026-11-11T01:57:51.693Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-11.md",
-  "totalModels": 56,
+  "date": "2026-11-12",
+  "generatedAt": "2026-11-12T03:04:27.651Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-12.md",
+  "totalModels": 57,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 13,
+      "count": 14,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
       "models": [
+        {
+          "id": "baidu/ernie-5.5-flash-preview:free",
+          "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
+          "contextWindow": 1024000
+        },
         {
           "id": "cohere/north-mini-code:free",
           "displayName": "Cohere: North Mini Code (free)",
@@ -394,16 +399,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-10",
-    "added": [],
-    "removed": [
+    "comparedWith": "2026-11-11",
+    "added": [
       {
         "provider": "openrouter",
-        "id": "xingchen-agi/xing4.0-29b-a4b:free",
-        "displayName": "XingChen: Xing4.0 29B A4B (free)",
-        "contextWindow": 262144
+        "id": "baidu/ernie-5.5-flash-preview:free",
+        "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
+        "contextWindow": 1024000
       }
     ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
