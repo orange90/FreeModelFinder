@@ -1,19 +1,24 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-12",
-  "generatedAt": "2026-11-12T03:04:27.651Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-12.md",
-  "totalModels": 57,
+  "date": "2026-11-13",
+  "generatedAt": "2026-11-13T02:39:33.963Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-13.md",
+  "totalModels": 58,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 14,
+      "count": 16,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
       "models": [
+        {
+          "id": "apodex/apodex-1.1-mini:free",
+          "displayName": "Apodex: Apodex 1.1 Mini (free)",
+          "contextWindow": 262144
+        },
         {
           "id": "baidu/ernie-5.5-flash-preview:free",
           "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
@@ -73,6 +78,11 @@
           "id": "openrouter/free",
           "displayName": "Free Models Router",
           "contextWindow": 200000
+        },
+        {
+          "id": "particle-ai/particle-1:free",
+          "displayName": "Particle AI: Particle-1 (free)",
+          "contextWindow": 1048576
         },
         {
           "id": "recursive/flint-v1.0:free",
@@ -274,16 +284,11 @@
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
-      "count": 8,
+      "count": 7,
       "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
       "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
       "models": [
-        {
-          "id": "google/diffusiongemma-26b-a4b-it",
-          "displayName": "google/diffusiongemma-26b-a4b-it",
-          "contextWindow": null
-        },
         {
           "id": "google/gemma-4-31b-it",
           "displayName": "google/gemma-4-31b-it",
@@ -399,16 +404,29 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-11",
+    "comparedWith": "2026-11-12",
     "added": [
       {
         "provider": "openrouter",
-        "id": "baidu/ernie-5.5-flash-preview:free",
-        "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
-        "contextWindow": 1024000
+        "id": "apodex/apodex-1.1-mini:free",
+        "displayName": "Apodex: Apodex 1.1 Mini (free)",
+        "contextWindow": 262144
+      },
+      {
+        "provider": "openrouter",
+        "id": "particle-ai/particle-1:free",
+        "displayName": "Particle AI: Particle-1 (free)",
+        "contextWindow": 1048576
       }
     ],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "nvidia",
+        "id": "google/diffusiongemma-26b-a4b-it",
+        "displayName": "google/diffusiongemma-26b-a4b-it",
+        "contextWindow": null
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

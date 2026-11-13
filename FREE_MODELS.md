@@ -2,30 +2,35 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-11-12（Asia/Shanghai）** · **57** 个免费模型入口 · **7/10** 个 Provider 正常。
+> 最近目录审计：**2026-11-13（Asia/Shanghai）** · **58** 个免费模型入口 · **7/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-12.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-13.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-11-11 相比，在成功比较的 7 个 Provider 中：**新增 1 个，移除 0 个**。
+与 2026-11-12 相比，在成功比较的 7 个 Provider 中：**新增 2 个，移除 1 个**。
 
 ### 新增
 
-- `openrouter:baidu/ernie-5.5-flash-preview:free`
+- `openrouter:apodex/apodex-1.1-mini:free`
+- `openrouter:particle-ai/particle-1:free`
+
+### 移除
+
+- `nvidia:google/diffusiongemma-26b-a4b-it`
 
 ## Provider 汇总
 
 | Provider      | 状态    | 免费模型数 | 免费类型              | 免费依据                                                                            |
 | ------------- | ------- | ---------: | --------------------- | ----------------------------------------------------------------------------------- |
-| OpenRouter    | 🟢 正常 |         14 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
+| OpenRouter    | 🟢 正常 |         16 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
 | ModelScope    | 🟢 正常 |         16 | 账号免费额度          | API-Inference 免费型号清单与可用目录取交集                                          |
-| NVIDIA NIM    | 🟢 正常 |          8 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
+| NVIDIA NIM    | 🟢 正常 |          7 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
 | Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
 | Hugging Face  | 🔴 失败 |   暂不可用 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
@@ -42,6 +47,7 @@
 
 | Gateway 模型 ID                                                 | 显示名称                                  | 上下文窗口 |
 | --------------------------------------------------------------- | ----------------------------------------- | ---------: |
+| `openrouter:apodex/apodex-1.1-mini:free`                        | Apodex: Apodex 1.1 Mini (free)            |     262.1K |
 | `openrouter:baidu/ernie-5.5-flash-preview:free`                 | Baidu: ERNIE-5.5-Flash-Preview (free)     |         1M |
 | `openrouter:cohere/north-mini-code:free`                        | Cohere: North Mini Code (free)            |       256K |
 | `openrouter:dots-studio/dots-3-note-preview:free`               | Dots Studio: Dots3-Note Preview (free)    |       512K |
@@ -54,6 +60,7 @@
 | `openrouter:nvidia/nemotron-3.5-lightning:free`                 | NVIDIA: Nemotron 3.5 Lightning (free)     |         1M |
 | `openrouter:nvidia/nemotron-3.5-super-vl:free`                  | NVIDIA: Nemotron 3.5 Super VL (free)      |         1M |
 | `openrouter:openrouter/free`                                    | Free Models Router                        |       200K |
+| `openrouter:particle-ai/particle-1:free`                        | Particle AI: Particle-1 (free)            |         1M |
 | `openrouter:recursive/flint-v1.0:free`                          | Recursive: Flint (free)                   |     262.1K |
 | `openrouter:thinkingmachines/inkling-2-small:free`              | Thinking Machines: Inkling 2 Small (free) |         1M |
 
@@ -134,7 +141,6 @@
 
 | Gateway 模型 ID                                        | 显示名称                                      | 上下文窗口 |
 | ------------------------------------------------------ | --------------------------------------------- | ---------: |
-| `nvidia:google/diffusiongemma-26b-a4b-it`              | google/diffusiongemma-26b-a4b-it              |          — |
 | `nvidia:google/gemma-4-31b-it`                         | google/gemma-4-31b-it                         |          — |
 | `nvidia:meta/llama-3.2-90b-vision-instruct`            | meta/llama-3.2-90b-vision-instruct            |          — |
 | `nvidia:nvidia/ising-calibration-1.5-31b`              | nvidia/ising-calibration-1.5-31b              |          — |
