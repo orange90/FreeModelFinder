@@ -1,24 +1,19 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-13",
-  "generatedAt": "2026-11-13T02:39:33.963Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-13.md",
-  "totalModels": 58,
+  "date": "2026-11-14",
+  "generatedAt": "2026-11-14T02:29:02.164Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-14.md",
+  "totalModels": 57,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 16,
+      "count": 15,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
       "models": [
-        {
-          "id": "apodex/apodex-1.1-mini:free",
-          "displayName": "Apodex: Apodex 1.1 Mini (free)",
-          "contextWindow": 262144
-        },
         {
           "id": "baidu/ernie-5.5-flash-preview:free",
           "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
@@ -45,9 +40,9 @@
           "contextWindow": 262144
         },
         {
-          "id": "liquid/lfm-2.5-2.6b:free",
-          "displayName": "LiquidAI: LFM2.5-2.6B (free)",
-          "contextWindow": 65536
+          "id": "inclusionai/ling-3.2-flash:free",
+          "displayName": "inclusionAI: Ling 3.2 Flash (free)",
+          "contextWindow": 1048576
         },
         {
           "id": "liquid/lfm-3-1.7b:free",
@@ -404,8 +399,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-12",
+    "comparedWith": "2026-11-13",
     "added": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.2-flash:free",
+        "displayName": "inclusionAI: Ling 3.2 Flash (free)",
+        "contextWindow": 1048576
+      }
+    ],
+    "removed": [
       {
         "provider": "openrouter",
         "id": "apodex/apodex-1.1-mini:free",
@@ -414,17 +417,9 @@
       },
       {
         "provider": "openrouter",
-        "id": "particle-ai/particle-1:free",
-        "displayName": "Particle AI: Particle-1 (free)",
-        "contextWindow": 1048576
-      }
-    ],
-    "removed": [
-      {
-        "provider": "nvidia",
-        "id": "google/diffusiongemma-26b-a4b-it",
-        "displayName": "google/diffusiongemma-26b-a4b-it",
-        "contextWindow": null
+        "id": "liquid/lfm-2.5-2.6b:free",
+        "displayName": "LiquidAI: LFM2.5-2.6B (free)",
+        "contextWindow": 65536
       }
     ],
     "comparedProviders": [
