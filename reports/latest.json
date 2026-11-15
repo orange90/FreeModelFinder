@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-14",
-  "generatedAt": "2026-11-14T02:29:02.164Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-14.md",
+  "date": "2026-11-15",
+  "generatedAt": "2026-11-15T01:57:37.871Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-15.md",
   "totalModels": 57,
   "providers": [
     {
@@ -399,29 +399,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-13",
-    "added": [
-      {
-        "provider": "openrouter",
-        "id": "inclusionai/ling-3.2-flash:free",
-        "displayName": "inclusionAI: Ling 3.2 Flash (free)",
-        "contextWindow": 1048576
-      }
-    ],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "apodex/apodex-1.1-mini:free",
-        "displayName": "Apodex: Apodex 1.1 Mini (free)",
-        "contextWindow": 262144
-      },
-      {
-        "provider": "openrouter",
-        "id": "liquid/lfm-2.5-2.6b:free",
-        "displayName": "LiquidAI: LFM2.5-2.6B (free)",
-        "contextWindow": 65536
-      }
-    ],
+    "comparedWith": "2026-11-14",
+    "added": [],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
