@@ -2,19 +2,15 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-11-17（Asia/Shanghai）** · **55** 个免费模型入口 · **7/10** 个 Provider 正常。
+> 最近目录审计：**2026-11-18（Asia/Shanghai）** · **56** 个免费模型入口 · **8/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-17.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-18.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-11-16 相比，在成功比较的 7 个 Provider 中：**新增 0 个，移除 1 个**。
-
-### 移除
-
-- `nvidia:meta/llama-3.2-90b-vision-instruct`
+与 2026-11-17 相比，成功比较的 7 个 Provider 模型清单没有变化。
 
 ## Provider 汇总
 
@@ -28,7 +24,7 @@
 | NVIDIA NIM    | 🟢 正常 |          5 | 免费开发端点          | 只保留审核过的 build.nvidia.com 免费开发端点                                        |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
 | Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
-| Hugging Face  | 🔴 失败 |   暂不可用 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
+| Hugging Face  | 🟢 正常 |          1 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
 | SenseNova     | 🟢 正常 |          7 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
 
 ## 完整列表
@@ -162,11 +158,13 @@
 ### Hugging Face
 
 - Provider ID：`huggingface`
-- 状态：🔴 失败
+- 状态：🟢 正常
 - 免费依据：实时端点明确报告 `is_free`，或输入输出价格均为 0
 - 主要风险：普通 Router 模型可能消耗 credits 或按量收费，因此不会混入
 
-本次没有可展示的模型清单。
+| Gateway 模型 ID                                    | 显示名称                             | 上下文窗口 |
+| -------------------------------------------------- | ------------------------------------ | ---------: |
+| `huggingface:deepseek-ai/DeepSeek-V4.1-Flash-1017` | deepseek-ai/DeepSeek-V4.1-Flash-1017 |         1M |
 
 ### SenseNova
 

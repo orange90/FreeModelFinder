@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-17",
-  "generatedAt": "2026-11-17T04:32:55.777Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-17.md",
-  "totalModels": 55,
+  "date": "2026-11-18",
+  "generatedAt": "2026-11-18T03:43:29.081Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-18.md",
+  "totalModels": 56,
   "providers": [
     {
       "id": "openrouter",
@@ -334,12 +334,18 @@
     {
       "id": "huggingface",
       "display": "Hugging Face",
-      "status": "error",
-      "count": 0,
+      "status": "ok",
+      "count": 1,
       "freeType": "实时零价端点",
       "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
       "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入",
-      "models": []
+      "models": [
+        {
+          "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "displayName": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "contextWindow": 1048576
+        }
+      ]
     },
     {
       "id": "sensenova",
@@ -389,16 +395,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-16",
+    "comparedWith": "2026-11-17",
     "added": [],
-    "removed": [
-      {
-        "provider": "nvidia",
-        "id": "meta/llama-3.2-90b-vision-instruct",
-        "displayName": "meta/llama-3.2-90b-vision-instruct",
-        "contextWindow": null
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",

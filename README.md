@@ -33,9 +33,9 @@
 
 <!-- AUDIT-SUMMARY-START -->
 
-> **目录审计于 2026-11-17（Asia/Shanghai）更新：55 个免费模型入口，覆盖 7/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
+> **目录审计于 2026-11-18（Asia/Shanghai）更新：56 个免费模型入口，覆盖 8/10 个 Provider。** 这里统计的是通过免费规则过滤的 Provider 模型入口，同一模型出现在多个 Provider 时会分别计数；本次未发送真实推理请求。
 
-> 本次目录失败：GitHub Models、Cohere、Hugging Face。
+> 本次目录失败：GitHub Models、Cohere。
 
 | Provider      | 状态    | 免费模型数 | 免费类型              |
 | ------------- | ------- | ---------: | --------------------- |
@@ -47,21 +47,14 @@
 | NVIDIA NIM    | 🟢 正常 |          5 | 免费开发端点          |
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          |
 | Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production |
-| Hugging Face  | 🔴 失败 |   暂不可用 | 实时零价端点          |
+| Hugging Face  | 🟢 正常 |          1 | 实时零价端点          |
 | SenseNova     | 🟢 正常 |          7 | 实时零价模型          |
 
-[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-17.md)
+[查看稳定的完整免费模型清单](FREE_MODELS.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-18.md)
 
 ### 今日变化
 
-与 2026-11-16 相比，在成功比较的 7 个 Provider 中：**新增 0 个，移除 1 个**。
-
-<details>
-<summary>查看移除的 1 个模型</summary>
-
-- `nvidia:meta/llama-3.2-90b-vision-instruct`
-
-</details>
+与 2026-11-17 相比，成功比较的 7 个 Provider 模型清单没有变化。
 
 ### 展开完整模型列表
 
@@ -146,6 +139,13 @@
 - `nvidia:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning`
 - `nvidia:nvidia/nemotron-3-ultra-550b-a55b`
 - `nvidia:openai/gpt-oss-20b`
+
+</details>
+
+<details>
+<summary><strong>Hugging Face · 1 个模型</strong></summary>
+
+- `huggingface:deepseek-ai/DeepSeek-V4.1-Flash-1017`
 
 </details>
 
