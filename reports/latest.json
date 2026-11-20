@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-19",
-  "generatedAt": "2026-11-19T03:34:26.276Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-19.md",
-  "totalModels": 54,
+  "date": "2026-11-20",
+  "generatedAt": "2026-11-20T03:23:37.702Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-20.md",
+  "totalModels": 52,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 15,
+      "count": 13,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -18,11 +18,6 @@
           "id": "baidu/ernie-5.5-flash-preview:free",
           "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
           "contextWindow": 1024000
-        },
-        {
-          "id": "cohere/north-mini-code:free",
-          "displayName": "Cohere: North Mini Code (free)",
-          "contextWindow": 256000
         },
         {
           "id": "dots-studio/dots-3-note-preview:free",
@@ -83,11 +78,6 @@
           "id": "recursive/flint-v1.0:free",
           "displayName": "Recursive: Flint (free)",
           "contextWindow": 262144
-        },
-        {
-          "id": "thinkingmachines/inkling-2-small:free",
-          "displayName": "Thinking Machines: Inkling 2 Small (free)",
-          "contextWindow": 1048576
         }
       ]
     },
@@ -385,20 +375,20 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-18",
+    "comparedWith": "2026-11-19",
     "added": [],
     "removed": [
       {
-        "provider": "nvidia",
-        "id": "openai/gpt-oss-20b",
-        "displayName": "openai/gpt-oss-20b",
-        "contextWindow": null
+        "provider": "openrouter",
+        "id": "cohere/north-mini-code:free",
+        "displayName": "Cohere: North Mini Code (free)",
+        "contextWindow": 256000
       },
       {
-        "provider": "sensenova",
-        "id": "glm-5.2",
-        "displayName": "glm-5.2",
-        "contextWindow": null
+        "provider": "openrouter",
+        "id": "thinkingmachines/inkling-2-small:free",
+        "displayName": "Thinking Machines: Inkling 2 Small (free)",
+        "contextWindow": 1048576
       }
     ],
     "comparedProviders": [
