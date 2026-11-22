@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-21",
-  "generatedAt": "2026-11-21T03:15:13.808Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-21.md",
-  "totalModels": 52,
+  "date": "2026-11-22",
+  "generatedAt": "2026-11-22T02:16:49.880Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-22.md",
+  "totalModels": 51,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 13,
+      "count": 12,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -18,11 +18,6 @@
           "id": "baidu/ernie-5.5-flash-preview:free",
           "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
           "contextWindow": 1024000
-        },
-        {
-          "id": "dots-studio/dots-3-note-preview:free",
-          "displayName": "Dots Studio: Dots3-Note Preview (free)",
-          "contextWindow": 512000
         },
         {
           "id": "google/gemma-4-26b-a4b-it:free",
@@ -375,9 +370,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-20",
+    "comparedWith": "2026-11-21",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "dots-studio/dots-3-note-preview:free",
+        "displayName": "Dots Studio: Dots3-Note Preview (free)",
+        "contextWindow": 512000
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
