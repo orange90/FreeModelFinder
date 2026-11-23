@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-22",
-  "generatedAt": "2026-11-22T02:16:49.880Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-22.md",
+  "date": "2026-11-23",
+  "generatedAt": "2026-11-23T02:51:17.012Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-23.md",
   "totalModels": 51,
   "providers": [
     {
@@ -370,16 +370,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-21",
+    "comparedWith": "2026-11-22",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "dots-studio/dots-3-note-preview:free",
-        "displayName": "Dots Studio: Dots3-Note Preview (free)",
-        "contextWindow": 512000
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
