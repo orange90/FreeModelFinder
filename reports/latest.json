@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-23",
-  "generatedAt": "2026-11-23T02:51:17.012Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-23.md",
-  "totalModels": 51,
+  "date": "2026-11-24",
+  "generatedAt": "2026-11-24T06:06:02.678Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-24.md",
+  "totalModels": 49,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 12,
+      "count": 13,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -18,6 +18,11 @@
           "id": "baidu/ernie-5.5-flash-preview:free",
           "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
           "contextWindow": 1024000
+        },
+        {
+          "id": "dots-studio/dots-3-note-preview:free",
+          "displayName": "Dots Studio: Dots3-Note Preview (free)",
+          "contextWindow": 512000
         },
         {
           "id": "google/gemma-4-26b-a4b-it:free",
@@ -331,48 +336,83 @@
       "id": "sensenova",
       "display": "SenseNova",
       "status": "ok",
-      "count": 6,
+      "count": 3,
       "freeType": "实时零价模型",
       "freeBasis": "实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单",
       "risk": "免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态",
       "models": [
         {
-          "id": "deepseek-flash",
-          "displayName": "deepseek-flash",
-          "contextWindow": null
-        },
-        {
           "id": "deepseek-v4-flash",
-          "displayName": "deepseek-v4-flash",
+          "displayName": "DeepSeek V4 Flash (SenseNova)",
           "contextWindow": null
         },
         {
-          "id": "glm-5.3",
-          "displayName": "glm-5.3",
+          "id": "glm-5.2",
+          "displayName": "GLM-5.2 (SenseNova)",
           "contextWindow": null
         },
         {
-          "id": "kimi-k3",
-          "displayName": "kimi-k3",
-          "contextWindow": null
-        },
-        {
-          "id": "sensenova-6.8-flash",
-          "displayName": "sensenova-6.8-flash",
-          "contextWindow": null
-        },
-        {
-          "id": "sensenova-6.8-flash-lite",
-          "displayName": "sensenova-6.8-flash-lite",
+          "id": "sensenova-6.7-flash-lite",
+          "displayName": "SenseNova 6.7 Flash-Lite",
           "contextWindow": null
         }
       ]
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-22",
-    "added": [],
-    "removed": [],
+    "comparedWith": "2026-11-23",
+    "added": [
+      {
+        "provider": "openrouter",
+        "id": "dots-studio/dots-3-note-preview:free",
+        "displayName": "Dots Studio: Dots3-Note Preview (free)",
+        "contextWindow": 512000
+      },
+      {
+        "provider": "sensenova",
+        "id": "glm-5.2",
+        "displayName": "GLM-5.2 (SenseNova)",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.7-flash-lite",
+        "displayName": "SenseNova 6.7 Flash-Lite",
+        "contextWindow": null
+      }
+    ],
+    "removed": [
+      {
+        "provider": "sensenova",
+        "id": "deepseek-flash",
+        "displayName": "deepseek-flash",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "glm-5.3",
+        "displayName": "glm-5.3",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "kimi-k3",
+        "displayName": "kimi-k3",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.8-flash",
+        "displayName": "sensenova-6.8-flash",
+        "contextWindow": null
+      },
+      {
+        "provider": "sensenova",
+        "id": "sensenova-6.8-flash-lite",
+        "displayName": "sensenova-6.8-flash-lite",
+        "contextWindow": null
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",

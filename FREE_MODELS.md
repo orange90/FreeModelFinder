@@ -2,21 +2,35 @@
 
 <!-- 此文件由 scripts/update-readme-audit.mjs 自动生成，请勿手动编辑。 -->
 
-> 最近目录审计：**2026-11-23（Asia/Shanghai）** · **51** 个免费模型入口 · **8/10** 个 Provider 正常。
+> 最近目录审计：**2026-11-24（Asia/Shanghai）** · **49** 个免费模型入口 · **8/10** 个 Provider 正常。
 
-[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-23.md)
+[返回项目 README](README.md) · [查看本次目录审计报告](reports/provider-free-model-audit-2026-11-24.md)
 
 这份列表每天由 GitHub Actions 通过各 Provider 的模型目录接口刷新，并应用 FreeModelFinder 核心层的免费规则。它不执行真实推理，不代表无限额度、永久免费或生产级可用。同一上游模型通过多个 Provider 提供时会分别计数，因为对应的账号资格、额度和 Gateway 模型 ID 不同。
 
 ## 今日变化
 
-与 2026-11-22 相比，成功比较的 8 个 Provider 模型清单没有变化。
+与 2026-11-23 相比，在成功比较的 8 个 Provider 中：**新增 3 个，移除 5 个**。
+
+### 新增
+
+- `openrouter:dots-studio/dots-3-note-preview:free`
+- `sensenova:glm-5.2`
+- `sensenova:sensenova-6.7-flash-lite`
+
+### 移除
+
+- `sensenova:deepseek-flash`
+- `sensenova:glm-5.3`
+- `sensenova:kimi-k3`
+- `sensenova:sensenova-6.8-flash`
+- `sensenova:sensenova-6.8-flash-lite`
 
 ## Provider 汇总
 
 | Provider      | 状态    | 免费模型数 | 免费类型              | 免费依据                                                                            |
 | ------------- | ------- | ---------: | --------------------- | ----------------------------------------------------------------------------------- |
-| OpenRouter    | 🟢 正常 |         12 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
+| OpenRouter    | 🟢 正常 |         13 | 零价格模型            | 实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型 |
 | Google Gemini | 🟢 正常 |          5 | 账号 Free Tier        | 账号实时目录与 Free Tier 白名单取交集，只保留支持 `generateContent` 的型号          |
 | Zhipu AI      | 🟢 正常 |          2 | 官方免费型号          | 只列入官方免费 Flash 清单                                                           |
 | SiliconFlow   | 🟢 正常 |          5 | 免费白名单            | 平台免费型号白名单与实时模型目录取交集                                              |
@@ -25,7 +39,7 @@
 | GitHub Models | 🔴 失败 |   暂不可用 | 原型开发额度          | 目录中的文本输出模型使用账号自带原型开发额度                                        |
 | Cohere        | 🔴 失败 |   暂不可用 | 免费 Trial/Production | 只保留 Trial Key 与 Production Key 都明确免费的 `north-mini-code-1-0`               |
 | Hugging Face  | 🟢 正常 |          1 | 实时零价端点          | 实时端点明确报告 `is_free`，或输入输出价格均为 0                                    |
-| SenseNova     | 🟢 正常 |          6 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
+| SenseNova     | 🟢 正常 |          3 | 实时零价模型          | 实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单         |
 
 ## 完整列表
 
@@ -36,20 +50,21 @@
 - 免费依据：实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型
 - 主要风险：免费账号通常共享日请求额度；上游目录和限额会变
 
-| Gateway 模型 ID                                                 | 显示名称                              | 上下文窗口 |
-| --------------------------------------------------------------- | ------------------------------------- | ---------: |
-| `openrouter:baidu/ernie-5.5-flash-preview:free`                 | Baidu: ERNIE-5.5-Flash-Preview (free) |         1M |
-| `openrouter:google/gemma-4-26b-a4b-it:free`                     | Google: Gemma 4 26B A4B (free)        |     262.1K |
-| `openrouter:google/gemma-4-31b-it:free`                         | Google: Gemma 4 31B (free)            |     262.1K |
-| `openrouter:inclusionai/ling-3.2-flash:free`                    | inclusionAI: Ling 3.2 Flash (free)    |         1M |
-| `openrouter:liquid/lfm-3-1.7b:free`                             | LiquidAI: LFM3-1.7B (free)            |     262.1K |
-| `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | NVIDIA: Nemotron 3 Nano Omni (free)   |       256K |
-| `openrouter:nvidia/nemotron-3-ultra-550b-a55b:free`             | NVIDIA: Nemotron 3 Ultra (free)       |         1M |
-| `openrouter:nvidia/nemotron-3.5-lightning:free`                 | NVIDIA: Nemotron 3.5 Lightning (free) |         1M |
-| `openrouter:nvidia/nemotron-3.5-super-vl:free`                  | NVIDIA: Nemotron 3.5 Super VL (free)  |         1M |
-| `openrouter:openrouter/free`                                    | Free Models Router                    |       200K |
-| `openrouter:particle-ai/particle-1:free`                        | Particle AI: Particle-1 (free)        |         1M |
-| `openrouter:recursive/flint-v1.0:free`                          | Recursive: Flint (free)               |     262.1K |
+| Gateway 模型 ID                                                 | 显示名称                               | 上下文窗口 |
+| --------------------------------------------------------------- | -------------------------------------- | ---------: |
+| `openrouter:baidu/ernie-5.5-flash-preview:free`                 | Baidu: ERNIE-5.5-Flash-Preview (free)  |         1M |
+| `openrouter:dots-studio/dots-3-note-preview:free`               | Dots Studio: Dots3-Note Preview (free) |       512K |
+| `openrouter:google/gemma-4-26b-a4b-it:free`                     | Google: Gemma 4 26B A4B (free)         |     262.1K |
+| `openrouter:google/gemma-4-31b-it:free`                         | Google: Gemma 4 31B (free)             |     262.1K |
+| `openrouter:inclusionai/ling-3.2-flash:free`                    | inclusionAI: Ling 3.2 Flash (free)     |         1M |
+| `openrouter:liquid/lfm-3-1.7b:free`                             | LiquidAI: LFM3-1.7B (free)             |     262.1K |
+| `openrouter:nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | NVIDIA: Nemotron 3 Nano Omni (free)    |       256K |
+| `openrouter:nvidia/nemotron-3-ultra-550b-a55b:free`             | NVIDIA: Nemotron 3 Ultra (free)        |         1M |
+| `openrouter:nvidia/nemotron-3.5-lightning:free`                 | NVIDIA: Nemotron 3.5 Lightning (free)  |         1M |
+| `openrouter:nvidia/nemotron-3.5-super-vl:free`                  | NVIDIA: Nemotron 3.5 Super VL (free)   |         1M |
+| `openrouter:openrouter/free`                                    | Free Models Router                     |       200K |
+| `openrouter:particle-ai/particle-1:free`                        | Particle AI: Particle-1 (free)         |         1M |
+| `openrouter:recursive/flint-v1.0:free`                          | Recursive: Flint (free)                |     262.1K |
 
 ### Google Gemini
 
@@ -169,11 +184,8 @@
 - 免费依据：实时目录中输入、输出价格都为 0 的文本模型；接口不可用时使用审核过的免费清单
 - 主要风险：免费配额和型号可能变化；当前网关只处理文本，即使模型本身支持多模态
 
-| Gateway 模型 ID                      | 显示名称                 | 上下文窗口 |
-| ------------------------------------ | ------------------------ | ---------: |
-| `sensenova:deepseek-flash`           | deepseek-flash           |          — |
-| `sensenova:deepseek-v4-flash`        | deepseek-v4-flash        |          — |
-| `sensenova:glm-5.3`                  | glm-5.3                  |          — |
-| `sensenova:kimi-k3`                  | kimi-k3                  |          — |
-| `sensenova:sensenova-6.8-flash`      | sensenova-6.8-flash      |          — |
-| `sensenova:sensenova-6.8-flash-lite` | sensenova-6.8-flash-lite |          — |
+| Gateway 模型 ID                      | 显示名称                      | 上下文窗口 |
+| ------------------------------------ | ----------------------------- | ---------: |
+| `sensenova:deepseek-v4-flash`        | DeepSeek V4 Flash (SenseNova) |          — |
+| `sensenova:glm-5.2`                  | GLM-5.2 (SenseNova)           |          — |
+| `sensenova:sensenova-6.7-flash-lite` | SenseNova 6.7 Flash-Lite      |          — |
