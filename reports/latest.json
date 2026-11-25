@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-24",
-  "generatedAt": "2026-11-24T06:06:02.678Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-24.md",
-  "totalModels": 49,
+  "date": "2026-11-25",
+  "generatedAt": "2026-11-25T04:54:43.770Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-25.md",
+  "totalModels": 46,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 13,
+      "count": 12,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -18,11 +18,6 @@
           "id": "baidu/ernie-5.5-flash-preview:free",
           "displayName": "Baidu: ERNIE-5.5-Flash-Preview (free)",
           "contextWindow": 1024000
-        },
-        {
-          "id": "dots-studio/dots-3-note-preview:free",
-          "displayName": "Dots Studio: Dots3-Note Preview (free)",
-          "contextWindow": 512000
         },
         {
           "id": "google/gemma-4-26b-a4b-it:free",
@@ -269,16 +264,11 @@
       "id": "nvidia",
       "display": "NVIDIA NIM",
       "status": "ok",
-      "count": 4,
+      "count": 3,
       "freeType": "免费开发端点",
       "freeBasis": "只保留审核过的 build.nvidia.com 免费开发端点",
       "risk": "面向学习、开发和原型，限速且不代表生产环境永久免费",
       "models": [
-        {
-          "id": "google/gemma-4-31b-it",
-          "displayName": "google/gemma-4-31b-it",
-          "contextWindow": null
-        },
         {
           "id": "nvidia/ising-calibration-1.5-31b",
           "displayName": "nvidia/ising-calibration-1.5-31b",
@@ -319,18 +309,12 @@
     {
       "id": "huggingface",
       "display": "Hugging Face",
-      "status": "ok",
-      "count": 1,
+      "status": "error",
+      "count": 0,
       "freeType": "实时零价端点",
       "freeBasis": "实时端点明确报告 `is_free`，或输入输出价格均为 0",
       "risk": "普通 Router 模型可能消耗 credits 或按量收费，因此不会混入",
-      "models": [
-        {
-          "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-          "displayName": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-          "contextWindow": 1048576
-        }
-      ]
+      "models": []
     },
     {
       "id": "sensenova",
@@ -360,8 +344,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-23",
-    "added": [
+    "comparedWith": "2026-11-24",
+    "added": [],
+    "removed": [
       {
         "provider": "openrouter",
         "id": "dots-studio/dots-3-note-preview:free",
@@ -369,47 +354,9 @@
         "contextWindow": 512000
       },
       {
-        "provider": "sensenova",
-        "id": "glm-5.2",
-        "displayName": "GLM-5.2 (SenseNova)",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.7-flash-lite",
-        "displayName": "SenseNova 6.7 Flash-Lite",
-        "contextWindow": null
-      }
-    ],
-    "removed": [
-      {
-        "provider": "sensenova",
-        "id": "deepseek-flash",
-        "displayName": "deepseek-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "glm-5.3",
-        "displayName": "glm-5.3",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "kimi-k3",
-        "displayName": "kimi-k3",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.8-flash",
-        "displayName": "sensenova-6.8-flash",
-        "contextWindow": null
-      },
-      {
-        "provider": "sensenova",
-        "id": "sensenova-6.8-flash-lite",
-        "displayName": "sensenova-6.8-flash-lite",
+        "provider": "nvidia",
+        "id": "google/gemma-4-31b-it",
+        "displayName": "google/gemma-4-31b-it",
         "contextWindow": null
       }
     ],
@@ -420,7 +367,6 @@
       "siliconflow",
       "modelscope",
       "nvidia",
-      "huggingface",
       "sensenova"
     ]
   }
