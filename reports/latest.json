@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-25",
-  "generatedAt": "2026-11-25T04:54:43.770Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-25.md",
+  "date": "2026-11-26",
+  "generatedAt": "2026-11-26T04:10:43.459Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-26.md",
   "totalModels": 46,
   "providers": [
     {
@@ -344,22 +344,9 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-24",
+    "comparedWith": "2026-11-25",
     "added": [],
-    "removed": [
-      {
-        "provider": "openrouter",
-        "id": "dots-studio/dots-3-note-preview:free",
-        "displayName": "Dots Studio: Dots3-Note Preview (free)",
-        "contextWindow": 512000
-      },
-      {
-        "provider": "nvidia",
-        "id": "google/gemma-4-31b-it",
-        "displayName": "google/gemma-4-31b-it",
-        "contextWindow": null
-      }
-    ],
+    "removed": [],
     "comparedProviders": [
       "openrouter",
       "gemini",
