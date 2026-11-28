@@ -1,15 +1,15 @@
 {
   "schemaVersion": 2,
-  "date": "2026-11-27",
-  "generatedAt": "2026-11-27T04:17:45.839Z",
-  "reportPath": "reports/provider-free-model-audit-2026-11-27.md",
-  "totalModels": 46,
+  "date": "2026-11-28",
+  "generatedAt": "2026-11-28T03:56:49.793Z",
+  "reportPath": "reports/provider-free-model-audit-2026-11-28.md",
+  "totalModels": 45,
   "providers": [
     {
       "id": "openrouter",
       "display": "OpenRouter",
       "status": "ok",
-      "count": 12,
+      "count": 11,
       "freeType": "零价格模型",
       "freeBasis": "实时目录中仅保留 `:free` 或 `openrouter/free`、输入输出价格均为 0、仅输出文本的模型",
       "risk": "免费账号通常共享日请求额度；上游目录和限额会变",
@@ -28,11 +28,6 @@
           "id": "google/gemma-4-31b-it:free",
           "displayName": "Google: Gemma 4 31B (free)",
           "contextWindow": 262144
-        },
-        {
-          "id": "inclusionai/ling-3.2-flash:free",
-          "displayName": "inclusionAI: Ling 3.2 Flash (free)",
-          "contextWindow": 1048576
         },
         {
           "id": "liquid/lfm-3-1.7b:free",
@@ -344,9 +339,16 @@
     }
   ],
   "changes": {
-    "comparedWith": "2026-11-26",
+    "comparedWith": "2026-11-27",
     "added": [],
-    "removed": [],
+    "removed": [
+      {
+        "provider": "openrouter",
+        "id": "inclusionai/ling-3.2-flash:free",
+        "displayName": "inclusionAI: Ling 3.2 Flash (free)",
+        "contextWindow": 1048576
+      }
+    ],
     "comparedProviders": [
       "openrouter",
       "gemini",
